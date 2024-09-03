@@ -1,5 +1,8 @@
 package acorn.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import acorn.entity.Injury;
 import acorn.repository.InjuryRepository;
-
-import java.util.Optional;
 
 @Service
 public class InjuryService {
@@ -18,6 +19,11 @@ public class InjuryService {
     @Autowired
     public InjuryService(InjuryRepository injuryRepository) {
         this.injuryRepository = injuryRepository;
+    }
+    
+    // 모든 부상 조회(일정에 추가)
+    public List<Injury> getAllInjuries() {
+        return injuryRepository.findAll();
     }
 
     // 모든 부상 조회 (페이징 처리)

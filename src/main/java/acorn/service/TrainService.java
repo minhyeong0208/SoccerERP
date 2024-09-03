@@ -1,5 +1,8 @@
 package acorn.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import acorn.entity.Train;
 import acorn.repository.TrainRepository;
-
-import java.util.Optional;
 
 @Service
 public class TrainService {
@@ -18,6 +19,11 @@ public class TrainService {
     @Autowired
     public TrainService(TrainRepository trainRepository) {
         this.trainRepository = trainRepository;
+    }
+    
+    // 모든 훈련 조회(일정에 추가)
+    public List<Train> getAllTrains() {
+        return trainRepository.findAll();
     }
 
     // 모든 훈련 조회 (페이징 처리)

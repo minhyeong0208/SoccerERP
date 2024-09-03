@@ -1,5 +1,8 @@
 package acorn.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import acorn.entity.Game;
 import acorn.repository.GameRepository;
-
-import java.util.Optional;
 
 @Service
 public class GameService {
@@ -18,6 +19,11 @@ public class GameService {
     @Autowired
     public GameService(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
+    }
+    
+    // 모든 경기 조회(일정에 추가)
+    public List<Game> getAllGames() {
+        return gameRepository.findAll();
     }
 
     // 모든 경기 조회 (페이징 처리)

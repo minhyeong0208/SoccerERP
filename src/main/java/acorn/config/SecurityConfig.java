@@ -1,3 +1,4 @@
+/*
 package acorn.config;
 
 
@@ -67,3 +68,4 @@ public class SecurityConfig {
     	return new AuthSuccessHandler();
     }
 }
+*/

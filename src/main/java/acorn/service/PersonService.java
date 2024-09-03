@@ -1,5 +1,8 @@
 package acorn.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import acorn.entity.Person;
 import acorn.repository.PersonRepository;
-
-import java.util.Optional;
 
 @Service
 public class PersonService {
@@ -22,7 +23,12 @@ public class PersonService {
 
     // 모든 사람 조회 (페이징 처리)
     public Page<Person> getAllPersons(Pageable pageable) {
-        return personRepository.findAll(pageable);
+        return personRepository.findAllWithAbility(pageable);
+    }
+
+    // 모든 선수 조회 (능력치 포함, 페이징 없이)
+    public List<Person> getAllPersonsWithAbility() {
+        return personRepository.findAllWithAbility();
     }
 
     // 특정 사람 조회
@@ -33,6 +39,10 @@ public class PersonService {
 
     // 새로운 사람 추가
     public Person addPerson(Person person) {
+        // 양방향 관계 설정
+        if (person.getAbility() != null) {
+            person.getAbility().setPerson(person);
+        }
         return personRepository.save(person);
     }
 
