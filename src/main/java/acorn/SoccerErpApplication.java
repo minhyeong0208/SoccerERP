@@ -9,3 +9,4 @@ public class SoccerErpApplication {
 		SpringApplication.run(SoccerErpApplication.class, args);
 	}
 }
+
