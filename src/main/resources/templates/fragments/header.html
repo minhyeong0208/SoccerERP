@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Header Fragment</title>
+</head>
+<body>
+<div th:fragment="header" class="header">
+    <div class="menu__wrapper">
+        <div class="menu__bar">
+            <a href="#" title="Logo" class="logo">
+                SOCCER ERP
+            </a>
+            <ul class="navigation">
+                <li>
+                    <a href="#services" title="Services">
+                        My Page
+                    </a>
+                </li>
+                <li>
+                    <a href="#blog" title="Blog">
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>
