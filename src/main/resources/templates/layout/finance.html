@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>재정 관리</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/default2.css}">
+    <th:block layout:fragment="customCss"></th:block>
+    <style>
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <!-- header -->
+        <div th:replace="~{fragments/header :: header}"></div>
+
+        <!-- sidebar -->
+        <div th:replace="~{fragments/sidebar :: sidebar(gubun = 'ADMIN')}"></div>
+
+        <!-- content -->
+        <div id="content" class="content">
+            <div class="grid-container">
+                <div class="grid-item">
+                    <!-- 페이지마다 내용이 바뀌는 공간을 미리 정의 -->
+                    <th:block layout:fragment="customContents">
+                        <h3>재정 관리</h3>
+                        <table border="1">
+                            <tr>
+                                <td>수입/지출 구분</td>
+                                <td>
+                                    <label><input type="radio" name="financeType" id="allRadio" value="" checked>전체</label>
+                                    <label><input type="radio" name="financeType" id="incomeRadio" value="수입"> 수입</label>
+                                    <label><input type="radio" name="financeType" id="expenseRadio" value="지출"> 지출</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>기간</td>
+                                <td>
+                                    <label><input type="date" id="startDate"></label>~
+                                    <label><input type="date" id="endDate"></label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>검색</td>
+                                <td></td>
+                            </tr>
+                        </table>
+                        <button id="searchButton">검색</button>
+                        <button id="addFinanceButton">추가</button>
+                        <table border="1" id="financeTable">
+                            <tr>
+                                <th><input type="checkbox"></th>
+                                <th>수입/지출</th>
+                                <th>거래 날짜</th>
+                                <th>금액</th>
+                                <th>거래 대상</th>
+                                <th>적요</th>
+                                <th>메모</th>
+                            </tr>
+                        </table>
+                        <div id="pagination">
+                            <button id="prevGroup" disabled>이전</button>
+                            <span id="pageButtons"></span>
+                            <button id="nextGroup" disabled>다음</button>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+
+        <!-- 모달 구조 -->
+        <div id="financeModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">수입 항목 추가</h2>
+
+                <!-- 공통 입력 필드 -->
+                <div id="commonFields">
+                    <label id="dateLabel">수입 날짜:</label>
+                    <input type="date" id="financeDate"><br>
+
+                    <label>금액:</label>
+                    <input type="text" id="amount" pattern="\d*"><br>
+
+                    <label>거래 대상:</label>
+                    <input type="text" id="trader"><br>
+
+                    <label>적요:</label>
+                    <input type="text" id="purpose"><br>
+
+                    <label>메모:</label>
+                    <textarea id="financeMemo"></textarea><br>
+                </div>
+
+                <!-- 수입/지출 구분 라디오 버튼 -->
+                <div>
+                    <label><input type="radio" name="modalFinanceType" id="modalIncomeRadio" value="수입" checked> 수입</label>
+                    <label><input type="radio" name="modalFinanceType" id="modalExpenseRadio" value="지출"> 지출</label>
+                </div>
+
+                <!-- 추가 및 취소 버튼 -->
+                <button id="submitFinance">추가</button>
+                <button class="close">취소</button>
+            </div>
+        </div>
+
+        <!-- 페이지마다 작성될 스크립트 공간 정의 -->
+        <th:block layout:fragment="customJs">
+            <script th:src="@{/js/finance.js}"></script>
+        </th:block>
+    </div>
+</body>
+</html>

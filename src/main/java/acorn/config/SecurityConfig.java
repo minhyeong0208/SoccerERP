@@ -1,6 +1,4 @@
-/*
 package acorn.config;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
+            	.requestMatchers("/").permitAll()
             	.requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 접근 가능	
             	.requestMatchers("/user/**").hasRole("USER") // 사용자만 접근 가능	
                 .anyRequest().authenticated() // 모든 요청에 대해 인증을 요구
@@ -68,4 +67,3 @@ public class SecurityConfig {
     	return new AuthSuccessHandler();
     }
 }
-*/
