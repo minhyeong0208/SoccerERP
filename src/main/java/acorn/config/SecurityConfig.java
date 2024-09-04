@@ -1,19 +1,19 @@
 package acorn.config;
 
-import acorn.entity.Login;
-import acorn.repository.LoginRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.core.userdetails.User.UserBuilder;
+
+import acorn.entity.Login;
+import acorn.repository.LoginRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
+            	.requestMatchers("/").permitAll()
             	.requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 접근 가능	
             	.requestMatchers("/user/**").hasRole("USER") // 사용자만 접근 가능	
                 .anyRequest().authenticated() // 모든 요청에 대해 인증을 요구

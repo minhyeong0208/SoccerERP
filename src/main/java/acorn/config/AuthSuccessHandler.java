@@ -22,7 +22,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         // 사용자 권한에 따라 리다이렉트할 URL 설정
         if (authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
-            redirectUrl = "/admin/home";
+            redirectUrl = "/admin/finance";
         } else if (authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER"))) {
             redirectUrl = "/user/home";
