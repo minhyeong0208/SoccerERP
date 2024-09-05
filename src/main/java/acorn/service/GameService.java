@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import acorn.entity.Game;
@@ -20,7 +22,7 @@ public class GameService {
     public GameService(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
-    
+
     // 모든 경기 조회(일정에 추가)
     public List<Game> getAllGames() {
         return gameRepository.findAll();
@@ -29,6 +31,11 @@ public class GameService {
     // 모든 경기 조회 (페이징 처리)
     public Page<Game> getAllGames(Pageable pageable) {
         return gameRepository.findAll(pageable);
+    }
+
+    // 게임 분류 조회
+    public Page<Game> getGamesByType(String gameType, Pageable pageable) {
+        return gameRepository.findByGameType(gameType, pageable);
     }
 
     // 특정 경기 조회
@@ -62,5 +69,38 @@ public class GameService {
     // 경기 삭제
     public void deleteGame(int gameIdx) {
         gameRepository.deleteById(gameIdx);
+    }
+
+
+    // 추가
+    // 페이징을 적용한 서비스 로직
+    public Page<Game> getGames(Pageable pageable) {
+        return gameRepository.findAll(pageable);
+    }
+
+    // 추가: 승패 마진 계산
+    public int calculateWinLossMargin() {
+        List<Game> allGames = gameRepository.findAll();
+        int wins = 0;
+        int losses = 0;
+        for (Game game : allGames) {
+            if (game.getGoal() > game.getConcede()) {
+                wins++;
+            } else if (game.getGoal() < game.getConcede()) {
+                losses++;
+            }
+        }
+        return wins - losses;
+    }
+
+    // 추가: 총 득점 계산
+    public int calculateTotalScore() {
+        List<Game> allGames = gameRepository.findAll();
+        return allGames.stream().mapToInt(Game::getGoal).sum();
+    }
+
+    public List<Game> getRecentGames(int count) {
+        PageRequest pageRequest = PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "gameDate"));
+        return gameRepository.findAll(pageRequest).getContent();
     }
 }
