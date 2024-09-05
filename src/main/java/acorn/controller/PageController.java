@@ -11,12 +11,7 @@ public class PageController {
 	
     @GetMapping("/login")
     public String login() {
-        return "login"; // 로그인 페이지 (login.html)
-    }
-
-    @GetMapping("/user/home")
-    public String userHome() {
-        return "home";
+        return "layout/login"; // 로그인 페이지 (login.html)
     }
     
     @GetMapping("/admin/finance")

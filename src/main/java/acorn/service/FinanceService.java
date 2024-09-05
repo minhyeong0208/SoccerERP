@@ -1,6 +1,7 @@
 package acorn.service;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,15 +18,10 @@ public class FinanceService {
 	
 	@Autowired
 	private FinanceRepository financeRepository;
-	
-	// 전체 데이터 조회
-	public Page<Finance> getAllFinances(Pageable pageable) {
-        return financeRepository.findAll(pageable);
-    }
-	
-	// 수입/지출 타입과 날짜 검색
-	public Page<Finance> getFinancesByTypeAndDate(String type, Date startDate, Date endDate, Pageable pageable) {
-        return financeRepository.findByTypeAndDate(type, startDate, endDate, pageable);
+
+	// 검색 기능
+	public Page<Finance> getFinancesByTypeAndDateAndKeyword(String type, Date startDate, Date endDate, String keyword, Pageable pageable) {
+        return financeRepository.findByTypeAndDate(type, startDate, endDate, keyword, pageable);
     }
 	
 	// 수입 항목 추가
@@ -56,5 +52,10 @@ public class FinanceService {
         } else {
             throw new RuntimeException("Finance not found with id " + id);
         }
+    }
+    
+    // 다중 삭제
+    public void deleteFinance(List<Integer> ids) {
+    	financeRepository.deleteAllByIdInBatch(ids);
     }
 }
