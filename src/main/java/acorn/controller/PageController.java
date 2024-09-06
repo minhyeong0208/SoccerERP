@@ -45,4 +45,11 @@ public class PageController {
         return "layout/games";
     }
 
+    @GetMapping("/schedule")
+    public String schedule(){
+        return "layout/schedule";
+    }
+
+
+
 }
