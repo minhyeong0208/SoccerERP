@@ -32,7 +32,7 @@ public class TrainController {
     public Page<Train> getAllTrains(Pageable pageable) {
         return trainService.getAllTrains(pageable);
     }
-
+    
     // 특정 훈련 조회
     @GetMapping("/{id}")
     public ResponseEntity<Train> getTrainById(@PathVariable(value = "id") int trainIdx) {

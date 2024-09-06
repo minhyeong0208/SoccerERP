@@ -1,7 +1,5 @@
 package acorn.entity;
 
-import java.util.Date;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,22 +9,24 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Transfer {
+public class Sponsor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int transferIdx;
+    private int sponsorIdx;
 
-    private int personIdx;
-    private int transferType;
-    private Date tradingDate;
-    private String opponent;
-    private String transferMemo;
+    private String sponsorName;
+    private Date contractDate;
     private int price;
+    private String contractCondition;  // 필드명 변경
+    private String sponsorMemo;
+    private Date startDate;
+    private Date endDate;
 }

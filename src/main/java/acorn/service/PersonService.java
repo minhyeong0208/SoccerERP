@@ -1,7 +1,6 @@
 package acorn.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,15 +25,29 @@ public class PersonService {
         return personRepository.findAllWithAbility(pageable);
     }
 
+    // 모든 사람 조회 (페이징 없이)
+    public List<Person> getAllPersons() {
+        return personRepository.findAll();
+    }
+
     // 모든 선수 조회 (능력치 포함, 페이징 없이)
     public List<Person> getAllPersonsWithAbility() {
         return personRepository.findAllWithAbility();
     }
 
+    // 역할 구분에 따른 조회 (선수/코치)
+    public List<Person> getPersonsByTypeCode(String typeCode) {
+        return personRepository.findByTypeCode(typeCode);
+    }
+
+    // 선수명 또는 포지션 검색
+    public List<Person> searchPersons(String personName, String position) {
+        return personRepository.searchByPersonNameOrPosition(personName, position);
+    }
+
     // 특정 사람 조회
     public Person getPersonById(int personIdx) {
-        Optional<Person> person = personRepository.findById(personIdx);
-        return person.orElse(null);
+        return personRepository.findById(personIdx).orElse(null);
     }
 
     // 새로운 사람 추가
@@ -51,7 +64,22 @@ public class PersonService {
         Person person = getPersonById(personIdx);
         if (person != null) {
             person.setPersonName(personDetails.getPersonName());
-            // 다른 필드도 업데이트 처리
+            person.setTeamIdx(personDetails.getTeamIdx());
+            person.setFacilityIdx(personDetails.getFacilityIdx());
+            person.setHeight(personDetails.getHeight());
+            person.setWeight(personDetails.getWeight());
+            person.setBirth(personDetails.getBirth());
+            person.setPosition(personDetails.getPosition());
+            person.setBackNumber(personDetails.getBackNumber());
+            person.setNationality(personDetails.getNationality());
+            person.setContractStart(personDetails.getContractStart());
+            person.setContractEnd(personDetails.getContractEnd());
+            person.setId(personDetails.getId());
+            person.setPhone(personDetails.getPhone());
+            person.setGender(personDetails.getGender());
+            person.setEmail(personDetails.getEmail());
+            person.setTypeCode(personDetails.getTypeCode());
+            person.setPersonImage(personDetails.getPersonImage());
             return personRepository.save(person);
         }
         return null;
@@ -60,5 +88,10 @@ public class PersonService {
     // 사람 삭제
     public void deletePerson(int personIdx) {
         personRepository.deleteById(personIdx);
+    }
+    
+    // 다중 삭제 메서드
+    public void deletePersons(List<Integer> personIds) {
+        personRepository.deleteAllByIdInBatch(personIds);
     }
 }

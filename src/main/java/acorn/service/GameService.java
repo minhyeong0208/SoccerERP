@@ -63,4 +63,9 @@ public class GameService {
     public void deleteGame(int gameIdx) {
         gameRepository.deleteById(gameIdx);
     }
+
+    // 선택된 경기를 삭제
+    public void deleteGames(List<Integer> gameIds) {
+        gameRepository.deleteAllByIdInBatch(gameIds);
+    }
 }
