@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import acorn.entity.Game;
 import acorn.service.GameService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/games")
 public class GameController {
@@ -55,8 +57,15 @@ public class GameController {
 
     // 경기 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGame(@PathVariable(value = "id") int gameIdx) {
+    public ResponseEntity<String> deleteGame(@PathVariable(value = "id") int gameIdx) {
         gameService.deleteGame(gameIdx);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Game with ID " + gameIdx + " has been successfully deleted.");
+    }
+
+    // 선택된 경기 삭제
+    @DeleteMapping("/delete-multiple")
+    public ResponseEntity<String> deleteGames(@RequestBody List<Integer> gameIds) {
+        gameService.deleteGames(gameIds);
+        return ResponseEntity.ok("Games with IDs " + gameIds + " have been successfully deleted.");
     }
 }
