@@ -142,26 +142,27 @@
           </button>
         </div>
       </div>
-      <div class="card-body">
-
-        <!-- 라디오 버튼 필터 -->
-      <div class="mb-3">
-        <div class="btn-group" role="group" aria-label="Game Type Filter">
-          <th:block th:each="type, iterStat : ${gameType}">
-            <input type="radio" class="btn-check" name="gameTypeFilter"
-                   th:id="${'gameType' + iterStat.index}"
-                   th:value="${type}"
-                   autocomplete="off"
-                   th:checked="${iterStat.first}">
-            <label class="btn btn-outline-primary"
-                   th:for="${'gameType' + iterStat.index}"
-                   th:text="${type}"></label>
-          </th:block>
-        </div>
     </div>
+    <div class="card-body">
 
+      <!-- 라디오 버튼 필터 -->
+      <div class="mb-3">
+          <div class="btn-group" role="group" aria-label="Game Type Filter">
+            <th:block th:each="type, iterStat : ${gameType}">
+              <input type="radio" class="btn-check" name="gameTypeFilter"
+                     th:id="${'gameType' + iterStat.index}"
+                     th:value="${type}"
+                     autocomplete="off"
+                     th:checked="${iterStat.first}">
+              <label class="btn btn-outline-primary"
+                     th:for="${'gameType' + iterStat.index}"
+                     th:text="${type}"></label>
+            </th:block>
+          </div>
+      </div>
+
+      <!-- 게임 목록 테이블 -->
       <div>
-        <!-- 게임 목록 테이블 -->
         <div id="gameList" class="table-responsive">
           <table class="table table-bordered">
             <thead>
@@ -199,78 +200,77 @@
           </ul>
         </nav>
       </div>
-  </div>
 
-  <!-- 경기 추가 모달 -->
-    <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addGameModalLabel">경기 추가</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form id="addGameForm">
-              <div class="row mb-3">
-                <div class="col">
-                  <label>대회유형</label>
-                  <div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="gameType" id="typeLeague" value="리그" checked>
-                      <label class="form-check-label" for="typeLeague">리그</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="gameType" id="typeTournament" value="토너먼트">
-                      <label class="form-check-label" for="typeTournament">토너먼트</label>
+    <!-- 경기 추가 모달 -->
+      <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addGameModalLabel">경기 추가</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="addGameForm">
+                <div class="row mb-3">
+                  <div class="col">
+                    <label>대회유형</label>
+                    <div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gameType" id="typeLeague" value="리그" checked>
+                        <label class="form-check-label" for="typeLeague">리그</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gameType" id="typeTournament" value="토너먼트">
+                        <label class="form-check-label" for="typeTournament">토너먼트</label>
+                      </div>
                     </div>
                   </div>
+                  <div class="col">
+                    <label for="gameDate" class="form-label">경기 일자</label>
+                    <input type="date" class="form-control" id="gameDate" required autocomplete="false">
+                  </div>
                 </div>
-                <div class="col">
-                  <label for="gameDate" class="form-label">경기 일자</label>
-                  <input type="date" class="form-control" id="gameDate" required autocomplete="false">
+                <div class="mb-3">
+                  <label for="opponent" class="form-label">상대팀</label>
+                  <select class="form-select" id="opponent" required>
+                    <option value="">상대팀 선택</option>
+                    <option value="USO">울산 HD</option>
+                    <option value="SWO">수원 FC</option>
+                    <option value="KSO">김천상무 FC</option>
+                    <option value="SEO">FC 서울</option>
+                    <option value="PSO">포항 스틸러스</option>
+                    <option value="KJO">광주 FC</option>
+                    <option value="JJO">제주 유나이티드 FC</option>
+                    <option value="DHO">대전 하나시티즈</option>
+                    <option value="ICO">인천 유나이티드 FC</option>
+                    <option value="JEO">전북 현대</option>
+                    <option value="DGO">대구 FC</option>
+                    <!-- 다른 팀들 추가 -->
+                  </select>
                 </div>
-              </div>
-              <div class="mb-3">
-                <label for="opponent" class="form-label">상대팀</label>
-                <select class="form-select" id="opponent" required>
-                  <option value="">상대팀 선택</option>
-                  <option value="USO">울산 HD</option>
-                  <option value="SWO">수원 FC</option>
-                  <option value="KSO">김천상무 FC</option>
-                  <option value="SEO">FC 서울</option>
-                  <option value="PSO">포항 스틸러스</option>
-                  <option value="KJO">광주 FC</option>
-                  <option value="JJO">제주 유나이티드 FC</option>
-                  <option value="DHO">대전 하나시티즈</option>
-                  <option value="ICO">인천 유나이티드 FC</option>
-                  <option value="JEO">전북 현대</option>
-                  <option value="DGO">대구 FC</option>
-                  <!-- 다른 팀들 추가 -->
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="stadium" class="form-label">경기장소</label>
-                <input type="text" class="form-control" id="stadium" required autocomplete="false">
-              </div>
-              <div class="row mb-3">
-                <div class="col">
-                  <label for="goal" class="form-label">득점</label>
-                  <input type="number" class="form-control" id="goal" min="0" required>
+                <div class="mb-3">
+                  <label for="stadium" class="form-label">경기장소</label>
+                  <input type="text" class="form-control" id="stadium" required autocomplete="false">
                 </div>
-                <div class="col">
-                  <label for="concede" class="form-label">실점</label>
-                  <input type="number" class="form-control" id="concede" min="0" required>
+                <div class="row mb-3">
+                  <div class="col">
+                    <label for="goal" class="form-label">득점</label>
+                    <input type="number" class="form-control" id="goal" min="0" required>
+                  </div>
+                  <div class="col">
+                    <label for="concede" class="form-label">실점</label>
+                    <input type="number" class="form-control" id="concede" min="0" required>
+                  </div>
                 </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-            <button type="button" class="btn btn-primary" id="saveGame">추가</button>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary" id="saveGame">추가</button>
+            </div>
           </div>
         </div>
-      </div>
-  </div>
+    </div>
 
   <!-- 경기 삭제 모달 -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
@@ -290,9 +290,8 @@
         </div>
       </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/js/games.js}"></script>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:src="@{/js/games.js}"></script>
 </body>
 </html>
