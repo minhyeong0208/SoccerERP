@@ -1,5 +1,9 @@
-/* 경기 관리 board css */
+/* 기본 폰트 설정 */
+body {
+    font-family: "IBM Plex Sans", sans-serif;
+}
 
+/* 경기 관리 board css */
 .card {
     border-radius: 0.35rem;
     box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
@@ -16,3 +20,74 @@
 .text-success { color: #1cc88a !important; }
 .text-info { color: #36b9cc !important; }
 .text-warning { color: #f6c23e !important; }
+
+/* IBM Plex Sans 폰트 스타일 */
+.ibm-plex-sans-thin {
+    font-weight: 100;
+    font-style: normal;
+}
+
+.ibm-plex-sans-extralight {
+    font-weight: 200;
+    font-style: normal;
+}
+
+.ibm-plex-sans-light {
+    font-weight: 300;
+    font-style: normal;
+}
+
+.ibm-plex-sans-regular {
+    font-weight: 400;
+    font-style: normal;
+}
+
+.ibm-plex-sans-medium {
+    font-weight: 500;
+    font-style: normal;
+}
+
+.ibm-plex-sans-semibold {
+    font-weight: 600;
+    font-style: normal;
+}
+
+.ibm-plex-sans-bold {
+    font-weight: 700;
+    font-style: normal;
+}
+
+.ibm-plex-sans-thin-italic {
+    font-weight: 100;
+    font-style: italic;
+}
+
+.ibm-plex-sans-extralight-italic {
+    font-weight: 200;
+    font-style: italic;
+}
+
+.ibm-plex-sans-light-italic {
+    font-weight: 300;
+    font-style: italic;
+}
+
+.ibm-plex-sans-regular-italic {
+    font-weight: 400;
+    font-style: italic;
+}
+
+.ibm-plex-sans-medium-italic {
+    font-weight: 500;
+    font-style: italic;
+}
+
+.ibm-plex-sans-semibold-italic {
+    font-weight: 600;
+    font-style: italic;
+}
+
+.ibm-plex-sans-bold-italic {
+    font-weight: 700;
+    font-style: italic;
+}

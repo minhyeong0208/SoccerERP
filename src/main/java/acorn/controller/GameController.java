@@ -28,9 +28,20 @@ public class GameController {
 
     @GetMapping("/dashboard")
     public String gameList(Model model) {
+        /* 경기 수 */
+        model.addAttribute("matchCount", gameService.getTotalGames());
+        /* 승패 마진 */
+        model.addAttribute("winLossMargin", gameService.getWinLossMargin());
+        /* 팀 득점 */
+        model.addAttribute("teamScore", gameService.getTotalGoals());
+        /* 팀 도움 */
+//        model.addAttribute("teamAssists", teamAssists);
+
         /* 게임 구분 */
         List<String> gameType = Arrays.asList(gameTypeStr.split(","));
         model.addAttribute("gameType", gameType);
+        /* 최근 1경기 */
+        model.addAttribute("mostRecentGame", gameService.getMostRecentGame());
         return "layout/games";
     }
 

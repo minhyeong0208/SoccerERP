@@ -1,6 +1,8 @@
 package acorn.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +18,8 @@ import acorn.repository.GameRepository;
 @Service
 public class GameService {
 
-    private final GameRepository gameRepository;
-
     @Autowired
-    public GameService(GameRepository gameRepository) {
-        this.gameRepository = gameRepository;
-    }
+    private GameRepository gameRepository;
 
     // 모든 경기 조회(일정에 추가)
     public List<Game> getAllGames() {
@@ -35,6 +33,30 @@ public class GameService {
         return gameRepository.findAll(pageable);
     }
 
+    // 경기 횟수
+    public long getTotalGames() {
+        return gameRepository.countTotalGames();
+    }
+
+    // 총 득점
+    public int getTotalGoals() {
+        return gameRepository.sumTotalGoals();
+    }
+
+    // 승패 마진
+    public String getWinLossMargin() {
+        int margin = gameRepository.calculateWinLossMargin();
+        /**
+         * margin 값에 부호를 붙여서 return
+         *
+         * 0보다 높으면 +
+         * 0이면 공백
+         * 0보다 낮으면 -
+         */
+        String marginStr = (margin > 0 ? "+" : "") + margin;
+        return marginStr;
+    }
+
     // 게임 분류 조회
     public Page<Game> getGamesByType(String gameType, Pageable pageable) {
         return gameRepository.findByGameType(gameType, pageable);
@@ -44,6 +66,14 @@ public class GameService {
     public Game getGameById(int gameIdx) {
         Optional<Game> game = gameRepository.findById(gameIdx);
         return game.orElse(null);
+    }
+
+    public Game getMostRecentGame() {
+        Game game = gameRepository.findFirstByGameDateBeforeOrderByGameDateDesc(LocalDateTime.now());
+        if (game == null) {
+            throw new NoSuchElementException("최근 경기가 없습니다.");
+        }
+        return game;
     }
 
     // 새로운 경기 추가
