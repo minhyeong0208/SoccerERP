@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import acorn.entity.Game;
 import acorn.service.GameService;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/games")
@@ -63,9 +60,53 @@ public class GameController {
     }
 
     // 새로운 경기 추가
-    @PostMapping
-    public Game createGame(@RequestBody Game game) {
-        return gameService.addGame(game);
+    @PostMapping("/add")
+    public ResponseEntity<?> createGame(@RequestBody Game game) {
+        Map<String, String> errors = new HashMap<>();
+
+        // 게임 타입 검증
+        if (game.getGameType() == null || game.getGameType().trim().isEmpty()) {
+            errors.put("gameType", "대회 유형은 필수입니다.");
+        }
+
+        // 상대팀 검증
+        if (game.getOpponent() == null || game.getOpponent().trim().isEmpty()) {
+            errors.put("opponent", "상대팀은 필수입니다.");
+        }
+
+        // 경기 일자 검증
+        if (game.getGameDate() == null) {
+            errors.put("gameDate", "경기 일자는 필수입니다.");
+        }
+
+        // 경기장 검증
+        if (game.getStadium() == null || game.getStadium().trim().isEmpty()) {
+            errors.put("stadium", "경기장소는 필수입니다.");
+        }
+
+        // 득점과 실점 검증 (0 이상의 정수여야 함)
+        if (game.getGoal() < 0) {
+            errors.put("goal", "득점은 0 이상이어야 합니다.");
+        }
+        if (game.getConcede() < 0) {
+            errors.put("concede", "실점은 0 이상이어야 합니다.");
+        }
+
+        // 홈/원정 검증 (0 또는 1이어야 함)
+        if (game.getIsHome() != 0 && game.getIsHome() != 1) {
+            errors.put("isHome", "홈/원정은 0 또는 1이어야 합니다.");
+        }
+
+        if (!errors.isEmpty()) {
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        try {
+            Game savedGame = gameService.addGame(game);
+            return ResponseEntity.ok(savedGame);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("경기 추가 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     // 경기 업데이트
