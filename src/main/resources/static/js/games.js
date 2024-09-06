@@ -29,14 +29,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // 경기 추가 버튼 이벤트 리스너
     document.getElementById('saveGame').addEventListener('click', addGame);
 
-    // 테스트 이벤트 리스너
-    document.getElementById('testBtn').addEventListener('click', testCaller);
-
     // 선택 삭제 버튼 이벤트 리스너
     document.getElementById('deleteSelectedBtn').addEventListener('click', showDeleteConfirmModal);
 
     // 삭제 확인 버튼 이벤트 리스너
-    document.getElementById('confirmDelete').addEventListener('click', deleteSelectedGames);
+    document.getElementById('confirmDelete').addEventListener('click', deleteGame);
 });
 
 function testCaller() {
@@ -153,12 +150,17 @@ function addGame() {
     const opponent = document.getElementById('opponent').value;
     const gameDate = document.getElementById('gameDate').value;
     const stadium = document.getElementById('stadium').value;
+    const goal = document.getElementById('goal').value;
+    const concede = document.getElementById('concede').value;
 
     const newGame = {
         gameType: gameType,
         opponent: opponent,
         gameDate: gameDate,
-        stadium: stadium
+        stadium: stadium,
+        goal: goal,
+        concede: concede
+
     };
 
     fetch('/games/add', {
@@ -198,36 +200,41 @@ function showDeleteConfirmModal() {
 }
 
 // 삭제 기능 추가
-function deleteSelectedFinances() {
-    const selectedCheckboxes = document.querySelectorAll('.delete-checkbox:checked');
-    const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute('data-id'));
+function deleteGame() {
+    const selectedCheckboxes = document.querySelectorAll('input[name="selectedMatches"]:checked');
+    const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
 
     if (selectedIds.length === 0) {
         alert('삭제할 항목을 선택하세요.');
         return;
     }
 
-    if (confirm('삭제하시겠습니까?')) {
-        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-        fetch(`http://localhost/finances`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify(selectedIds)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('삭제 오류');
-                }
-                // 삭제 후 테이블 갱신
-                loadFinanceData(currentPage);
-            })
-            .catch(error => {
-                console.error('삭제 오류:', error);
+    fetch('/games', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(selectedIds)
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(text || '서버 응답이 올바르지 않습니다.');
+                });
+            }
+            return response.text().then(text => {
+                return text ? JSON.parse(text) : {};
             });
-    }
+        })
+        .then(data => {
+            console.log('삭제 성공:', data);
+            // 페이지 새로고침 또는 테이블 업데이트
+            location.reload();
+            // 또는 특정 함수를 호출하여 테이블만 업데이트할 수 있습니다.
+            // updateTable();
+        })
+        .catch((error) => {
+            console.error('삭제 중 오류 발생:', error);
+            alert('경기 삭제 중 오류가 발생했습니다: ' + error.message);
+        });
 }

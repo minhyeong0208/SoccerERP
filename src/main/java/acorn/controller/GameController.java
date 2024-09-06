@@ -126,7 +126,7 @@ public class GameController {
     public ResponseEntity<?> deleteGame(@RequestBody List<Integer> ids) {
         try {
             gameService.deleteGame(ids);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("삭제 중 오류가 발생했습니다: " + e.getMessage());
