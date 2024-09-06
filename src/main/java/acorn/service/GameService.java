@@ -67,7 +67,7 @@ public class GameService {
     }
 
     // 경기 삭제
-    public void deleteGame(int gameIdx) {
-        gameRepository.deleteById(gameIdx);
+    public void deleteGame(List<Integer> ids) {
+        gameRepository.deleteAllByIdInBatch(ids);
     }
 }
