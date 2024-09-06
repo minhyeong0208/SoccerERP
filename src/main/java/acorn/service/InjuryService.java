@@ -21,14 +21,18 @@ public class InjuryService {
         this.injuryRepository = injuryRepository;
     }
     
-    // 모든 부상 조회(일정에 추가)
-    public List<Injury> getAllInjuries() {
-        return injuryRepository.findAll();
+    // 모든 부상 조회 (선수 정보 포함)
+    public List<Injury> findAllInjuriesWithPerson() {
+        return injuryRepository.findAllInjuriesWithPerson();
     }
 
     // 모든 부상 조회 (페이징 처리)
     public Page<Injury> getAllInjuries(Pageable pageable) {
         return injuryRepository.findAll(pageable);
+    }
+    
+    public List<Injury> getAllInjuries() {
+        return injuryRepository.findAll();
     }
 
     // 특정 부상 조회
@@ -46,7 +50,7 @@ public class InjuryService {
     public Injury updateInjury(int injuryIdx, Injury injuryDetails) {
         Injury injury = getInjuryById(injuryIdx);
         if (injury != null) {
-            injury.setPersonIdx(injuryDetails.getPersonIdx());
+            injury.setPerson(injuryDetails.getPerson());  // 수정된 부분
             injury.setBrokenDate(injuryDetails.getBrokenDate());
             injury.setSeverity(injuryDetails.getSeverity());
             injury.setDoctor(injuryDetails.getDoctor());

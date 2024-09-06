@@ -70,37 +70,4 @@ public class GameService {
     public void deleteGame(int gameIdx) {
         gameRepository.deleteById(gameIdx);
     }
-
-
-    // 추가
-    // 페이징을 적용한 서비스 로직
-    public Page<Game> getGames(Pageable pageable) {
-        return gameRepository.findAll(pageable);
-    }
-
-    // 추가: 승패 마진 계산
-    public int calculateWinLossMargin() {
-        List<Game> allGames = gameRepository.findAll();
-        int wins = 0;
-        int losses = 0;
-        for (Game game : allGames) {
-            if (game.getGoal() > game.getConcede()) {
-                wins++;
-            } else if (game.getGoal() < game.getConcede()) {
-                losses++;
-            }
-        }
-        return wins - losses;
-    }
-
-    // 추가: 총 득점 계산
-    public int calculateTotalScore() {
-        List<Game> allGames = gameRepository.findAll();
-        return allGames.stream().mapToInt(Game::getGoal).sum();
-    }
-
-    public List<Game> getRecentGames(int count) {
-        PageRequest pageRequest = PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "gameDate"));
-        return gameRepository.findAll(pageRequest).getContent();
-    }
 }

@@ -1,8 +1,6 @@
 package acorn.controller;
 
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import acorn.entity.Game;
 import acorn.service.GameService;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/games")
@@ -122,9 +123,16 @@ public class GameController {
 
     // 경기 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGame(@PathVariable(value = "id") int gameIdx) {
+    public ResponseEntity<String> deleteGame(@PathVariable(value = "id") int gameIdx) {
         gameService.deleteGame(gameIdx);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Game with ID " + gameIdx + " has been successfully deleted.");
+    }
+
+    // 선택된 경기 삭제
+    @DeleteMapping("/delete-multiple")
+    public ResponseEntity<String> deleteGames(@RequestBody List<Integer> gameIds) {
+        gameService.deleteGames(gameIds);
+        return ResponseEntity.ok("Games with IDs " + gameIds + " have been successfully deleted.");
     }
 
     // 데이터를 페이징으로 가져오도록 설정

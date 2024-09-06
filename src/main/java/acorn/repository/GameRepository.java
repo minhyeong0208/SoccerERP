@@ -11,4 +11,7 @@ import acorn.entity.Game;
 public interface GameRepository extends JpaRepository<Game, Integer> {
     // 기본적인 CRUD 메서드와 페이징 지원 메서드 포함
     Page<Game> findByGameType(String gameType, Pageable pageable);
+
+    // 여러 경기를 한꺼번에 삭제하는 메서드
+    void deleteAllByIdInBatch(Iterable<Integer> ids);
 }
