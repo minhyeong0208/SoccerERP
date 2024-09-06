@@ -15,9 +15,13 @@ public class PersonService {
 
     private final PersonRepository personRepository;
 
-    @Autowired
     public PersonService(PersonRepository personRepository) {
         this.personRepository = personRepository;
+    }
+    
+    // 여러 ID로 선수 조회
+    public List<Person> getPersonsByIds(List<Integer> ids) {
+        return personRepository.findAllById(ids);
     }
 
     // 모든 사람 조회 (페이징 처리)

@@ -30,4 +30,5 @@ public class Train {
     private Date endTime;
     private String area;
     private String memo;
+    private String countMem;
 }
