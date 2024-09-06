@@ -53,6 +53,7 @@ public class TrainService {
             train.setEndTime(trainDetails.getEndTime());
             train.setArea(trainDetails.getArea());
             train.setMemo(trainDetails.getMemo());
+            train.setCountMem(trainDetails.getCountMem());
             return trainRepository.save(train);
         }
         return null;

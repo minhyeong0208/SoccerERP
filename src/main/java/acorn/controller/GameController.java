@@ -37,7 +37,7 @@ public class GameController {
     // 모든 경기 조회 (페이징 처리)
     @GetMapping("/list")
     public ResponseEntity<Object> getAllGames(
-            @RequestParam(required = false) String gameType,
+    		@RequestParam(value = "gameType", required = false) String gameType,
             Pageable pageable) {
         Page<Game> gameList;
 

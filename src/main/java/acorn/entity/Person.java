@@ -50,9 +50,9 @@ public class Person {
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private Ability ability;
-    
+
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<Injury> injuries;  // Injury와의 관계 설정
+    private List<Injury> injuries;
 
 }

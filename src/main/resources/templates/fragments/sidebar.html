@@ -10,16 +10,22 @@
     <ul>
       <li>
         <a th:href="@{/main}" title="Dashboard" class="tooltip">
-          <span class="link hide">대시보드</span>
+          <span class="link">대시보드</span>
           <span class="tooltip__content">Dashboard</span>
         </a>
       </li>
       <!-- role이 ADMIN인 경우에만 Finance 탭 보이도록 -->
       <!-- role이 어떻게 넘어올지 몰라서 일단 하드코딩, 수정 예정~ -->
       <li th:if="${gubun == 'ADMIN'}">
-        <a th:href="@{/main}" title="Finance" class="tooltip">
+        <a th:href="@{/admin/finance}" title="Finance" class="tooltip">
           <span class="link hide">재정 관리</span>
           <span class="tooltip__content">Finance</span>
+        </a>
+      </li>
+      <li>
+        <a th:href="@{/#}" title="Settings" class="tooltip">
+          <span class="link hide">코치 관리</span>
+          <span class="tooltip__content">코치 관리</span>
         </a>
       </li>
       <li>
@@ -29,21 +35,21 @@
         </a>
       </li>
       <li>
+        <a th:href="@{/}" title="Transfer" class="tooltip">
+          <span class="link hide">이적 관리</span>
+          <span class="tooltip__content">이적 관리</span>
+        </a>
+      </li>
+      <li>
         <a th:href="@{/#}" title="Reports" class="tooltip">
           <span class="link hide">시설 관리</span>
           <span class="tooltip__content">시설 관리</span>
         </a>
       </li>
       <li>
-        <a th:href="@{/#}" title="Industries" class="tooltip">
+        <a th:href="@{/game}" title="Industries" class="tooltip">
           <span class="link hide">경기 관리</span>
           <span class="tooltip__content">경기 관리</span>
-        </a>
-      </li>
-      <li>
-        <a th:href="@{/#}" title="Settings" class="tooltip">
-          <span class="link hide">코치 관리</span>
-          <span class="tooltip__content">코치 관리</span>
         </a>
       </li>
       <li>
