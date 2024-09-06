@@ -1,0 +1,18 @@
+/* 경기 관리 board css */
+
+.card {
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+.card-left-border {
+    border-left: 0.25rem solid;
+}
+.border-left-primary { border-left-color: #4e73df; }
+.border-left-success { border-left-color: #1cc88a; }
+.border-left-info { border-left-color: #36b9cc; }
+.border-left-warning { border-left-color: #f6c23e; }
+.text-xs { font-size: .7rem; }
+.text-primary { color: #4e73df !important; }
+.text-success { color: #1cc88a !important; }
+.text-info { color: #36b9cc !important; }
+.text-warning { color: #f6c23e !important; }

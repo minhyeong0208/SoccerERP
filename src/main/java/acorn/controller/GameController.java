@@ -3,6 +3,7 @@ package acorn.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +24,7 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
-    private final static String gameTypeStr = "전체,리그,토너먼트,컵";
+    private final static String gameTypeStr = "전체,리그,토너먼트";
 
     @GetMapping("/dashboard")
     public String gameList(Model model) {
@@ -111,7 +112,7 @@ public class GameController {
 
     // 경기 업데이트
     @PutMapping("/{id}")
-    public ResponseEntity<Game> updateGame(
+    public ResponseEntity<?> updateGame(
             @PathVariable(value = "id") int gameIdx, @RequestBody Game gameDetails) {
         Game updatedGame = gameService.updateGame(gameIdx, gameDetails);
         if (updatedGame == null) {
@@ -122,7 +123,13 @@ public class GameController {
 
     // 선택된 경기 삭제
     @DeleteMapping
-    public void deleteGame(@RequestBody List<Integer> ids) {
-        gameService.deleteGame(ids);
+    public ResponseEntity<?> deleteGame(@RequestBody List<Integer> ids) {
+        try {
+            gameService.deleteGame(ids);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 }

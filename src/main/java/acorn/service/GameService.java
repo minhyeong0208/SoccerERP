@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import acorn.entity.Game;
@@ -28,6 +30,8 @@ public class GameService {
 
     // 모든 경기 조회 (페이징 처리)
     public Page<Game> getAllGames(Pageable pageable) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "gameDate");
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         return gameRepository.findAll(pageable);
     }
 
