@@ -20,7 +20,7 @@ public class GameService {
     public GameService(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
-    
+
     // 모든 경기 조회(일정에 추가)
     public List<Game> getAllGames() {
         return gameRepository.findAll();
@@ -29,6 +29,11 @@ public class GameService {
     // 모든 경기 조회 (페이징 처리)
     public Page<Game> getAllGames(Pageable pageable) {
         return gameRepository.findAll(pageable);
+    }
+
+    // 게임 분류 조회
+    public Page<Game> getGamesByType(String gameType, Pageable pageable) {
+        return gameRepository.findByGameType(gameType, pageable);
     }
 
     // 특정 경기 조회
@@ -60,12 +65,7 @@ public class GameService {
     }
 
     // 경기 삭제
-    public void deleteGame(int gameIdx) {
-        gameRepository.deleteById(gameIdx);
-    }
-
-    // 선택된 경기를 삭제
-    public void deleteGames(List<Integer> gameIds) {
-        gameRepository.deleteAllByIdInBatch(gameIds);
+    public void deleteGame(List<Integer> ids) {
+        gameRepository.deleteAllByIdInBatch(ids);
     }
 }

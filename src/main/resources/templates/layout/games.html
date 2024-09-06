@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>경기 관리 대시보드</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+  <style>
+    .card {
+      border-radius: 0.35rem;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+    .card-left-border {
+      border-left: 0.25rem solid;
+    }
+    .border-left-primary { border-left-color: #4e73df; }
+    .border-left-success { border-left-color: #1cc88a; }
+    .border-left-info { border-left-color: #36b9cc; }
+    .border-left-warning { border-left-color: #f6c23e; }
+    .text-xs { font-size: .7rem; }
+    .text-primary { color: #4e73df !important; }
+    .text-success { color: #1cc88a !important; }
+    .text-info { color: #36b9cc !important; }
+    .text-warning { color: #f6c23e !important; }
+  </style>
+
+</head>
+<body>
+<div class="container-fluid mt-4">
+  <h1 class="h3 mb-2 text-gray-800">경기 관리</h1>
+
+  <!-- 통계 카드 -->
+  <div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card card-left-border border-left-primary h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">경기 수</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${matchCount}">26</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-calendar fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card card-left-border border-left-success h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">승패 마진</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${winLossMargin}">+10</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-balance-scale fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card card-left-border border-left-info h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">팀 득점</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${teamScore}">78</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-futbol fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card card-left-border border-left-warning h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">팀 도움</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${teamAssists}">42</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-hands-helping fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 최근 경기 추가 -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">최근 경기</h6>
+    </div>
+    <div class="card-body">
+      <div class="recent-match" th:each="match : ${recentMatches}">
+        <div class="row align-items-center">
+          <div class="col-md-4 text-center">
+            <img th:src="@{'/img/' + ${match.isHome == 1 ? 'gangwon.png' : match.opponent + '.png'}}" alt="Home Team" class="team-logo">
+            <span th:text="${match.isHome == 1 ? '강원 FC' : match.opponent}">강원 FC</span>
+          </div>
+          <div class="col-md-4 text-center">
+            <h4 th:text="${match.goal} + ' : ' + ${match.concede}">2 : 1</h4>
+            <p th:text="${#dates.format(match.gameDate, 'yyyy-MM-dd')}">2024-09-01</p>
+            <p th:text="${match.stadium}">서울월드컵경기장</p>
+          </div>
+          <div class="col-md-4 text-center">
+            <img th:src="@{'/img/' + ${match.isHome == 1 ? match.opponent + '.png' : 'gangwon.png'}}" alt="Away Team" class="team-logo">
+            <span th:text="${match.isHome == 1 ? match.opponent : '강원 FC'}">서울 FC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 경기 목록 -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">경기 목록</h6>
+      <div>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addGameModal">
+          <i class="fas fa-plus fa-sm text-white-50"></i> 경기 추가
+        </button>
+        <button class="btn btn-danger btn-sm" id="deleteSelectedBtn">
+          <i class="fas fa-trash fa-sm text-white-50"></i> 선택 삭제
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- 라디오 버튼 필터 -->
+    <div class="mb-3">
+      <div class="btn-group" role="group" aria-label="Game Type Filter">
+        <th:block th:each="type, iterStat : ${gameType}">
+          <input type="radio" class="btn-check" name="gameTypeFilter"
+                 th:id="${'gameType' + iterStat.index}"
+                 th:value="${type}"
+                 autocomplete="off"
+                 th:checked="${iterStat.first}">
+          <label class="btn btn-outline-primary"
+                 th:for="${'gameType' + iterStat.index}"
+                 th:text="${type}"></label>
+        </th:block>
+      </div>
+  </div>
+
+    <div>
+      <!-- 게임 목록 테이블 -->
+      <div id="gameList" class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>대회 유형</th>
+            <th>득점</th>
+            <th>실점</th>
+            <th>상대팀</th>
+            <th>경기장</th>
+            <th>경기 일자</th>
+            <th>결과</th>
+          </tr>
+          </thead>
+          <tbody id="gameTableBody">
+          <!-- Thymeleaf를 사용하여 초기 데이터 렌더링 -->
+          <tr th:each="match : ${matches}">
+            <td><input type="checkbox" name="selectedMatches" th:value="${match.gameIdx}"></td> <!-- 체크 박스 -->
+            <td th:text="${match.gameType}"></td> <!-- 대회 유형 -->
+            <td th:text="${match.goal}"></td> <!-- 득점 -->
+            <td th:text="${match.concede}"></td> <!-- 실점 -->
+            <td th:text="${match.opponent}"></td>  <!-- 상대팀 -->
+            <td th:text="${match.stadium}"></td> <!-- 경기장 -->
+            <td th:text="${#dates.format(match.gameDate, 'yyyy-MM-dd')}"></td> <!-- 경기 일자 -->
+            <td th:text="${match.goal > match.concede ? '승' : (match.goal < match.concede ? '패' : '무')}"></td> <!-- 결과 -->
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 페이지네이션 -->
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center" id="pagination">
+          <!-- JavaScript로 동적으로 페이지 링크가 추가됩니다 -->
+        </ul>
+      </nav>
+    </div>
+</div>
+
+<!-- 경기 추가 모달 -->
+  <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addGameModalLabel">경기 추가</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addGameForm">
+            <div class="row mb-3">
+              <div class="col">
+                <label>대회유형</label>
+                <div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gameType" id="typeLeague" value="리그" checked>
+                    <label class="form-check-label" for="typeLeague">리그</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gameType" id="typeTournament" value="토너먼트">
+                    <label class="form-check-label" for="typeTournament">토너먼트</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <label for="gameDate" class="form-label">경기 일자</label>
+                <input type="date" class="form-control" id="gameDate" required autocomplete="false">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="opponent" class="form-label">상대팀</label>
+              <select class="form-select" id="opponent" required>
+                <option value="">상대팀 선택</option>
+                <option value="SEO">FC 서울</option>
+                <option value="JEO">전북 현대</option>
+                <!-- 다른 팀들 추가 -->
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="stadium" class="form-label">경기장소</label>
+              <input type="text" class="form-control" id="stadium" required autocomplete="false">
+            </div>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="goal" class="form-label">득점</label>
+                <input type="number" class="form-control" id="goal" min="0" required>
+              </div>
+              <div class="col">
+                <label for="concede" class="form-label">실점</label>
+                <input type="number" class="form-control" id="concede" min="0" required>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveGame">추가</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- 삭제 확인 모달 -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmModalLabel">삭제 확인</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        정말 선택한 경기를 삭제하시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">삭제</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+      // 전역 변수 선언
+      let currentPage = 0;
+      let gameType = '';
+      const pageSize = 10;
+      let gameData = null;
+
+      document.addEventListener('DOMContentLoaded', function() {
+        // 초기 데이터 설정 및 게임 목록 로드
+        initializeGameData();
+        loadGames(currentPage);
+
+        // 전체 선택 체크박스 이벤트 리스너
+        document.getElementById('selectAll').addEventListener('change', function() {
+          const checkboxes = document.getElementsByName('selectedMatches');
+          for(let checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+          }
+        });
+
+        // 게임 유형 필터 이벤트 리스너
+        document.querySelectorAll('input[name="gameTypeFilter"]').forEach(radio => {
+          radio.addEventListener('change', function() {
+            gameType = this.value === '전체' ? '' : this.value;
+            currentPage = 0;
+            loadGames(currentPage);
+          });
+        });
+
+        // 경기 추가 버튼 이벤트 리스너
+        document.getElementById('saveGame').addEventListener('click', addGame);
+
+        // 선택 삭제 버튼 이벤트 리스너
+        document.getElementById('deleteSelectedBtn').addEventListener('click', showDeleteConfirmModal);
+
+        // 삭제 확인 버튼 이벤트 리스너
+        document.getElementById('confirmDelete').addEventListener('click', deleteSelectedGames);
+      });
+
+      function initializeGameData() {
+        const initialDataElement = document.getElementById('initialData');
+        if (initialDataElement) {
+          try {
+            gameData = JSON.parse(initialDataElement.textContent);
+          } catch (error) {
+            console.error('Error parsing initial data:', error);
+          }
+        }
+      }
+
+      function loadGames(page) {
+        fetch(`/games/list?page=${page}&size=${pageSize}&gameType=${gameType}`)
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error('서버 응답이 올바르지 않습니다.');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  if (data && data.content) {
+                    updateTable(data.content);
+                    updatePagination(data);
+                  } else {
+                    throw new Error('유효하지 않은 데이터 형식');
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  const tableBody = document.getElementById('gameTableBody');
+                  tableBody.innerHTML = '<tr><td colspan="8">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>';
+                });
+      }
+
+      function updateTable(games) {
+        const tableBody = document.getElementById('gameTableBody');
+        tableBody.innerHTML = '';
+
+        if (!Array.isArray(games) || games.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="8">표시할 게임 데이터가 없습니다.</td></tr>';
+          return;
+        }
+
+        games.forEach(game => {
+          if (game && typeof game === 'object') {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+        <td><input type="checkbox" name="selectedMatches" value="${game.gameIdx || ''}"></td>
+        <td>${game.gameType || ''}</td>
+        <td>${game.goal || 0}</td>
+        <td>${game.concede || 0}</td>
+        <td>${game.opponent || ''}</td>
+        <td>${game.stadium || ''}</td>
+        <td>${game.gameDate ? new Date(game.gameDate).toLocaleDateString() : ''}</td>
+        <td>${game.goal > game.concede ? '승' : (game.goal < game.concede ? '패' : '무')}</td>
+      `;
+            tableBody.appendChild(row);
+          }
+        });
+      }
+
+      function updatePagination(pageData) {
+        if (!pageData || typeof pageData.number === 'undefined' || typeof pageData.totalPages === 'undefined') {
+          console.error('Invalid page data:', pageData);
+          return;
+        }
+
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+
+        const prevLink = createPageLink(pageData.number - 1, '이전', pageData.first);
+        pagination.appendChild(prevLink);
+
+        for (let i = 0; i < pageData.totalPages; i++) {
+          const pageLink = createPageLink(i, i + 1, false, i === pageData.number);
+          pagination.appendChild(pageLink);
+        }
+
+        const nextLink = createPageLink(pageData.number + 1, '다음', pageData.last);
+        pagination.appendChild(nextLink);
+      }
+
+      function createPageLink(pageNumber, text, disabled = false, active = false) {
+        const li = document.createElement('li');
+        li.className = `page-item${disabled ? ' disabled' : ''}${active ? ' active' : ''}`;
+
+        const a = document.createElement('a');
+        a.className = `page-link${text === '이전' ? ' prev' : text === '다음' ? ' next' : ''}`;
+        a.href = '#';
+        a.textContent = text;
+
+        if (!disabled) {
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadGames(pageNumber);
+          });
+        }
+
+        li.appendChild(a);
+        return li;
+      }
+
+      // 경기 추가 function
+      function addGame() {
+        const gameType = document.querySelector('input[name="gameType"]:checked').value;
+        const opponent = document.getElementById('opponent').value;
+        const gameDate = document.getElementById('gameDate').value;
+        const stadium = document.getElementById('stadium').value;
+
+        const newGame = {
+          gameType: gameType,
+          opponent: opponent,
+          gameDate: gameDate,
+          stadium: stadium
+        };
+
+        fetch('/games/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newGame)
+        })
+                .then(response => {
+                  if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log('Success:', data);
+                  loadGames(currentPage);
+                  const modal = bootstrap.Modal.getInstance(document.getElementById('addGameModal'));
+                  modal.hide();
+                  alert('경기가 성공적으로 추가되었습니다.');
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                  alert('경기 추가 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'));
+                });
+      }
+
+      function showDeleteConfirmModal() {
+        const selectedGames = document.querySelectorAll('input[name="selectedMatches"]:checked');
+        if (selectedGames.length > 0) {
+          const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+          modal.show();
+        } else {
+          alert('삭제할 경기를 선택해주세요.');
+        }
+      }
+
+      function deleteSelectedGames() {
+        const selectedGames = document.querySelectorAll('input[name="selectedMatches"]:checked');
+        const gameIds = Array.from(selectedGames).map(cb => cb.value);
+
+        fetch('/games', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(gameIds)
+        })
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error('서버 응답이 올바르지 않습니다.');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log('Success:', data);
+                  loadGames(currentPage);
+                  const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+                  modal.hide();
+                  alert('선택한 경기가 성공적으로 삭제되었습니다.');
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  alert('삭제 중 오류가 발생했습니다: ' + error.message);
+                });
+      }
+    </script>
+    </body>
+    </html>
