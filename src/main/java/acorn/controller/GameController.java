@@ -23,20 +23,10 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
-    private final static String gameTypeStr = "전체,리그,토너먼트,컵";
-
-    @GetMapping("/dashboard")
-    public String gameList(Model model) {
-        /* 게임 구분 */
-        List<String> gameType = Arrays.asList(gameTypeStr.split(","));
-        model.addAttribute("gameType", gameType);
-        return "layout/games";
-    }
-
     // 모든 경기 조회 (페이징 처리)
     @GetMapping("/list")
     public ResponseEntity<Object> getAllGames(
-            @RequestParam(required = false) String gameType,
+    		@RequestParam(value = "gameType", required = false) String gameType,
             Pageable pageable) {
         Page<Game> gameList;
 

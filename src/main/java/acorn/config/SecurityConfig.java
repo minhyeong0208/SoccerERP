@@ -1,4 +1,3 @@
-/*
 package acorn.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -20,16 +21,16 @@ import acorn.repository.LoginRepository;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Autowired
+    @Autowired
     private LoginRepository loginRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-            	.requestMatchers("/").permitAll()
-            	.requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 접근 가능	
-            	.requestMatchers("/user/**").hasRole("USER") // 사용자만 접근 가능	
+                .requestMatchers("/", "/css/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 접근 가능
+                .requestMatchers("/user/**").hasRole("USER") // 사용자만 접근 가능
                 .anyRequest().authenticated() // 모든 요청에 대해 인증을 요구
             )
             .formLogin(form -> form
@@ -41,10 +42,16 @@ public class SecurityConfig {
                 .permitAll() // 로그아웃은 누구나 접근 가능
             )
             .sessionManagement(session -> session
-            	.maximumSessions(10)  // 최대 허용 세션 개수
-            	.expiredUrl("/login")
+                .maximumSessions(10) // 최대 허용 세션 개수
+                .expiredUrl("/login")
             );
         return http.build();
+    }
+
+    // PasswordEncoder 빈 등록
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // BCrypt 알고리즘을 사용하는 PasswordEncoder
     }
 
     @Bean
@@ -54,18 +61,17 @@ public class SecurityConfig {
             if (login == null) {
                 throw new UsernameNotFoundException("User not found");
             }
-            // 비밀번호는 암호화하지 않기 때문에 raw 비밀번호로 User 객체를 생성
+            // 암호화된 비밀번호를 사용할 수 있도록 설정
             UserBuilder builder = User.withUsername(username)
-                .password("{noop}" + login.getPw())
+                .password(login.getPw()) // 암호화된 비밀번호 그대로 사용
                 .roles(login.getRole());
 
             return builder.build();
         };
     }
-    
+
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-    	return new AuthSuccessHandler();
+        return new AuthSuccessHandler();
     }
 }
-*/

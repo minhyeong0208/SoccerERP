@@ -9,6 +9,12 @@ function loadFinanceData(page) {
 	const endDate = document.querySelector('#endDate').value;
 	const keyword = document.querySelector('#searchKeyword').value;
 
+	// 날짜 비교: startDate가 있고, endDate가 있으며, startDate가 endDate보다 클 경우
+	if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+		alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
+		return; // 더 이상 진행하지 않음
+	}
+
 	let url = `http://localhost/finances?page=${page}&size=${pageSize}`;
 	if (financeType) url += `&type=${financeType}`;
 	if (startDate) url += `&startDate=${startDate}`;
@@ -18,66 +24,27 @@ function loadFinanceData(page) {
 	fetch(url)
 		.then(response => response.json())
 		.then(data => {
-			const table = document.querySelector("#financeTable");
+			const table = document.querySelector("#financeTable tbody");
 			const pageButtons = document.querySelector("#pageButtons");
 
 			// 총 페이지 수 계산
 			totalPages = data.totalPages;
 
-			// 기존 테이블 내용 지우기 (헤더 제외)
-			const rows = table.querySelectorAll("tr:not(:first-child)");
-			rows.forEach(row => table.removeChild(row));
+			// 기존 테이블 내용 지우기
+			table.innerHTML = '';
 
 			// 새로운 데이터 추가
 			data.content.forEach(finance => {
-				const row = document.createElement("tr");
-
-				const checkboxCell = document.createElement("td");
-				const checkbox = document.createElement("input");
-				checkbox.type = "checkbox";
-				checkbox.classList.add("delete-checkbox");
-				checkbox.setAttribute("data-id", finance.financeIdx);
-				checkboxCell.appendChild(checkbox);
-
-				// 수입/지출 타입 컬럼의 경우, 수정 불가
-				const financeTypeCell = document.createElement("td");
-				financeTypeCell.textContent = finance.financeType;
-
-				const financeDateCell = document.createElement("td");
-				financeDateCell.textContent = finance.financeDate;
-				financeDateCell.classList.add('editable');
-				financeDateCell.setAttribute('data-field', 'financeDate');
-
-				const amountCell = document.createElement("td");
-				amountCell.textContent = finance.amount;
-				amountCell.classList.add('editable');
-				amountCell.setAttribute('data-field', 'amount');
-
-				const traderCell = document.createElement("td");
-				traderCell.textContent = finance.trader;
-				traderCell.classList.add('editable');
-				traderCell.setAttribute('data-field', 'trader');
-
-				const purposeCell = document.createElement("td");
-				purposeCell.textContent = finance.purpose;
-				purposeCell.classList.add('editable');
-				purposeCell.setAttribute('data-field', 'purpose');
-
-				const financeMemoCell = document.createElement("td");
-				financeMemoCell.textContent = finance.financeMemo;
-				financeMemoCell.classList.add('editable');
-				financeMemoCell.setAttribute('data-field', 'financeMemo');
-
-				row.appendChild(checkboxCell);
-				row.appendChild(financeTypeCell);
-				row.appendChild(financeDateCell);
-				row.appendChild(amountCell);
-				row.appendChild(traderCell);
-				row.appendChild(purposeCell);
-				row.appendChild(financeMemoCell);
-				row.setAttribute('data-id', finance.financeIdx); // 각 행에 고유 ID 설정
-
-				table.appendChild(row);
+				table.innerHTML += `
+			        <tr data-id="${finance.financeIdx}">
+			            <td><input type="checkbox" class="delete-checkbox" data-id="${finance.financeIdx}"></td>
+			            <td>${finance.financeType}</td>
+			            <td class="editable" data-field="financeDate">${finance.financeDate}</td>
+			            <td class="editable" data-field="amount">${finance.amount}</td>
+			            <td class="editable" data-field="trader">${finance.trader}</td>
+			            <td class="editable" data-field="purpose">${finance.purpose}</td>
+			            <td class="editable" data-field="financeMemo">${finance.financeMemo}</td>
+			        </tr>`;
 			});
 
 			// 각 셀에 더블 클릭 시 편집 가능하도록 이벤트 리스너 추가
@@ -86,9 +53,7 @@ function loadFinanceData(page) {
 			});
 
 			// 페이지 버튼 초기화
-			while (pageButtons.firstChild) {
-				pageButtons.removeChild(pageButtons.firstChild);
-			}
+			pageButtons.innerHTML = '';
 
 			// 중앙을 기준으로 10페이지 생성
 			let startPage = Math.max(0, page - Math.floor(maxVisiblePages / 2));
@@ -99,14 +64,10 @@ function loadFinanceData(page) {
 			}
 
 			for (let i = startPage; i < endPage; i++) {
-				const button = document.createElement("button");
-				button.textContent = i + 1;
-				button.disabled = i === page;
-				button.onclick = () => {
-					currentPage = i;
-					loadFinanceData(currentPage);
-				};
-				pageButtons.appendChild(button);
+				pageButtons.innerHTML += `
+			        <li class="page-item ${i === page ? 'active' : ''}">
+			            <button class="page-link" onclick="loadFinanceData(${i})">${i + 1}</button>
+			        </li>`;
 			}
 
 			// 이전/다음 그룹 버튼 활성화/비활성화 설정
@@ -125,14 +86,9 @@ function editField(event) {
 	const id = row.getAttribute('data-id');
 
 	const inputType = field === 'financeDate' ? 'date' : 'text';
-	const input = document.createElement('input');
-	input.type = inputType;
-	input.classList.add('editable-input');
-	input.value = originalValue;
+	cell.innerHTML = `<input type="${inputType}" class="editable-input" value="${originalValue}">`;
 
-	cell.textContent = ''; // 셀의 내용을 비우고
-	cell.appendChild(input); // 인풋 필드로 변경
-
+	const input = cell.querySelector('input');
 	input.focus(); // 인풋 필드에 포커스
 
 	input.addEventListener('blur', function() {
@@ -159,6 +115,13 @@ function updateFinanceData(id) {
 	const trader = row.querySelector('[data-field="trader"]').textContent;
 	const purpose = row.querySelector('[data-field="purpose"]').textContent;
 	const financeMemo = row.querySelector('[data-field="financeMemo"]').textContent;
+
+	// 금액이 숫자인지 확인
+	if (isNaN(amount) || amount.trim() === "") {
+		showAlertModal("금액은 숫자만 입력 가능합니다.");
+		
+		return; // 숫자가 아닌 경우 함수 종료
+	}
 
 	const updatedData = {
 		financeDate: financeDate,
@@ -215,17 +178,27 @@ function deleteSelectedFinances() {
 			},
 			body: JSON.stringify(selectedIds)
 		})
-		.then(response => {
-			if (!response.ok) {
-				throw new Error('삭제 오류');
-			}
-			// 삭제 후 테이블 갱신
-			loadFinanceData(currentPage);
-		})
-		.catch(error => {
-			console.error('삭제 오류:', error);
-		});
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('삭제 오류');
+				}
+				// 삭제 후 테이블 갱신
+				loadFinanceData(currentPage);
+			})
+			.catch(error => {
+				console.error('삭제 오류:', error);
+			});
 	}
+}
+
+// 모달을 띄우기 위한 함수 추가
+function showAlertModal(message) {
+    // 모달의 내용 변경 (필요에 따라 메시지를 다르게 설정 가능)
+    document.querySelector("#alertModal .modal-body").textContent = message;
+
+    // Bootstrap 모달 인스턴스 생성 및 모달 표시
+    var alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+    alertModal.show();
 }
 
 // 모달 관련 코드
@@ -236,7 +209,7 @@ const addFinanceButton = document.getElementById("addFinanceButton");
 const closeButtons = document.getElementsByClassName("close");
 
 // 모달 열기 (기본적으로 수입 모달로 열림)
-addFinanceButton.onclick = function () {
+addFinanceButton.onclick = function() {
 	modalTitle.innerText = "수입 항목 추가";
 	dateLabel.innerText = "수입 날짜:";
 	document.getElementById("modalIncomeRadio").checked = true;
@@ -244,31 +217,31 @@ addFinanceButton.onclick = function () {
 }
 
 // 라디오 버튼에 따라 모달 내용 변경
-document.getElementById("modalIncomeRadio").onclick = function () {
+document.getElementById("modalIncomeRadio").onclick = function() {
 	modalTitle.innerText = "수입 항목 추가";
 	dateLabel.innerText = "수입 날짜:";
 }
 
-document.getElementById("modalExpenseRadio").onclick = function () {
+document.getElementById("modalExpenseRadio").onclick = function() {
 	modalTitle.innerText = "지출 항목 추가";
 	dateLabel.innerText = "지출 날짜:";
 }
 
 // 모달 닫기
 for (let i = 0; i < closeButtons.length; i++) {
-	closeButtons[i].onclick = function () {
+	closeButtons[i].onclick = function() {
 		modal.style.display = "none";
 	}
 }
 
-window.onclick = function (event) {
+window.onclick = function(event) {
 	if (event.target == modal) {
 		modal.style.display = "none";
 	}
 }
 
 // 추가 버튼 클릭 시 데이터 처리
-document.getElementById("submitFinance").onclick = function () {
+document.getElementById("submitFinance").onclick = function() {
 	const financeType = document.getElementById("modalIncomeRadio").checked ? "수입" : "지출";
 	const financeDate = document.getElementById("financeDate").value;
 	const amount = document.getElementById("amount").value;
@@ -340,7 +313,7 @@ document.querySelector("#searchButton").onclick = () => {
 };
 
 // 페이지 로드 시 데이터 로드
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
 	loadFinanceData(currentPage);
 });
 
@@ -350,7 +323,7 @@ document.querySelector("#deleteFinanceButton").onclick = () => {
 };
 
 // "전체 선택" 체크박스 클릭 시 이벤트
-document.querySelector("#selectAllCheckbox").addEventListener("change", function () {
+document.querySelector("#selectAllCheckbox").addEventListener("change", function() {
 	const isChecked = this.checked;
 	const checkboxes = document.querySelectorAll(".delete-checkbox");
 
