@@ -142,11 +142,11 @@ html {
 }
 
 /* ?tooltip */
-.tooltip {
+.custom_tooltip {
     position: relative;
 }
 
-.tooltip .tooltip__content::after {
+.custom_tooltip .tooltip__content::after {
     content: " ";
     position: absolute;
     top: 50%;
@@ -158,7 +158,7 @@ html {
     border-color: transparent var(--primary-color) transparent transparent;
 }
 
-.tooltip .tooltip__content {
+.custom_tooltip .tooltip__content {
     visibility: hidden;
     background-color: var(--primary-color);
     color: var(--white);
