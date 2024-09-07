@@ -4,6 +4,9 @@ let gameType = '';
 const pageSize = 10;
 let gameData = null;
 
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
 document.addEventListener('DOMContentLoaded', function() {
     // 초기 데이터 설정 및 게임 목록 로드
     initializeGameData();
@@ -167,6 +170,7 @@ function addGame() {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
+		[csrfHeader]: csrfToken
         },
         body: JSON.stringify(newGame)
     })
@@ -213,6 +217,7 @@ function deleteGame() {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
+			[csrfHeader]: csrfToken
         },
         body: JSON.stringify(selectedIds)
     })
