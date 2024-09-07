@@ -106,6 +106,7 @@ function updateTable(games) {
     });
 }
 
+// 페이징
 function updatePagination(pageData) {
     if (!pageData || typeof pageData.number === 'undefined' || typeof pageData.totalPages === 'undefined') {
         console.error('Invalid page data:', pageData);
@@ -150,13 +151,16 @@ function createPageLink(pageNumber, text, disabled = false, active = false) {
 // 경기 추가 function
 function addGame() {
     const gameType = document.querySelector('input[name="gameType"]:checked').value;
+    const gameName = document.getElementById('game_name').value;
     const opponent = document.getElementById('opponent').value;
     const gameDate = document.getElementById('gameDate').value;
     const stadium = document.getElementById('stadium').value;
     const goal = document.getElementById('goal').value;
     const concede = document.getElementById('concede').value;
 
+    // 일정에 떠야 할 game_name 추가
     const newGame = {
+        gameName: gameName,
         gameType: gameType,
         opponent: opponent,
         gameDate: gameDate,
