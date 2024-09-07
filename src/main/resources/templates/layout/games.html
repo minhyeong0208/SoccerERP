@@ -66,7 +66,7 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="h6 font-weight-bold text-warning text-uppercase mb-1">팀 도움</div>
+                <div class="h6 font-weight-bold text-warning text-uppercase mb-1">팀 실점</div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${teamAssists}"></div>
               </div>
               <div class="col-auto">
@@ -194,6 +194,7 @@
         </div>
       </div>
     </div>
+
     <!-- 경기 추가 모달 -->
     <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -223,6 +224,13 @@
                     <input type="date" class="form-control" id="gameDate" required autocomplete="false">
                   </div>
                 </div>
+
+                <!-- 새로 추가된 game_name 입력 필드 -->
+                <div class="mb-3">
+                  <label for="game_name" class="form-label">경기명</label>
+                  <input type="text" class="form-control" id="game_name" required>
+                </div>
+
                 <div class="mb-3">
                   <label for="opponent" class="form-label">상대팀</label>
                   <select class="form-select" id="opponent" required>

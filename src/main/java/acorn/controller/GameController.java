@@ -76,6 +76,11 @@ public class GameController {
     public ResponseEntity<?> createGame(@RequestBody Game game) {
         Map<String, String> errors = new HashMap<>();
 
+        // 게임명 검증
+        if (game.getGameName() == null || game.getGameName().trim().isEmpty()) {
+            errors.put("game_name", "경기명은 필수입니다.");
+        }
+
         // 게임 타입 검증
         if (game.getGameType() == null || game.getGameType().trim().isEmpty()) {
             errors.put("gameType", "대회 유형은 필수입니다.");
