@@ -22,10 +22,10 @@ function loadTrainData(page) {
 					<tr data-id="${train.trainIdx}">
 						<td><input type="checkbox" class="delete-checkbox" data-id="${train.trainIdx}"></td>
 						<td>${train.trainName}</td>
-						<td>${train.startTime}</td>		
-						<td>${train.endTime}</td>					
-						<td>${train.startDate}</td>
-						<td>${train.endDate}</td>
+						<td>${formatTime(train.startTime)}</td>		
+						<td>${formatTime(train.endTime)}</td>					
+						<td>${formatDate(train.startDate)}</td>
+						<td>${formatDate(train.endDate)}</td>
 						<td>${train.countMem}</td>
 					</tr>`;
 			});
@@ -53,6 +53,18 @@ function loadTrainData(page) {
 			document.querySelector("#nextGroup").disabled = currentPage >= totalPages - 1;
 		})
 		.catch(error => console.error('Error fetching data:', error));
+}
+
+// 날짜 형식 변환 함수
+function formatDate(dateStr) {
+	const date = new Date(dateStr);
+  	return date.toISOString().split('T')[0]; // 'YYYY-MM-DD' 형식으로 변환
+}
+
+// 시간 형식 변환 함수
+function formatTime(dateStr) {
+  	const time = new Date(dateStr);
+  	return time.toISOString().split('T')[1].substring(0, 5); // 'HH:MM' 형식으로 변환
 }
 
 // 페이지 로드 시 데이터 로드
