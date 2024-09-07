@@ -31,7 +31,6 @@ public class PageController {
     	return "layout/dashboard";
     }
    
-    
     @GetMapping("/game")
     public String gameList(Model model) {
         // 게임 구분 문자열을 메소드 내부에 정의
