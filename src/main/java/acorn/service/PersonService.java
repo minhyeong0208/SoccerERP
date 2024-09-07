@@ -65,29 +65,70 @@ public class PersonService {
 
     // 사람 업데이트
     public Person updatePerson(int personIdx, Person personDetails) {
-        Person person = getPersonById(personIdx);
+        Person person = getPersonById(personIdx); // 기존의 데이터를 가져옴
         if (person != null) {
-            person.setPersonName(personDetails.getPersonName());
-            person.setTeamIdx(personDetails.getTeamIdx());
-            person.setFacilityIdx(personDetails.getFacilityIdx());
-            person.setHeight(personDetails.getHeight());
-            person.setWeight(personDetails.getWeight());
-            person.setBirth(personDetails.getBirth());
-            person.setPosition(personDetails.getPosition());
-            person.setBackNumber(personDetails.getBackNumber());
-            person.setNationality(personDetails.getNationality());
-            person.setContractStart(personDetails.getContractStart());
-            person.setContractEnd(personDetails.getContractEnd());
-            person.setId(personDetails.getId());
-            person.setPhone(personDetails.getPhone());
-            person.setGender(personDetails.getGender());
-            person.setEmail(personDetails.getEmail());
-            person.setTypeCode(personDetails.getTypeCode());
-            person.setPersonImage(personDetails.getPersonImage());
+            // 필드가 null이 아닐 때만 업데이트 (문자열 등)
+            if (personDetails.getPersonName() != null) {
+                person.setPersonName(personDetails.getPersonName());
+            }
+            if (personDetails.getTeamIdx() != null) {
+                person.setTeamIdx(personDetails.getTeamIdx());
+            }
+            if (personDetails.getFacilityIdx() != 0) { // 숫자 필드 체크
+                person.setFacilityIdx(personDetails.getFacilityIdx());
+            }
+            if (personDetails.getHeight() != 0) { // 키가 0이 아니면 업데이트
+                person.setHeight(personDetails.getHeight());
+            }
+            if (personDetails.getWeight() != 0) {
+                person.setWeight(personDetails.getWeight());
+            }
+            if (personDetails.getBirth() != null) {
+                person.setBirth(personDetails.getBirth());
+            }
+            if (personDetails.getPosition() != null) {
+                person.setPosition(personDetails.getPosition());
+            }
+            if (personDetails.getBackNumber() != 0) { // 백넘버가 0이 아니면 업데이트
+                person.setBackNumber(personDetails.getBackNumber());
+            }
+            if (personDetails.getNationality() != null) {
+                person.setNationality(personDetails.getNationality());
+            }
+            if (personDetails.getContractStart() != null) {
+                person.setContractStart(personDetails.getContractStart());
+            }
+            if (personDetails.getContractEnd() != null) {
+                person.setContractEnd(personDetails.getContractEnd());
+            }
+            if (personDetails.getId() != null) {
+                person.setId(personDetails.getId());
+            }
+            if (personDetails.getPhone() != null) {
+                person.setPhone(personDetails.getPhone());
+            }
+            if (personDetails.getGender() != null) {
+                person.setGender(personDetails.getGender());
+            }
+            if (personDetails.getEmail() != null) {
+                person.setEmail(personDetails.getEmail());
+            }
+            if (personDetails.getTypeCode() != null) {
+                person.setTypeCode(personDetails.getTypeCode());
+            }
+            if (personDetails.getPersonImage() != null) {
+                person.setPersonImage(personDetails.getPersonImage());
+            }
+            // 능력치 업데이트 (null 체크)
+            if (personDetails.getAbility() != null) {
+                person.setAbility(personDetails.getAbility());
+            }
+
             return personRepository.save(person);
         }
         return null;
     }
+
 
     // 사람 삭제
     public void deletePerson(int personIdx) {

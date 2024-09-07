@@ -51,7 +51,7 @@ public class Person {
     @JsonManagedReference
     private Ability ability;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Injury> injuries;
 

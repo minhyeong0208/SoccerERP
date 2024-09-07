@@ -1,24 +1,29 @@
 package acorn.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import acorn.entity.Ability;
 import acorn.service.AbilityService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/abilities")
 public class AbilityController {
 
-    private final AbilityService abilityService;
+	@Autowired
+    private AbilityService abilityService;
 
-    @Autowired
-    public AbilityController(AbilityService abilityService) {
-        this.abilityService = abilityService;
-    }
-
+    
     // 모든 능력치 조회
     @GetMapping
     public List<Ability> getAllAbilities() {
