@@ -34,8 +34,8 @@ public class GameController {
         model.addAttribute("winLossMargin", gameService.getWinLossMargin());
         /* 팀 득점 */
         model.addAttribute("teamScore", gameService.getTotalGoals());
-        /* 팀 도움 */
-//        model.addAttribute("teamAssists", teamAssists);
+        /* 팀 실점 */
+        model.addAttribute("teamConcede", gameService.getTotalConcede());
 
         /* 게임 구분 */
         List<String> gameType = Arrays.asList(gameTypeStr.split(","));

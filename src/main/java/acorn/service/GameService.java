@@ -43,6 +43,11 @@ public class GameService {
         return gameRepository.sumTotalGoals();
     }
 
+    // 총 실점
+    public int getTotalConcede() {
+        return gameRepository.sumTotalConcede();
+    }
+
     // 승패 마진
     public String getWinLossMargin() {
         int margin = gameRepository.calculateWinLossMargin();

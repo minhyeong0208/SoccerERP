@@ -33,7 +33,7 @@ public class PageController {
     @GetMapping("/game")
     public String gameList(Model model) {
         // 게임 구분 문자열을 메소드 내부에 정의
-        String gameTypeStr = "전체,리그,토너먼트,컵";
+        String gameTypeStr = "전체,리그,토너먼트";
 
         /* 경기 수 */
         model.addAttribute("matchCount", gameService.getTotalGames());
@@ -41,6 +41,8 @@ public class PageController {
         model.addAttribute("winLossMargin", gameService.getWinLossMargin());
         /* 팀 득점 */
         model.addAttribute("teamScore", gameService.getTotalGoals());
+        /* 팀 실점 (새로 추가) */
+        model.addAttribute("teamConcede", gameService.getTotalConcede());
 
         /* 게임 구분 */
         List<String> gameType = Arrays.asList(gameTypeStr.split(","));
