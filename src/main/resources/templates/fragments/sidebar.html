@@ -9,7 +9,7 @@
   <div class="sidebar-links">
     <ul>
       <li>
-        <a th:href="@{/main}" title="Dashboard" class="tooltip">
+        <a th:href="@{/dashboard}" title="Dashboard" class="custom_tooltip">
           <span class="link">대시보드</span>
           <span class="tooltip__content">Dashboard</span>
         </a>
@@ -17,49 +17,67 @@
       <!-- role이 ADMIN인 경우에만 Finance 탭 보이도록 -->
       <!-- role이 어떻게 넘어올지 몰라서 일단 하드코딩, 수정 예정~ -->
       <li th:if="${gubun == 'ADMIN'}">
-        <a th:href="@{/admin/finance}" title="Finance" class="tooltip">
+        <a th:href="@{/finance}" title="Finance" class="custom_tooltip">
           <span class="link hide">재정 관리</span>
-          <span class="tooltip__content">Finance</span>
+          <span class="tooltip__content">재정 관리</span>
+        </a>
+      </li>
+      <li th:if="${gubun == 'ADMIN'}">
+        <a th:href="@{/sponsor}" title="Sponsor" class="custom_tooltip">
+          <span class="link hide">스폰서 관리</span>
+          <span class="tooltip__content">스폰서 관리</span>
         </a>
       </li>
       <li>
-        <a th:href="@{/#}" title="Settings" class="tooltip">
+        <a th:href="@{/coach}" title="Settings" class="custom_tooltip">
           <span class="link hide">코치 관리</span>
           <span class="tooltip__content">코치 관리</span>
         </a>
       </li>
       <li>
-        <a th:href="@{/player}" title="Analytics" class="tooltip">
+        <a th:href="@{/player}" title="Analytics" class="custom_tooltip">
           <span class="link hide">선수 관리</span>
           <span class="tooltip__content">선수 관리</span>
         </a>
       </li>
+      <li th:if="${gubun == 'USER'}">
+        <a th:href="@{/injury}" title="Injury" class="custom_tooltip">
+          <span class="link hide">부상 관리</span>
+          <span class="tooltip__content">부상 관리</span>
+        </a>
+      </li>
+      <li th:if="${gubun == 'USER'}">
+        <a th:href="@{/train}" title="Train" class="custom_tooltip">
+          <span class="link hide">훈련 관리</span>
+          <span class="tooltip__content">훈련 관리</span>
+        </a>
+      </li>
       <li>
-        <a th:href="@{/}" title="Transfer" class="tooltip">
+        <a th:href="@{/transfer}" title="Transfer" class="custom_tooltip">
           <span class="link hide">이적 관리</span>
           <span class="tooltip__content">이적 관리</span>
         </a>
       </li>
       <li>
-        <a th:href="@{/#}" title="Reports" class="tooltip">
+        <a th:href="@{/facility}" title="Reports" class="custom_tooltip">
           <span class="link hide">시설 관리</span>
           <span class="tooltip__content">시설 관리</span>
         </a>
       </li>
       <li>
-        <a th:href="@{/game}" title="Industries" class="tooltip">
+        <a th:href="@{/game}" title="Industries" class="custom_tooltip">
           <span class="link hide">경기 관리</span>
           <span class="tooltip__content">경기 관리</span>
         </a>
       </li>
       <li>
-        <a th:href="@{/schedule}" class="tooltip">
+        <a th:href="@{/schedule}" class="custom_tooltip">
           <span class="link hide">일정 관리</span>
           <span class="tooltip__content">일정 관리</span>
         </a>
       </li>
       <li>
-        <a th:href="@{/#}" title="Notifications" class="tooltip">
+        <a th:href="@{/team}" title="Notifications" class="custom_tooltip">
           <span class="link hide">팀 정보</span>
           <span class="tooltip__content">팀 정보</span>
         </a>

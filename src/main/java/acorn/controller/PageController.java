@@ -15,21 +15,16 @@ public class PageController {
         return "layout/login"; // 로그인 페이지 (login.html)
     }
     
-    @GetMapping("/admin/finance")
+    @GetMapping("/finance")
     public String adminFinance() {
     	return "layout/finance";
     }
     
-    @GetMapping("/admin/dashboard")
-    public String adminDashboard() {
-    	return "layout/admin_dashboard";
+    @GetMapping("/dashboard")
+    public String dashboard() {
+    	return "layout/dashboard";
     }
-    
-    @GetMapping("/user/dashboard")
-    public String userDashboard() {
-    	return "layout/user_dashboard";
-    }
-    
+   
     @GetMapping("/game")
     public String gameList(Model model) {
         // 게임 구분 문자열을 메소드 내부에 정의

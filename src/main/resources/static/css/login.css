@@ -1,74 +1,80 @@
 body {
-	background-color: #212121;
+    background-color: #212121;
+    display: flex;
+    justify-content: center; /* 가로축 가운데 정렬 */
+    align-items: center; /* 세로축 가운데 정렬 */
+    height: 100vh; /* 화면 전체 높이 */
+    margin: 0; /* 기본 margin 제거 */
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-left: 2em;
-  padding-right: 2em;
-  padding-bottom: 0.4em;
-  background-color: #171717;
-  border-radius: 25px;
-  transition: .4s ease-in-out;
-  max-width: 290px; /* 최대 폭 설정 */
-  margin: 0 auto; /* 가운데 정렬 */
-  
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 요소 간 간격을 조금 더 넓힘 */
+    padding-left: 2.5em;
+    padding-right: 2.5em;
+    padding-bottom: 0.6em;
+    background-color: #171717;
+    border-radius: 25px;
+    transition: .4s ease-in-out;
+    max-width: 350px; /* 최대 폭을 350px로 확대 */
+    margin: 0 auto; /* 가운데 정렬 */
 }
 
 .form:hover {
-  transform: scale(1.05);
-  border: 1px solid black;
+    transform: scale(1.05);
+    border: 1px solid black;
 }
 
 #heading {
-  text-align: center;
-  margin: 2em;
-  color: rgb(255, 255, 255);
-  font-size: 1.2em;
+    text-align: center;
+    margin: 2.5em;
+    color: rgb(255, 255, 255);
+    font-size: 1.5em; /* 폰트 크기를 키움 */
 }
 
 .field {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5em;
-  border-radius: 25px;
-  padding: 0.6em;
-  border: none;
-  outline: none;
-  color: white;
-  background-color: #171717;
-  box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7em; /* 아이콘과 입력 필드 간격을 약간 더 넓힘 */
+    border-radius: 25px;
+    padding: 0.8em; /* 패딩을 늘려 입력 필드 크기 확대 */
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #171717;
+    box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
 }
 
 .input-icon {
-  height: 1.3em;
-  width: 1.3em;
-  fill: white;
+    height: 1.5em; /* 아이콘 크기를 키움 */
+    width: 1.5em; /* 아이콘 크기를 키움 */
+    fill: white;
 }
 
 .input-field {
-  background: none;
-  border: none;
-  outline: none;
-  width: 100%;
-  color: #d3d3d3;
+    background: none;
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #d3d3d3;
+    font-size: 1.1em; /* 입력 필드 텍스트 크기를 조금 키움 */
 }
 
 .button {
-  margin-bottom: 3em;
-  padding: 0.5em;
-  border-radius: 5px;
-  border: none;
-  outline: none;
-  transition: .4s ease-in-out;
-  background-color: #252525;
-  color: white;
+    margin-bottom: 3em;
+    padding: 0.8em; /* 버튼 패딩을 늘려 크기 확대 */
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    transition: .4s ease-in-out;
+    background-color: #252525;
+    color: white;
+    font-size: 1.1em; /* 버튼 폰트 크기를 조금 키움 */
 }
 
 .button:hover {
-  background-color: black;
-  color: white;
+    background-color: black;
+    color: white;
 }
