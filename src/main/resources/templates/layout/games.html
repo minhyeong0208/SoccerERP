@@ -6,7 +6,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
-
+    <!-- 승패마진 board icon CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   	<link rel="stylesheet" type="text/css" th:href="@{/css/games.css}">
 </th:block>
 
@@ -25,7 +26,7 @@
                 <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${matchCount}"></div>
               </div>
               <div class="col-auto">
-                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
               </div>
             </div>
           </div>
@@ -40,7 +41,7 @@
                 <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${winLossMargin}"></div>
               </div>
               <div class="col-auto">
-                <i class="fas fa-balance-scale fa-2x text-gray-300"></i>
+                <i class="fa-solid fa-chart-line fa-2x text-gray-300"></i>
               </div>
             </div>
           </div>
@@ -61,16 +62,17 @@
           </div>
         </div>
       </div>
+
       <div class="col-xl-3 col-md-6 mb-4">
         <div class="card card-left-border border-left-warning h-100 py-2">
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="h6 font-weight-bold text-warning text-uppercase mb-1">팀 실점</div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${teamAssists}"></div>
+                <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${teamConcede}"></div>
               </div>
               <div class="col-auto">
-                <i class="fas fa-hands-helping fa-2x text-gray-300"></i>
+                <i class="fa-solid fa-circle-exclamation fa-2x text-gray-300"></i>
               </div>
             </div>
           </div>
@@ -94,7 +96,7 @@
           <div class="row align-items-center mb-3">
             <div class="col-4">
 <!--              <h4 th:text="${mostRecentGame.ownTeam}"></h4>-->
-              <h1>KWO</h1>
+              <h1>강원 FC</h1>
             </div>
             <div class="col-4">
               <h3>vs</h3>
@@ -235,18 +237,17 @@
                   <label for="opponent" class="form-label">상대팀</label>
                   <select class="form-select" id="opponent" required>
                     <option value="">상대팀 선택</option>
-                    <option value="USO">울산 HD</option>
-                    <option value="SWO">수원 FC</option>
-                    <option value="KSO">김천상무 FC</option>
-                    <option value="SEO">FC 서울</option>
-                    <option value="PSO">포항 스틸러스</option>
-                    <option value="KJO">광주 FC</option>
-                    <option value="JJO">제주 유나이티드 FC</option>
-                    <option value="DHO">대전 하나시티즈</option>
-                    <option value="ICO">인천 유나이티드 FC</option>
-                    <option value="JEO">전북 현대</option>
-                    <option value="DGO">대구 FC</option>
-                    <!-- 다른 팀들 추가 -->
+                    <option value="울산 HD">울산 HD</option>
+                    <option value="수원 FC">수원 FC</option>
+                    <option value="김천상무 FC">김천상무 FC</option>
+                    <option value="FC 서울">FC 서울</option>
+                    <option value="포항 스틸러스">포항 스틸러스</option>
+                    <option value="광주 FC">광주 FC</option>
+                    <option value="제주 유나이티드 FC">제주 유나이티드 FC</option>
+                    <option value="대전 하나시티즈">대전 하나시티즈</option>
+                    <option value="인천 유나이티드 FC">인천 유나이티드 FC</option>
+                    <option value="전북 현대">전북 현대</option>
+                    <option value="대구 FC">대구 FC</option>
                   </select>
                 </div>
                 <div class="mb-3">

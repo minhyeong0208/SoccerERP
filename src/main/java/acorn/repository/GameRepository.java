@@ -29,6 +29,10 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
     @Query("SELECT SUM(g.goal) FROM Game g")
     Integer sumTotalGoals();
 
+    // 팀 전체 실점 조회
+    @Query("SELECT SUM(g.concede) FROM Game g")
+    Integer sumTotalConcede();
+
     // 승패 마진 계산 (승리 수 - 패배 수)
     @Query("SELECT " +
             "(SELECT COUNT(g) FROM Game g WHERE g.goal > g.concede) - " +
