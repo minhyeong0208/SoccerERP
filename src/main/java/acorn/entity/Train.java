@@ -1,16 +1,15 @@
 package acorn.entity;
 
-import java.util.Date;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Data
 @Builder
@@ -31,4 +30,8 @@ public class Train {
     private String area;
     private String memo;
     private String countMem;
+
+    @OneToMany(mappedBy = "train", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<TrainMem> trainMems;
 }

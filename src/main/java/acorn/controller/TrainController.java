@@ -1,5 +1,7 @@
 package acorn.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import acorn.entity.Person;
 import acorn.entity.Train;
+import acorn.service.PersonService;
+import acorn.service.TrainMemService;
 import acorn.service.TrainService;
 
 @RestController
@@ -21,10 +26,14 @@ import acorn.service.TrainService;
 public class TrainController {
 
     private final TrainService trainService;
+    private final TrainMemService trainMemService;
+    private final PersonService personService;  // PersonService 추가
 
     @Autowired
-    public TrainController(TrainService trainService) {
+    public TrainController(TrainService trainService, TrainMemService trainMemService, PersonService personService) {
         this.trainService = trainService;
+        this.trainMemService = trainMemService;
+        this.personService = personService;
     }
 
     // 모든 훈련 조회 (페이징 처리)
@@ -33,6 +42,42 @@ public class TrainController {
         return trainService.getAllTrains(pageable);
     }
     
+    // 훈련에 참가자를 추가하는 엔드포인트
+    @PostMapping("/{id}/add-participants")
+    public ResponseEntity<String> addParticipantsToTraining(@PathVariable("id") int trainIdx, @RequestBody List<Integer> personIds) {
+        Train train = trainService.getTrainById(trainIdx);
+        if (train == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<Person> participants = personService.getPersonsByIds(personIds);
+        for (Person person : participants) {
+            trainMemService.addTrainMem(train, person);
+        }
+
+        return ResponseEntity.ok("Participants have been successfully added to the training.");
+    }
+    
+    // 특정 훈련에서 특정 선수를 제거하는 엔드포인트
+    @DeleteMapping("/{trainId}/remove-participant/{personId}")
+    public ResponseEntity<String> removeParticipantFromTraining(
+            @PathVariable("trainId") int trainId, 
+            @PathVariable("personId") int personId) {
+        
+        Train train = trainService.getTrainById(trainId);
+        if (train == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Person person = personService.getPersonById(personId);
+        if (person == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        trainMemService.removeTrainMem(train, person);
+        return ResponseEntity.ok("Participant removed successfully.");
+    }
+
     // 특정 훈련 조회
     @GetMapping("/{id}")
     public ResponseEntity<Train> getTrainById(@PathVariable(value = "id") int trainIdx) {
