@@ -289,7 +289,6 @@ document.getElementById("submitFinance").onclick = function() {
 document.querySelectorAll('input[name="financeType"]').forEach(radio => {
 	radio.addEventListener('change', () => {
 		currentPage = 0; // 페이지를 초기화합니다.
-		loadFinanceData(currentPage);
 	});
 });
 

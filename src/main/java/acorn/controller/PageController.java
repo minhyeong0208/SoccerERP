@@ -29,7 +29,7 @@ public class PageController {
     public String dashboard() {
     	return "layout/dashboard";
     }
-   
+    
     @GetMapping("/game")
     public String gameList(Model model) {
         // 게임 구분 문자열을 메소드 내부에 정의
@@ -59,6 +59,9 @@ public class PageController {
         return "layout/schedule";
     }
 
-
+    @GetMapping("/train")
+    public String train(){
+        return "layout/train";
+    }
 
 }
