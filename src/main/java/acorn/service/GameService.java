@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -81,26 +83,53 @@ public class GameService {
         return game;
     }
 
-    // 새로운 경기 추가
-    public Game addGame(Game game) {
-        return gameRepository.save(game);
+    // 게임 저장 전 유효성 검사
+    public Map<String, String> validGame(Game game) {
+        Map<String, String> errors = new HashMap<>();
+
+        // 게임명 검증
+        if (game.getGameName() == null || game.getGameName().trim().isEmpty()) {
+            errors.put("game_name", "경기명은 필수입니다.");
+        }
+
+        // 게임 타입 검증
+        if (game.getGameType() == null || game.getGameType().trim().isEmpty()) {
+            errors.put("gameType", "대회 유형은 필수입니다.");
+        }
+
+        // 상대팀 검증
+        if (game.getOpponent() == null || game.getOpponent().trim().isEmpty()) {
+            errors.put("opponent", "상대팀은 필수입니다.");
+        }
+
+        // 경기 일자 검증
+        if (game.getGameDate() == null) {
+            errors.put("gameDate", "경기 일자는 필수입니다.");
+        }
+
+        // 경기장 검증
+        if (game.getStadium() == null || game.getStadium().trim().isEmpty()) {
+            errors.put("stadium", "경기장소는 필수입니다.");
+        }
+
+        // 득점과 실점 검증 (0 이상의 정수여야 함)
+        if (game.getGoal() < 0) {
+            errors.put("goal", "득점은 0 이상이어야 합니다.");
+        }
+        if (game.getConcede() < 0) {
+            errors.put("concede", "실점은 0 이상이어야 합니다.");
+        }
+
+        // 홈/원정 검증 (0 또는 1이어야 함)
+        if (game.getIsHome() != 0 && game.getIsHome() != 1) {
+            errors.put("isHome", "홈/원정은 0 또는 1이어야 합니다.");
+        }
+        return errors;
     }
 
-    // 경기 업데이트
-    public Game updateGame(int gameIdx, Game gameDetails) {
-        Game game = getGameById(gameIdx);
-        if (game != null) {
-            game.setGameName(gameDetails.getGameName());
-            game.setGameDate(gameDetails.getGameDate());
-            game.setStadium(gameDetails.getStadium());
-            game.setGoal(gameDetails.getGoal());
-            game.setConcede(gameDetails.getConcede());
-            game.setOpponent(gameDetails.getOpponent());
-            game.setGameType(gameDetails.getGameType());
-            game.setIsHome(gameDetails.getIsHome());
-            return gameRepository.save(game);
-        }
-        return null;
+    // 경기 추가 및 갱신
+    public Game saveGame(Game game) {
+        return gameRepository.save(game);
     }
 
     // 경기 삭제
