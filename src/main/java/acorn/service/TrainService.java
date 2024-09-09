@@ -16,9 +16,18 @@ public class TrainService {
 
     private final TrainRepository trainRepository;
 
-    @Autowired
     public TrainService(TrainRepository trainRepository) {
         this.trainRepository = trainRepository;
+    }
+    
+    // 훈련의 현재 참가자 수를 반환하는 메서드 추가
+    public int getParticipantCount(Train train) {
+        return train.getTrainMems().size();  // trainMems의 크기로 현재 참가자 수를 확인
+    }
+    
+    // 훈련명으로 검색 (페이징 처리)
+    public Page<Train> searchTrainsByName(String trainName, Pageable pageable) {
+        return trainRepository.findByTrainNameContaining(trainName, pageable);
     }
     
     // 모든 훈련 조회(일정에 추가)

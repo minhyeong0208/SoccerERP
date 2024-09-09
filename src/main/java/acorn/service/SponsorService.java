@@ -1,24 +1,26 @@
 package acorn.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import acorn.entity.Finance;
 import acorn.entity.Sponsor;
 import acorn.repository.SponsorRepository;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SponsorService {
 
     private final SponsorRepository sponsorRepository;
+    private final FinanceService financeService; // FinanceService 필드 추가
 
-    @Autowired
-    public SponsorService(SponsorRepository sponsorRepository) {
+    public SponsorService(SponsorRepository sponsorRepository, FinanceService financeService) {
         this.sponsorRepository = sponsorRepository;
+        this.financeService = financeService; // 생성자 주입
     }
 
     // 모든 스폰서 조회 (페이징 처리)
@@ -38,8 +40,29 @@ public class SponsorService {
 
     // 새로운 스폰서 추가
     public Sponsor addSponsor(Sponsor sponsor) {
-        return sponsorRepository.save(sponsor);
+        Sponsor savedSponsor = sponsorRepository.save(sponsor);
+
+        // 중복 재정 항목이 있는지 확인
+        boolean exists = financeService.existsByTraderAndFinanceDate(savedSponsor.getSponsorName(), new Date(System.currentTimeMillis()));
+
+        if (!exists) {
+            Finance finance = Finance.builder()
+                .financeType("수입")
+                .financeDate(new Date(System.currentTimeMillis()))  // 현재 날짜 또는 계약 날짜
+                .amount(savedSponsor.getPrice())  // 스폰서 금액
+                .trader(savedSponsor.getSponsorName())  // 거래처 정보
+                .purpose("스폰서 계약")
+                .financeMemo("스폰서 계약에 따른 수입")
+                .build();
+
+            financeService.addIncome(finance);  // 재정 항목에 추가
+        } else {
+            System.out.println("Duplicate finance entry detected for sponsor: " + savedSponsor.getSponsorName());
+        }
+
+        return savedSponsor;
     }
+
 
     // 스폰서 업데이트
     public Sponsor updateSponsor(int sponsorIdx, Sponsor sponsorDetails) {

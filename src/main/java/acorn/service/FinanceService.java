@@ -29,6 +29,11 @@ public class FinanceService {
         finance.setFinanceType("수입");
         return financeRepository.save(finance);
     }
+    
+    // 트레이더와 재정 날짜로 중복된 항목이 있는지 확인
+    public boolean existsByTraderAndFinanceDate(String trader, Date financeDate) {
+        return financeRepository.existsByTraderAndFinanceDate(trader, financeDate);
+    }
 
     // 지출 항목 추가
     public Finance addExpense(Finance finance) {

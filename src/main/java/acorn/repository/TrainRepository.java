@@ -1,11 +1,15 @@
 package acorn.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import acorn.entity.Train;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository
 public interface TrainRepository extends JpaRepository<Train, Integer> {
-    // 페이징과 정렬을 포함한 기본 CRUD 메서드가 자동으로 제공됩니다.
+
+    // 훈련명을 포함하는 훈련 조회 (페이징 처리)
+    Page<Train> findByTrainNameContaining(String trainName, Pageable pageable);
 }
