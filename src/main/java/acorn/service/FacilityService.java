@@ -1,6 +1,8 @@
 package acorn.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import acorn.entity.Facility;
 import acorn.repository.FacilityRepository;
@@ -17,12 +19,18 @@ public class FacilityService {
     public FacilityService(FacilityRepository facilityRepository) {
         this.facilityRepository = facilityRepository;
     }
-
+   
     // 모든 시설 조회 (페이징 없이)
     public List<Facility> getAllFacilities() {
         return facilityRepository.findAll();
     }
-
+    
+    // 페이징 처리 추가 - 09-09
+    // 페이징 처리된 모든 시설 조회 
+    public Page<Facility> getAllFacilities(Pageable pageable) {
+        return facilityRepository.findAll(pageable);
+    }
+    
     // 시설명으로 검색
     public List<Facility> searchFacilitiesByName(String facilityName) {
         return facilityRepository.findByFacilityNameContaining(facilityName);
