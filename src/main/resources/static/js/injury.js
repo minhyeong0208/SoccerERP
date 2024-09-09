@@ -6,7 +6,7 @@ $(document).ready(function() {
 	let injuryData = [];  // 부상 데이터를 저장할 배열
 	let playerData = [];  // 선수 데이터를 저장할 배열
 	let currentPage = 0;  // 현재 페이지
-	const pageSize = 10;  // 한 페이지에 보여줄 항목 수
+	const pageSize = 20;  // 한 페이지에 보여줄 항목 수
 	let totalPages = 0;   // 전체 페이지 수
 
 	// 전체 선택 체크박스 클릭 시 모든 체크박스의 상태를 변경
