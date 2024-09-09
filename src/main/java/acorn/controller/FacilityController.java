@@ -1,6 +1,8 @@
 package acorn.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,16 +21,24 @@ public class FacilityController {
     public FacilityController(FacilityService facilityService) {
         this.facilityService = facilityService;
     }
-
+    
     // 모든 시설 조회 (페이징 없이)
     @GetMapping("/all")
     public List<Facility> getAllFacilities() {
         return facilityService.getAllFacilities();
     }
-
+    
+    // 페이징 처리 추가 - 09-09
+    // 페이징 처리된 모든 시설 조회
+    @GetMapping
+    public Page<Facility> getAllFacilities(Pageable pageable) {
+        return facilityService.getAllFacilities(pageable);
+    }
+    
+    // (value = "facilityName") 추가 - 09-09
     // 시설명으로 검색
     @GetMapping("/search")
-    public List<Facility> searchFacilitiesByName(@RequestParam String facilityName) {
+    public List<Facility> searchFacilitiesByName(@RequestParam(value = "facilityName") String facilityName) {
         return facilityService.searchFacilitiesByName(facilityName);
     }
 

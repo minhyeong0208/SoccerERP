@@ -45,6 +45,13 @@ public class PageController {
         return "layout/schedule";
     }
 
-
-
+    @GetMapping("/injury")
+    public String injury() {
+    	return "layout/injury";
+    }
+    
+    @GetMapping("/facility")
+    public String facility() {
+    	return "layout/facility";
+    }
 }

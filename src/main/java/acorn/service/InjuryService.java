@@ -50,7 +50,7 @@ public class InjuryService {
     public Injury updateInjury(int injuryIdx, Injury injuryDetails) {
         Injury injury = getInjuryById(injuryIdx);
         if (injury != null) {
-            injury.setPerson(injuryDetails.getPerson());  // 수정된 부분
+            // injury.setPerson(injuryDetails.getPerson());  // 수정된 부분
             injury.setBrokenDate(injuryDetails.getBrokenDate());
             injury.setSeverity(injuryDetails.getSeverity());
             injury.setDoctor(injuryDetails.getDoctor());
