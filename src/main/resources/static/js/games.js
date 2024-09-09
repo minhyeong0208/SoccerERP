@@ -230,7 +230,7 @@ function addGame() {
     };
 
     fetch('/games/add', {
-        method: 'PUT',
+        method: 'POST',
         headers: {
         'Content-Type': 'application/json',
 		[csrfHeader]: csrfToken
