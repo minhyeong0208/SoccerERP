@@ -58,10 +58,19 @@ public class PageController {
     public String schedule(){
         return "layout/schedule";
     }
+    
+    @GetMapping("/injury")
+    public String injury() {
+    	return "layout/injury";
+    }
+    
+    @GetMapping("/facility")
+    public String facility() {
+    	return "layout/facility";
+    }
 
     @GetMapping("/train")
     public String train(){
         return "layout/train";
     }
-
 }
