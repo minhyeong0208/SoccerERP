@@ -21,6 +21,26 @@ body {
 .text-info { color: #36b9cc !important; }
 .text-warning { color: #f6c23e !important; }
 
+.custom-icon1 {
+    color: #4e73df; /* 경기 수 */
+    opacity: 0.5;
+}
+
+.custom-icon2 {
+    color: #1cc88a; /* 승패 마진 */
+    opacity: 0.5;
+}
+
+.custom-icon3 {
+    color: #36b9cc; /* 팀 득점 */
+    opacity: 0.5;
+}
+
+.custom-icon4 {
+    color: #f6c23e; /* 팀 실점 */
+    opacity: 0.5;
+}
+
 /* 팀 로고 컨테이너 스타일 */
 .team-logo-container {
     width: 150px;
@@ -32,9 +52,16 @@ body {
 }
 
 /* 팀 로고 이미지 스타일 */
-.team-logo {
+.team-logo{
     max-width: 100%;
     max-height: 100%;
+    object-fit: contain;
+}
+
+/* vs 로고 이미지 스타일 */
+.versus-logo {
+    max-width: 70%;
+    max-height: 70%;
     object-fit: contain;
 }
 
