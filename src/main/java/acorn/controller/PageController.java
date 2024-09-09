@@ -73,4 +73,9 @@ public class PageController {
     public String train(){
         return "layout/train";
     }
+
+    @GetMapping("/player")
+    public String player(){
+        return "layout/player";
+    }
 }
