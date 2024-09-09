@@ -136,4 +136,23 @@ public class GameService {
     public void deleteGame(List<Integer> ids) {
         gameRepository.deleteAllByIdInBatch(ids);
     }
+
+    // 팀 이미지 추가
+    public String getTeamImageFileName(String teamName) {
+        Map<String, String> nameMap = new HashMap<>();
+        nameMap.put("울산HD", "울산HD");
+        nameMap.put("수원FC", "수원FC");
+        nameMap.put("김천상무FC", "김천상무FC");
+        nameMap.put("서울FC", "서울FC");
+        nameMap.put("포항 스틸러스", "포항 스틸러스");
+        nameMap.put("광주FC", "광주FC");
+        nameMap.put("제주 유나이티드FC", "제주 유나이티드FC");
+        nameMap.put("대전 하나시티즈", "대전 하나시티즈");
+        nameMap.put("인천 유나이티드FC", "인천 유나이티드FC");
+        nameMap.put("전북 현대", "전북 현대");
+        nameMap.put("대구FC", "대구FC");
+        nameMap.put("강원FC", "강원FC");
+
+        return nameMap.getOrDefault(teamName, teamName) + ".png";
+    }
 }

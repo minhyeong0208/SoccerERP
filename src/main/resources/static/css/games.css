@@ -21,6 +21,23 @@ body {
 .text-info { color: #36b9cc !important; }
 .text-warning { color: #f6c23e !important; }
 
+/* 팀 로고 컨테이너 스타일 */
+.team-logo-container {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+/* 팀 로고 이미지 스타일 */
+.team-logo {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
 /* IBM Plex Sans 폰트 스타일 */
 .ibm-plex-sans-thin {
     font-weight: 100;
