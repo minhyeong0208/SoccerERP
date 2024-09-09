@@ -29,7 +29,6 @@ public class TrainController {
     private final TrainMemService trainMemService;
     private final PersonService personService;  // PersonService 추가
 
-    @Autowired
     public TrainController(TrainService trainService, TrainMemService trainMemService, PersonService personService) {
         this.trainService = trainService;
         this.trainMemService = trainMemService;

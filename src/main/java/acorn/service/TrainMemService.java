@@ -1,6 +1,7 @@
 package acorn.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import acorn.entity.Person;
@@ -8,14 +9,11 @@ import acorn.entity.Train;
 import acorn.entity.TrainMem;
 import acorn.repository.TrainMemRepository;
 
-import java.util.List;
-
 @Service
 public class TrainMemService {
 
     private final TrainMemRepository trainMemRepository;
 
-    @Autowired
     public TrainMemService(TrainMemRepository trainMemRepository) {
         this.trainMemRepository = trainMemRepository;
     }
