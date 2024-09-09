@@ -1,22 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>경기 관리 대시보드</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default2}">
+<th:block layout:fragment="customCss">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <!-- 승패마진 board icon CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  	<link rel="stylesheet" type="text/css" th:href="@{/css/games.css}">
+</th:block>
 
-  <!-- IBM Plex Sans 폰트 적용 https://fonts.google.com/selection/embed -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<th:block layout:fragment="customContents">
 
-  <link rel="stylesheet" type="text/css" th:href="@{/css/games.css}">
-</head>
-<body>
-  <div class="container-fluid mt-4">
-    <h1 class="h3 mb-2 text-gray-800">경기 관리</h1>
+    <h3 class="mb-2 text-gray-800">경기 관리</h3>
 
     <!-- 통계 카드 -->
     <div class="row">
@@ -29,7 +26,7 @@
                 <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${matchCount}"></div>
               </div>
               <div class="col-auto">
-                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
               </div>
             </div>
           </div>
@@ -44,7 +41,7 @@
                 <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${winLossMargin}"></div>
               </div>
               <div class="col-auto">
-                <i class="fas fa-balance-scale fa-2x text-gray-300"></i>
+                <i class="fa-solid fa-chart-line fa-2x text-gray-300"></i>
               </div>
             </div>
           </div>
@@ -65,16 +62,17 @@
           </div>
         </div>
       </div>
+
       <div class="col-xl-3 col-md-6 mb-4">
         <div class="card card-left-border border-left-warning h-100 py-2">
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="h6 font-weight-bold text-warning text-uppercase mb-1">팀 도움</div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${teamAssists}"></div>
+                <div class="h6 font-weight-bold text-warning text-uppercase mb-1">팀 실점</div>
+                <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${teamConcede}"></div>
               </div>
               <div class="col-auto">
-                <i class="fas fa-hands-helping fa-2x text-gray-300"></i>
+                <i class="fa-solid fa-circle-exclamation fa-2x text-gray-300"></i>
               </div>
             </div>
           </div>
@@ -98,7 +96,7 @@
           <div class="row align-items-center mb-3">
             <div class="col-4">
 <!--              <h4 th:text="${mostRecentGame.ownTeam}"></h4>-->
-              <h1>KWO</h1>
+              <h1>강원 FC</h1>
             </div>
             <div class="col-4">
               <h3>vs</h3>
@@ -198,6 +196,7 @@
         </div>
       </div>
     </div>
+
     <!-- 경기 추가 모달 -->
     <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -227,22 +226,28 @@
                     <input type="date" class="form-control" id="gameDate" required autocomplete="false">
                   </div>
                 </div>
+
+                <!-- 새로 추가된 game_name 입력 필드 -->
+                <div class="mb-3">
+                  <label for="game_name" class="form-label">경기명</label>
+                  <input type="text" class="form-control" id="game_name" required>
+                </div>
+
                 <div class="mb-3">
                   <label for="opponent" class="form-label">상대팀</label>
                   <select class="form-select" id="opponent" required>
                     <option value="">상대팀 선택</option>
-                    <option value="USO">울산 HD</option>
-                    <option value="SWO">수원 FC</option>
-                    <option value="KSO">김천상무 FC</option>
-                    <option value="SEO">FC 서울</option>
-                    <option value="PSO">포항 스틸러스</option>
-                    <option value="KJO">광주 FC</option>
-                    <option value="JJO">제주 유나이티드 FC</option>
-                    <option value="DHO">대전 하나시티즈</option>
-                    <option value="ICO">인천 유나이티드 FC</option>
-                    <option value="JEO">전북 현대</option>
-                    <option value="DGO">대구 FC</option>
-                    <!-- 다른 팀들 추가 -->
+                    <option value="울산HD">울산HD</option>
+                    <option value="수원FC">수원FC</option>
+                    <option value="김천상무FC">김천상무FC</option>
+                    <option value="서울FC">서울FC</option>
+                    <option value="포항 스틸러스">포항 스틸러스</option>
+                    <option value="광주FC">광주FC</option>
+                    <option value="제주 유나이티드FC">제주 유나이티드FC</option>
+                    <option value="대전 하나시티즈">대전 하나시티즈</option>
+                    <option value="인천 유나이티드FC">인천 유나이티드FC</option>
+                    <option value="전북 현대">전북 현대</option>
+                    <option value="대구FC">대구FC</option>
                   </select>
                 </div>
                 <div class="mb-3">
@@ -269,6 +274,84 @@
         </div>
     </div>
 
+    <!-- 경기 수정 모달 -->
+    <div class="modal fade" id="editGameModal" tabindex="-1" aria-labelledby="editGameModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editGameModalLabel">경기 정보 수정</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editGameForm">
+              <input type="hidden" id="editGameIdx">
+              <div class="row mb-3">
+                <div class="col">
+                  <label>대회유형</label>
+                  <div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="editGameType" id="editTypeLeague" value="리그" checked>
+                      <label class="form-check-label" for="typeLeague">리그</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="editGameType" id="editTypeTournament" value="토너먼트">
+                      <label class="form-check-label" for="typeTournament">토너먼트</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <label for="editGameDate" class="form-label">경기 일자</label>
+                  <input type="date" class="form-control" id="editGameDate" required autocomplete="false">
+                </div>
+              </div>
+
+              <!-- 새로 추가된 game_name 입력 필드 -->
+              <div class="mb-3">
+                <label for="editGameName" class="form-label">경기명</label>
+                <input type="text" class="form-control" id="editGameName" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="editOpponent" class="form-label">상대팀</label>
+                <select class="form-select" id="editOpponent" required>
+                  <option value="">상대팀 선택</option>
+                  <option value="울산HD">울산HD</option>
+                  <option value="수원FC">수원FC</option>
+                  <option value="김천상무FC">김천상무FC</option>
+                  <option value="서울FC">서울FC</option>
+                  <option value="포항 스틸러스">포항 스틸러스</option>
+                  <option value="광주FC">광주FC</option>
+                  <option value="제주 유나이티드FC">제주 유나이티드FC</option>
+                  <option value="대전 하나시티즈">대전 하나시티즈</option>
+                  <option value="인천 유나이티드FC">인천 유나이티드FC</option>
+                  <option value="전북 현대">전북 현대</option>
+                  <option value="대구FC">대구FC</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="editStadium" class="form-label">경기장소</label>
+                <input type="text" class="form-control" id="editStadium" required autocomplete="false">
+              </div>
+              <div class="row mb-3">
+                <div class="col">
+                  <label for="editGoal" class="form-label">득점</label>
+                  <input type="number" class="form-control" id="editGoal" min="0" required>
+                </div>
+                <div class="col">
+                  <label for="editConcede" class="form-label">실점</label>
+                  <input type="number" class="form-control" id="editConcede" min="0" required>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+            <button type="button" class="btn btn-primary" id="editGame">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   <!-- 경기 삭제 모달 -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -287,8 +370,10 @@
         </div>
       </div>
     </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script th:src="@{/js/games.js}"></script>
-</body>
+</th:block>
+
+<th:block layout:fragment="customJs">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  	<script th:src="@{/js/games.js}"></script>
+</th:block>
 </html>

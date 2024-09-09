@@ -4,6 +4,9 @@ let gameType = '';
 const pageSize = 10;
 let gameData = null;
 
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
 document.addEventListener('DOMContentLoaded', function() {
     // 초기 데이터 설정 및 게임 목록 로드
     initializeGameData();
@@ -26,6 +29,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // 득점, 실점 Column 더블클릭 시 수정
+    document.querySelector('#gameTableBody').addEventListener('dblclick', e => {
+        // 클릭된 요소가 득점(3번째 열) 또는 실점(4번째 열) 셀인지 확인
+        if (e.target.cellIndex !== 0) {
+            const row = e.target.closest('tr');
+            if (row) {
+                const checkbox = row.querySelector('input[type=checkbox]');
+                const value = checkbox.getAttribute('value');
+
+                openEditModal(value);
+            }
+        }
+    })
+
+    // 수정 저장 버튼 클릭 이벤트
+    document.getElementById('editGame').addEventListener('click', editGame);
+
     // 경기 추가 버튼 이벤트 리스너
     document.getElementById('saveGame').addEventListener('click', addGame);
 
@@ -36,10 +56,52 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('confirmDelete').addEventListener('click', deleteGame);
 });
 
-function testCaller() {
-    const selectedItems = document.querySelectorAll('input[name="selectedMatches"]:checked');
-    const selectedIds = Array.from(selectedItems).map(checkbox => checkbox.value);
-    console.log('# Ids >', selectedIds);
+// 경기 수정 모달
+function openEditModal(gameIdx) {
+    document.getElementById('editGameIdx').value = gameIdx;
+
+    // 서버에서 게임 정보 가져오기
+    fetch(`/games/${gameIdx}`, {
+        headers: {
+            [csrfHeader]: csrfToken
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('게임 정보를 가져오는데 실패했습니다.');
+        }
+        return response.json();
+    })
+    .then(game => {
+        // 폼 필드 초기화
+        document.getElementById('editGameName').value = game.gameName;
+        document.getElementById('editGameDate').value = formatDate(game.gameDate);
+        document.getElementById('editOpponent').value = game.opponent;
+        document.getElementById('editStadium').value = game.stadium;
+        document.getElementById('editGoal').value = game.goal;
+        document.getElementById('editConcede').value = game.concede;
+
+        // 라디오 버튼 설정
+        if (game.gameType === '리그') {
+            document.getElementById('editTypeLeague').checked = true;
+        } else if (game.gameType === '토너먼트') {
+            document.getElementById('editTypeTournament').checked = true;
+        }
+
+        // 모달 열기
+        const editModal = new bootstrap.Modal(document.getElementById('editGameModal'));
+        editModal.show();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('경기 정보를 불러오는 중 오류가 발생했습니다.');
+    });
+}
+
+// 날짜 포맷 함수 (YYYY-MM-DD)
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
 }
 
 function initializeGameData() {
@@ -103,6 +165,7 @@ function updateTable(games) {
     });
 }
 
+// 페이징
 function updatePagination(pageData) {
     if (!pageData || typeof pageData.number === 'undefined' || typeof pageData.totalPages === 'undefined') {
         console.error('Invalid page data:', pageData);
@@ -147,13 +210,16 @@ function createPageLink(pageNumber, text, disabled = false, active = false) {
 // 경기 추가 function
 function addGame() {
     const gameType = document.querySelector('input[name="gameType"]:checked').value;
+    const gameName = document.getElementById('game_name').value;
     const opponent = document.getElementById('opponent').value;
     const gameDate = document.getElementById('gameDate').value;
     const stadium = document.getElementById('stadium').value;
     const goal = document.getElementById('goal').value;
     const concede = document.getElementById('concede').value;
 
+    // 일정에 떠야 할 game_name 추가
     const newGame = {
+        gameName: gameName,
         gameType: gameType,
         opponent: opponent,
         gameDate: gameDate,
@@ -167,6 +233,7 @@ function addGame() {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
+		[csrfHeader]: csrfToken
         },
         body: JSON.stringify(newGame)
     })
@@ -186,6 +253,56 @@ function addGame() {
         .catch((error) => {
             console.error('Error:', error);
             alert('경기 추가 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'));
+        });
+}
+
+// 경기 수정 function
+function editGame() {
+    const gameIdx = document.getElementById('editGameIdx').value;
+    const gameType = document.querySelector('input[name="editGameType"]:checked').value;
+    const gameName = document.getElementById('editGameName').value;
+    const opponent = document.getElementById('editOpponent').value;
+    const gameDate = document.getElementById('editGameDate').value;
+    const stadium = document.getElementById('editStadium').value;
+    const goal = document.getElementById('editGoal').value;
+    const concede = document.getElementById('editConcede').value;
+
+    // 일정에 떠야 할 game_name 추가
+    const newGame = {
+        gameIdx: gameIdx,
+        gameName: gameName,
+        gameType: gameType,
+        opponent: opponent,
+        gameDate: gameDate,
+        stadium: stadium,
+        goal: goal,
+        concede: concede
+    };
+
+    fetch('/games/edit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify(newGame)
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            loadGames(currentPage);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editGameModal'));
+            modal.hide();
+            alert('경기가 성공적으로 수정되었습니다.');
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('경기 수정 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'));
         });
 }
 
@@ -213,6 +330,7 @@ function deleteGame() {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
+			[csrfHeader]: csrfToken
         },
         body: JSON.stringify(selectedIds)
     })
