@@ -45,10 +45,11 @@ public class TransferController {
 
     // 특정 이적 정보 조회
     @GetMapping("/{id}")
-    public ResponseEntity<Transfer> getTransferById(@PathVariable int id) {
+    public ResponseEntity<Transfer> getTransferById(@PathVariable("id") int id) {
         Transfer transfer = transferService.getTransferById(id);
         return transfer != null ? ResponseEntity.ok(transfer) : ResponseEntity.notFound().build();
     }
+
 
     // 모든 이적 정보 조회 (페이징 처리)
     @GetMapping

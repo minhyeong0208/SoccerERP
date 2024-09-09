@@ -4,6 +4,8 @@ package acorn.entity;
 import java.sql.Date;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Finance {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int financeIdx;
 	
 	private String financeType;

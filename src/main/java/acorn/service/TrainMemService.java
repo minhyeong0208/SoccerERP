@@ -18,13 +18,18 @@ public class TrainMemService {
         this.trainMemRepository = trainMemRepository;
     }
 
-    // 훈련에 참가자 추가 로직
+    // 훈련에 참가자 추가 로직 수정 (참가자 제한 로직 추가)
     public TrainMem addTrainMem(Train train, Person person) {
         // 이미 참가자가 있는지 확인
         if (trainMemRepository.findByTrainAndPerson(train, person) != null) {
             throw new IllegalArgumentException("This person is already added to the training.");
         }
         
+        // 현재 참가자 수가 제한 인원을 초과하는지 확인
+        if (train.getTrainMems().size() >= Integer.parseInt(train.getCountMem())) {
+            throw new IllegalArgumentException("Cannot add more participants. The training session is full.");
+        }
+
         TrainMem trainMem = TrainMem.builder()
                 .train(train)
                 .person(person)

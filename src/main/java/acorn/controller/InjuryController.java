@@ -2,7 +2,6 @@ package acorn.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,6 @@ public class InjuryController {
     private final InjuryService injuryService;
     private final PersonService personService;  // PersonService 추가
 
-    @Autowired
     public InjuryController(InjuryService injuryService, PersonService personService) {
         this.injuryService = injuryService;
         this.personService = personService;

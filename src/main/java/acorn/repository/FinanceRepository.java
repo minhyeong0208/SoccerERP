@@ -19,4 +19,7 @@ public interface FinanceRepository extends JpaRepository<Finance, Integer> {
 	    Page<Finance> findByTypeAndDate(@Param("type") String type, @Param("startDate") Date startDate,
 	        @Param("endDate") Date endDate, @Param("keyword") String keyword, Pageable pageable);
 	
+	// 트레이더와 재정 날짜를 기준으로 중복 항목이 있는지 확인하는 메서드
+    boolean existsByTraderAndFinanceDate(String trader, Date financeDate);
+	
 }
