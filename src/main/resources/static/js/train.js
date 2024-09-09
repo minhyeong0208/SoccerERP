@@ -84,6 +84,76 @@ function handleSelectAll() {
 	});
 }
 
+// 선수 목록의 전체 선택 체크박스 처리
+function handleSelectAllPlayers() {
+    const selectAllPersonCheckbox = document.getElementById('selectAllPerson');
+    const playerCheckboxes = document.querySelectorAll('.player-checkbox');
+
+    // 전체 선택 체크박스 클릭 시 모든 선수 체크박스 선택/해제
+    selectAllPersonCheckbox.addEventListener('change', function() {
+        playerCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+
+            // 체크 여부에 따라 선수 추가/제거 처리
+            const personIdx = parseInt(checkbox.value);
+            if (this.checked) {
+                // 체크된 경우 추가 목록에 없는 선수만 추가
+                if (!currentParticipants.includes(personIdx) && !playersToAdd.includes(personIdx)) {
+                    playersToAdd.push(personIdx);
+                }
+                // 제거 목록에서 제거
+                const removeIndex = playersToRemove.indexOf(personIdx);
+                if (removeIndex > -1) {
+                    playersToRemove.splice(removeIndex, 1);
+                }
+            } else {
+                // 해제된 경우 제거 목록에 없는 참가자만 제거 목록에 추가
+                if (currentParticipants.includes(personIdx) && !playersToRemove.includes(personIdx)) {
+                    playersToRemove.push(personIdx);
+                }
+                // 추가 목록에서 제거
+                const addIndex = playersToAdd.indexOf(personIdx);
+                if (addIndex > -1) {
+                    playersToAdd.splice(addIndex, 1);
+                }
+            }
+        });
+    });
+
+    // 개별 체크박스 선택 시 전체 선택 체크박스 상태 업데이트
+    playerCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const personIdx = parseInt(this.value);
+            if (this.checked) {
+                // 체크된 경우
+                if (!currentParticipants.includes(personIdx) && !playersToAdd.includes(personIdx)) {
+                    playersToAdd.push(personIdx);
+                }
+                const removeIndex = playersToRemove.indexOf(personIdx);
+                if (removeIndex > -1) {
+                    playersToRemove.splice(removeIndex, 1);
+                }
+            } else {
+                // 체크 해제된 경우
+                if (currentParticipants.includes(personIdx) && !playersToRemove.includes(personIdx)) {
+                    playersToRemove.push(personIdx);
+                }
+                const addIndex = playersToAdd.indexOf(personIdx);
+                if (addIndex > -1) {
+                    playersToAdd.splice(addIndex, 1);
+                }
+            }
+
+            // 모든 체크박스가 선택된 경우 전체 선택 체크박스 활성화
+            if (Array.from(playerCheckboxes).every(cb => cb.checked)) {
+                selectAllPersonCheckbox.checked = true;
+            } else {
+                selectAllPersonCheckbox.checked = false;
+            }
+        });
+    });
+}
+
 // 훈련 상세 정보 표시 및 선수 목록 로드
 function showTrainDetails(train) {
 	document.getElementById('noSelectionMessage').style.display = 'none';
@@ -119,105 +189,82 @@ function loadParticipants(trainIdx) {
 
 // 선수 목록 가져오기
 function loadPlayerData(trainIdx) {
-	fetch('http://localhost/persons/players')
-		.then(response => response.json())
-		.then(players => {
-			return fetch(`/trains/${trainIdx}`)
-				.then(response => response.json())
-				.then(training => {
-					const participants = training.trainMems.map(mem => mem.person.personIdx);
-					const table = document.querySelector("#playerTable tbody");
-					table.innerHTML = '';
-					playersToAdd = []; // 초기화
-					playersToRemove = []; // 초기화
+    fetch('http://localhost/persons/players')
+        .then(response => response.json())
+        .then(players => {
+            return fetch(`/trains/${trainIdx}`)
+                .then(response => response.json())
+                .then(training => {
+                    const participants = training.trainMems.map(mem => mem.person.personIdx);
+                    const table = document.querySelector("#playerTable tbody");
+                    table.innerHTML = '';
+                    playersToAdd = []; // 초기화
+                    playersToRemove = []; // 초기화
 
-					players.forEach(player => {
-						const isChecked = participants.includes(player.personIdx) ? 'checked' : '';
-						const row = document.createElement('tr');
-						row.innerHTML = `
+                    players.forEach(player => {
+                        const isChecked = participants.includes(player.personIdx) ? 'checked' : '';
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
                             <td><input type="checkbox" class="player-checkbox" value="${player.personIdx}" ${isChecked}></td>
                             <td>${player.backNumber}</td>
                             <td>${player.personName}</td>
                             <td>${player.position}</td>
                         `;
-						table.appendChild(row);
-					});
+                        table.appendChild(row);
+                    });
 
-					document.querySelectorAll('.player-checkbox').forEach(checkbox => {
-						checkbox.addEventListener('change', function() {
-							const personIdx = parseInt(this.value);
-							if (this.checked) {
-								// 체크된 경우
-								if (!currentParticipants.includes(personIdx) && !playersToAdd.includes(personIdx)) {
-									playersToAdd.push(personIdx); // 현재 참가자에 없고 추가 목록에 없으면 추가
-								}
-								const removeIndex = playersToRemove.indexOf(personIdx);
-								if (removeIndex > -1) {
-									playersToRemove.splice(removeIndex, 1); // 제거 목록에서 삭제
-								}
-							} else {
-								// 해제된 경우
-								if (currentParticipants.includes(personIdx) && !playersToRemove.includes(personIdx)) {
-									playersToRemove.push(personIdx); // 현재 참가자 목록에 있고 제거 목록에 없으면 추가
-								}
-								const addIndex = playersToAdd.indexOf(personIdx);
-								if (addIndex > -1) {
-									playersToAdd.splice(addIndex, 1); // 추가 목록에서 삭제
-								}
-							}
-						});
-					});
-				});
-		})
-		.catch(error => console.error('Error fetching player data:', error));
+                    handleSelectAllPlayers(); // 전체 선택 체크박스 및 개별 체크박스 동작 처리
+                });
+        })
+        .catch(error => console.error('Error fetching player data:', error));
 }
 
 // 선수 추가/삭제 버튼 클릭 시 서버로 변경 사항 전송
 document.getElementById('addPlayersToTrain').addEventListener('click', function() {
-	if (playersToAdd.length > 0) {
-		// 추가할 선수 서버에 전송
-		fetch(`/trains/${selectedTrainIdx}/add-participants`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				[csrfHeader]: csrfToken
-			},
-			body: JSON.stringify(playersToAdd)
-		})
-			.then(response => {
-				if (!response.ok) throw new Error('참가자 추가 실패');
-				return response.json();
-			})
-			.then(() => {
-				console.log(`참가자 ${playersToAdd.join(", ")} 추가 성공`);
-				loadParticipants(selectedTrainIdx); // 참가자 목록 새로 로드
-				loadPlayerData(selectedTrainIdx); // 선수 목록 다시 로드하여 체크 상태 업데이트
-			})
-			.catch(error => console.error('참가자 추가 중 오류 발생:', error));
-	}
+    if (playersToAdd.length > 0) {
+        // 추가할 선수 서버에 전송
+        fetch(`/trains/${selectedTrainIdx}/add-participants`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(playersToAdd)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('참가자 추가 실패');
+                return response.json();
+            })
+            .then(() => {
+                console.log(`참가자 ${playersToAdd.join(", ")} 추가 성공`);
+                loadParticipants(selectedTrainIdx); // 참가자 목록 새로 로드
+                loadPlayerData(selectedTrainIdx); // 선수 목록 다시 로드하여 체크 상태 업데이트
+            })
+            .catch(error => console.error('참가자 추가 중 오류 발생:', error));
+    }
 
-	if (playersToRemove.length > 0) {
-		// 제거할 선수 서버에 전송
-		playersToRemove.forEach(personIdx => {
-			fetch(`/trains/${selectedTrainIdx}/remove-participant/${personIdx}`, {
-				method: 'DELETE',
-				headers: {
-					'Content-Type': 'application/json',
-					[csrfHeader]: csrfToken
-				}
-			})
-				.then(response => {
-					if (!response.ok) throw new Error('참가자 삭제 실패');
-					return response.text();
-				})
-				.then(() => {
-					console.log(`참가자 ${personIdx} 삭제 성공`);
-					loadParticipants(selectedTrainIdx); // 참가자 목록 새로 로드
-					loadPlayerData(selectedTrainIdx); // 선수 목록 다시 로드하여 체크 상태 업데이트
-				})
-				.catch(error => console.error('참가자 삭제 중 오류 발생:', error));
-		});
-	}
+    if (playersToRemove.length > 0) {
+        // 제거할 선수 서버에 전송
+        playersToRemove.forEach(personIdx => {
+            fetch(`/trains/${selectedTrainIdx}/remove-participant/${personIdx}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('참가자 삭제 실패');
+                    return response.text();
+                })
+                .then(() => {
+                    console.log(`참가자 ${personIdx} 삭제 성공`);
+                    loadParticipants(selectedTrainIdx); // 참가자 목록 새로 로드
+                    loadPlayerData(selectedTrainIdx); // 선수 목록 다시 로드하여 체크 상태 업데이트
+                })
+                .catch(error => console.error('참가자 삭제 중 오류 발생:', error));
+        });
+    }
 });
 
 // 훈련 추가 버튼 클릭 시
