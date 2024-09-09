@@ -101,7 +101,9 @@ function openEditModal(gameIdx) {
 // 날짜 포맷 함수 (YYYY-MM-DD)
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    const offset = date.getTimezoneOffset() * 60000; // 분을 밀리초로 변환
+    const localDate = new Date(date.getTime() - offset);
+    return localDate.toISOString().split('T')[0];
 }
 
 function initializeGameData() {
@@ -109,6 +111,10 @@ function initializeGameData() {
     if (initialDataElement) {
         try {
             gameData = JSON.parse(initialDataElement.textContent);
+            // 날짜 형식 변환
+            if (gameData && gameData.gameDate) {
+                gameData.gameDate = formatDate(gameData.gameDate);
+            }
         } catch (error) {
             console.error('Error parsing initial data:', error);
         }
@@ -262,12 +268,11 @@ function editGame() {
     const gameType = document.querySelector('input[name="editGameType"]:checked').value;
     const gameName = document.getElementById('editGameName').value;
     const opponent = document.getElementById('editOpponent').value;
-    const gameDate = document.getElementById('editGameDate').value;
+    const gameDate = new Date(document.getElementById('editGameDate').value).toISOString();
     const stadium = document.getElementById('editStadium').value;
     const goal = document.getElementById('editGoal').value;
     const concede = document.getElementById('editConcede').value;
 
-    // 일정에 떠야 할 game_name 추가
     const newGame = {
         gameIdx: gameIdx,
         gameName: gameName,
