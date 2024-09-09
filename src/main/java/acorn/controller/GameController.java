@@ -91,8 +91,9 @@ public class GameController {
         // 값 검사
         Map<String, String> validErrors = gameService.validGame(game);
         if (!validErrors.isEmpty()) return ResponseEntity.badRequest().body(validErrors);
-        
+
         try {
+            // 이미 Game 객체에 날짜가 포함되어 있으므로 별도의 변환 과정은 필요 없습니다.
             Game savedGame = gameService.saveGame(game);
             return ResponseEntity.ok(savedGame);
         } catch (Exception e) {
