@@ -29,7 +29,6 @@ public class TrainController {
     private final TrainMemService trainMemService;
     private final PersonService personService;  // PersonService 추가
 
-    @Autowired
     public TrainController(TrainService trainService, TrainMemService trainMemService, PersonService personService) {
         this.trainService = trainService;
         this.trainMemService = trainMemService;
@@ -52,11 +51,17 @@ public class TrainController {
 
         List<Person> participants = personService.getPersonsByIds(personIds);
         for (Person person : participants) {
-            trainMemService.addTrainMem(train, person);
+            // 이미 훈련에 참가한 인원이 있는지 확인
+            if (!trainMemService.isPersonInTraining(train, person)) {
+                trainMemService.addTrainMem(train, person);
+            } else {
+                return ResponseEntity.badRequest().body("Participant " + person.getPersonName() + " is already added to this training.");
+            }
         }
 
         return ResponseEntity.ok("Participants have been successfully added to the training.");
     }
+
     
     // 특정 훈련에서 특정 선수를 제거하는 엔드포인트
     @DeleteMapping("/{trainId}/remove-participant/{personId}")
