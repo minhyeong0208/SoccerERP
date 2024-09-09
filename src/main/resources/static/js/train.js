@@ -34,6 +34,7 @@ function loadTrainData(page) {
 				table.appendChild(row);
 			});
 
+			totalPages = data.totalPages; // totalPages 업데이트
 			updatePaginationButtons(page, data.totalPages);
 
 			// 모두 선택 체크박스 동작 처리
@@ -44,22 +45,39 @@ function loadTrainData(page) {
 
 // 페이지네이션 버튼 생성
 function updatePaginationButtons(page, totalPages) {
-	const pageButtons = document.querySelector("#pageButtons");
-	pageButtons.innerHTML = '';
+    const pageButtons = document.querySelector("#pageButtons");
+    pageButtons.innerHTML = '';  // 이전 페이지 버튼들을 초기화
 
-	let startPage = Math.max(0, page - Math.floor(maxVisiblePages / 2));
-	let endPage = Math.min(totalPages, startPage + maxVisiblePages);
+    let startPage = Math.max(0, page - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages);
 
-	for (let i = startPage; i < endPage; i++) {
-		pageButtons.innerHTML += `
+    for (let i = startPage; i < endPage; i++) {
+        pageButtons.innerHTML += `
             <li class="page-item ${i === page ? 'active' : ''}">
                 <button class="page-link" onclick="loadTrainData(${i})">${i + 1}</button>
             </li>`;
-	}
+    }
 
-	document.querySelector("#prevGroup").disabled = page === 0;
-	document.querySelector("#nextGroup").disabled = page >= totalPages - 1;
+    // 이전 버튼 활성화/비활성화 설정
+    document.querySelector("#prevGroup").disabled = page === 0;
+    // 다음 버튼 활성화/비활성화 설정
+    document.querySelector("#nextGroup").disabled = page >= totalPages - 1;
 }
+
+// 이전/다음 버튼 이벤트 추가
+document.getElementById('prevGroup').addEventListener('click', function() {
+    if (currentPage > 0) {
+        currentPage--;
+        loadTrainData(currentPage); // 이전 페이지로 이동
+    }
+});
+
+document.getElementById('nextGroup').addEventListener('click', function() {
+    if (currentPage < totalPages - 1) {
+        currentPage++;
+        loadTrainData(currentPage); // 다음 페이지로 이동
+    }
+});
 
 // 모두 선택 체크박스 처리
 function handleSelectAll() {
@@ -441,6 +459,7 @@ document.getElementById('deleteTrainButton').addEventListener('click', function(
 		});
 });
 
+
 // 선택된 항목 삭제
 document.querySelector('button[type="deleteButton"]').addEventListener('click', function() {
 	const selectedCheckboxes = document.querySelectorAll('.delete-checkbox:checked');
@@ -470,12 +489,14 @@ document.querySelector('button[type="deleteButton"]').addEventListener('click', 
 			})
 			.then(() => {
 				console.log(`훈련 ${trainId} 삭제 성공`);
-				loadTrainData(currentPage); // 훈련 목록 다시 로드
+				
+				// 삭제된 후에는 오른쪽 상세 영역 비우기
+				document.getElementById('trainInfo').style.display = 'none';
+				document.getElementById('noSelectionMessage').style.display = 'block';
+				document.getElementById('playerSection').style.display = 'none';
 
-				// 오른쪽 영역 비우기
-				document.getElementById('trainDetails').innerHTML = ''; // 훈련 상세 정보 영역 비우기
-				document.getElementById('buttonsWrapper').innerHTML = ''; // 버튼 영역 비우기
-				document.getElementById('playerSection').innerHTML = ''; // 선수 목록 테이블 비우기
+				// 훈련 목록 다시 로드
+				loadTrainData(currentPage);
 
 				// 선택된 훈련 초기화
 				selectedTrainIdx = null;
