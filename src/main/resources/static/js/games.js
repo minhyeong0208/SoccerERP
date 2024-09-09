@@ -360,4 +360,22 @@ function deleteGame() {
             console.error('삭제 중 오류 발생:', error);
             alert('경기 삭제 중 오류가 발생했습니다: ' + error.message);
         });
+
+function getTeamImageFileName(teamName) {
+    const nameMap = {
+        '울산HD': '울산',
+        '수원FC': '수원',
+        '김천상무FC': '김천',
+        '서울FC': '서울',
+        '포항 스틸러스': '포항',
+        '광주FC': '광주',
+        '제주 유나이티드FC': '제주',
+        '대전 하나시티즈': '대전',
+        '인천 유나이티드FC': '인천',
+        '전북 현대': '전북',
+        '대구FC': '대구',
+        '강원FC': '강원'
+    };
+    return (nameMap[teamName] || teamName) + '.png';
+    }
 }

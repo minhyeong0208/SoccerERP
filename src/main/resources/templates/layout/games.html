@@ -95,14 +95,23 @@
           <!-- 팀 정보 -->
           <div class="row align-items-center mb-3">
             <div class="col-4">
-<!--              <h4 th:text="${mostRecentGame.ownTeam}"></h4>-->
-              <h1>강원 FC</h1>
+              <div class="team-logo-container">
+                <img th:src="@{'/img/team/강원FC.png'}" alt="강원 FC 로고" class="team-logo">
+              </div>
+              <br>
+              <h2>강원 FC</h2>
             </div>
             <div class="col-4">
               <h3>vs</h3>
             </div>
             <div class="col-4">
-              <h1 th:text="${mostRecentGame.opponent}"></h1>
+              <div class="team-logo-container">
+                <img th:src="@{'/img/team/' + ${@gameService.getTeamImageFileName(mostRecentGame.opponent)}}"
+                     th:alt="${mostRecentGame.opponent} + ' 로고'"
+                     class="team-logo">
+              </div>
+              <br>
+              <h2 th:text="${mostRecentGame.opponent}"></h2>
             </div>
           </div>
 
