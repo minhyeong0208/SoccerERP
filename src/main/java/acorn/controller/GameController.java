@@ -3,6 +3,7 @@ package acorn.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import acorn.entity.Game;
 import acorn.service.GameService;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -91,8 +93,9 @@ public class GameController {
         // 값 검사
         Map<String, String> validErrors = gameService.validGame(game);
         if (!validErrors.isEmpty()) return ResponseEntity.badRequest().body(validErrors);
-        
+
         try {
+            // 이미 Game 객체에 날짜가 포함되어 있으므로 별도의 변환 과정은 필요 없습니다.
             Game savedGame = gameService.saveGame(game);
             return ResponseEntity.ok(savedGame);
         } catch (Exception e) {
