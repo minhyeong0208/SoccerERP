@@ -31,17 +31,29 @@ public class TransferController {
     
     // 선수 판매 
     @PostMapping("/sale")
-    public ResponseEntity<Transfer> createSaleTransfer(@RequestBody Transfer transfer) {
-        Transfer savedTransfer = transferService.addSaleTransfer(transfer);
-        return ResponseEntity.ok(savedTransfer);
+    public ResponseEntity<String> createSaleTransfer(@RequestBody Transfer transfer) {
+        // 이적 타입이 0인지 확인
+        if (transfer.getTransferType() != 0) {
+            return ResponseEntity.badRequest().body("Invalid transfer type. Sale transfers must have transferType set to 0.");
+        }
+        transfer.setTransferType(0);  // 판매 타입을 0으로 설정
+        transferService.addSaleTransfer(transfer);
+        return ResponseEntity.ok("Sale transfer created successfully.");
     }
+
     
     // 선수 구매
     @PostMapping("/purchase")
-    public ResponseEntity<Transfer> createPurchaseTransfer(@RequestBody TransferWithPersonDto dto) {
-        Transfer savedTransfer = transferService.addPurchaseTransfer(dto);
-        return ResponseEntity.ok(savedTransfer);
+    public ResponseEntity<String> createPurchaseTransfer(@RequestBody TransferWithPersonDto dto) {
+        // 이적 타입이 1인지 확인
+        if (dto.getTransfer().getTransferType() != 1) {
+            return ResponseEntity.badRequest().body("Invalid transfer type. Purchase transfers must have transferType set to 1.");
+        }
+        dto.getTransfer().setTransferType(1);  // 구매 타입을 1로 설정
+        transferService.addPurchaseTransfer(dto);
+        return ResponseEntity.ok("Purchase transfer created successfully.");
     }
+
 
     // 특정 이적 정보 조회
     @GetMapping("/{id}")

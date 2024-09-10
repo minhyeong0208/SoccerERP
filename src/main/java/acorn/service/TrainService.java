@@ -36,8 +36,9 @@ public class TrainService {
     }
 
     // 모든 훈련 조회 (페이징 처리)
+ // 모든 훈련 조회 (시작일 내림차순 정렬, 페이징 처리)
     public Page<Train> getAllTrains(Pageable pageable) {
-        return trainRepository.findAll(pageable);
+        return trainRepository.findAllByOrderByStartDateDesc(pageable);
     }
 
     // 특정 훈련 조회
