@@ -1,8 +1,7 @@
 package acorn.service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
@@ -75,60 +74,69 @@ public class GameService {
         return game.orElse(null);
     }
 
+    // 최근 경기
     public Game getMostRecentGame() {
-        Game game = gameRepository.findFirstByGameDateBeforeOrderByGameDateDesc(LocalDateTime.now());
-        if (game == null) {
-            throw new NoSuchElementException("최근 경기가 없습니다.");
-        }
-        return game;
+        return gameRepository.findFirstByGameDateBeforeOrderByGameDateDesc(LocalDate.now());
     }
 
     // 게임 저장 전 유효성 검사
     public Map<String, String> validGame(Game game) {
         Map<String, String> errors = new HashMap<>();
 
-        // 게임명 검증
+        // 기존의 유효성 검사 로직
         if (game.getGameName() == null || game.getGameName().trim().isEmpty()) {
             errors.put("game_name", "경기명은 필수입니다.");
         }
 
-        // 게임 타입 검증
         if (game.getGameType() == null || game.getGameType().trim().isEmpty()) {
             errors.put("gameType", "대회 유형은 필수입니다.");
         }
 
-        // 상대팀 검증
         if (game.getOpponent() == null || game.getOpponent().trim().isEmpty()) {
             errors.put("opponent", "상대팀은 필수입니다.");
         }
 
-        // 경기 일자 검증
         if (game.getGameDate() == null) {
             errors.put("gameDate", "경기 일자는 필수입니다.");
         }
 
-        // 경기장 검증
         if (game.getStadium() == null || game.getStadium().trim().isEmpty()) {
             errors.put("stadium", "경기장소는 필수입니다.");
         }
 
-        // 득점과 실점 검증 (0 이상의 정수여야 함)
-        if (game.getGoal() < 0) {
-            errors.put("goal", "득점은 0 이상이어야 합니다.");
-        }
-        if (game.getConcede() < 0) {
-            errors.put("concede", "실점은 0 이상이어야 합니다.");
-        }
-
-        // 홈/원정 검증 (0 또는 1이어야 함)
         if (game.getIsHome() != 0 && game.getIsHome() != 1) {
             errors.put("isHome", "홈/원정은 0 또는 1이어야 합니다.");
         }
+
+        // 미래 경기 득점과 실점 검증 수정
+        if (game.getGameDate() != null && game.getGameDate().isAfter(LocalDate.now())) {
+            if (game.getGoal() != 0 || game.getConcede() != 0) {
+                errors.put("futureGame", "미래 경기의 득점과 실점은 0이어야 합니다.");
+            }
+        } else {
+            // 과거 또는 현재 경기에 대한 득점과 실점 검증
+            if (game.getGoal() < 0) {
+                errors.put("goal", "득점은 0 이상이어야 합니다.");
+            }
+            if (game.getConcede() < 0) {
+                errors.put("concede", "실점은 0 이상이어야 합니다.");
+            }
+        }
+
         return errors;
     }
 
-    // 경기 추가 및 갱신
+    // 경기 추가 및 갱신, 과거와 미래 데이터 구분
     public Game saveGame(Game game) {
+        LocalDate now = LocalDate.now();
+
+        // 미래 경기일 경우 득점과 실점을 0으로 설정
+        if (game.getGameDate().isAfter(now)) {
+            game.setGoal(0);
+            game.setConcede(0);
+        }
+
+        // 과거 경기 또는 현재 경기일 경우 기존 득점과 실점을 유지
         return gameRepository.save(game);
     }
 
