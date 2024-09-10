@@ -2,7 +2,6 @@ package acorn.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import acorn.entity.Person;
@@ -41,7 +41,13 @@ public class TrainController {
         return trainService.getAllTrains(pageable);
     }
     
-    // 훈련에 참가자를 추가하는 엔드포인트
+    // 훈련명을 포함하는 훈련 검색 (페이징 처리)
+    @GetMapping("/search")
+    public Page<Train> searchTrainsByName(@RequestParam("trainName") String trainName, Pageable pageable) {
+        return trainService.searchTrainsByName(trainName, pageable);
+    }
+    
+    // 훈련에 참가자를 추가하는 엔드포인트 (참가자 제한 로직 추가)
     @PostMapping("/{id}/add-participants")
     public ResponseEntity<String> addParticipantsToTraining(@PathVariable("id") int trainIdx, @RequestBody List<Integer> personIds) {
         Train train = trainService.getTrainById(trainIdx);
@@ -53,7 +59,11 @@ public class TrainController {
         for (Person person : participants) {
             // 이미 훈련에 참가한 인원이 있는지 확인
             if (!trainMemService.isPersonInTraining(train, person)) {
-                trainMemService.addTrainMem(train, person);
+                try {
+                    trainMemService.addTrainMem(train, person);
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.badRequest().body(e.getMessage());
+                }
             } else {
                 return ResponseEntity.badRequest().body("Participant " + person.getPersonName() + " is already added to this training.");
             }

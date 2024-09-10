@@ -1,9 +1,11 @@
 package acorn.entity;
 
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,13 +18,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 public class Finance {
-	@Id
-	private int financeIdx;
-	
-	private String financeType;
-	private Date financeDate;
-	private int amount;
-	private String trader;
-	private String purpose;
-	private String financeMemo;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int financeIdx;
+    
+    private String financeType;
+    private Timestamp financeDate;  // Timestamp로 변경
+    private int amount;
+    private String trader;
+    private String purpose;
+    private String financeMemo;
 }

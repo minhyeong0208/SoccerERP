@@ -2,7 +2,6 @@ package acorn.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,13 +39,13 @@ public class PersonService {
     }
 
     // 역할 구분에 따른 조회 (선수/코치)
-    public List<Person> getPersonsByTypeCode(String typeCode) {
-        return personRepository.findByTypeCode(typeCode);
+    public Page<Person> getPersonsByTypeCode(String typeCode, Pageable pageable) {
+        return personRepository.findByTypeCode(typeCode, pageable);
     }
 
-    // 선수명 또는 포지션 검색
-    public List<Person> searchPersons(String personName, String position) {
-        return personRepository.searchByPersonNameOrPosition(personName, position);
+    // 선수명 또는 포지션 검색 (페이징 처리)
+    public Page<Person> searchPersons(String personName, String position, Pageable pageable) {
+        return personRepository.searchByPersonNameOrPosition(personName, position, pageable); 
     }
 
     // 특정 사람 조회

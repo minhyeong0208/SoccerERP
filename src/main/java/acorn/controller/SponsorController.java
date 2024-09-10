@@ -1,26 +1,37 @@
 package acorn.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.sql.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import acorn.entity.Finance;
 import acorn.entity.Sponsor;
 import acorn.service.SponsorService;
-
-import java.util.Date;
-import java.util.List;
+import acorn.service.FinanceService; // FinanceService 추가
 
 @RestController
 @RequestMapping("/sponsors")
 public class SponsorController {
 
     private final SponsorService sponsorService;
+    private final FinanceService financeService; // FinanceService 필드 추가
 
-    @Autowired
-    public SponsorController(SponsorService sponsorService) {
+    // SponsorService와 FinanceService를 생성자 주입
+    public SponsorController(SponsorService sponsorService, FinanceService financeService) {
         this.sponsorService = sponsorService;
+        this.financeService = financeService;
     }
 
     // 모든 스폰서 조회 (페이징 처리)
@@ -31,19 +42,24 @@ public class SponsorController {
 
     // 스폰서 이름으로 검색 (페이징 처리)
     @GetMapping("/search")
-    public Page<Sponsor> searchSponsorsByName(@RequestParam String sponsorName, Pageable pageable) {
+    public Page<Sponsor> searchSponsorsByName(@RequestParam("sponsorName") String sponsorName, Pageable pageable) {
         return sponsorService.searchSponsorsByName(sponsorName, pageable);
     }
 
     // 기간으로 스폰서 검색 (페이징 처리)
-    @GetMapping("/search-by-date")
-    public Page<Sponsor> searchSponsorsByDateRange(@RequestParam Date startDate, @RequestParam Date endDate, Pageable pageable) {
-        return sponsorService.searchSponsorsByDateRange(startDate, endDate, pageable);
+ // contractDate 기준으로 기간별 스폰서 검색 (페이징 처리)
+    @GetMapping("/search-by-contract-date")
+    public Page<Sponsor> searchSponsorsByContractDateRange(
+            @RequestParam("startDate") Date startDate,
+            @RequestParam("endDate") Date endDate,
+            Pageable pageable) {
+        return sponsorService.searchSponsorsByContractDateRange(startDate, endDate, pageable);
     }
 
     // 새로운 스폰서 추가
     @PostMapping
     public Sponsor createSponsor(@RequestBody Sponsor sponsor) {
+        // 스폰서 추가는 SponsorService에서 처리 (재정 추가도 여기서 처리)
         return sponsorService.addSponsor(sponsor);
     }
 

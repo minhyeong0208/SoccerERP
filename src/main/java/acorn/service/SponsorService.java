@@ -1,24 +1,28 @@
 package acorn.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import acorn.entity.Finance;
 import acorn.entity.Sponsor;
 import acorn.repository.SponsorRepository;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import jakarta.transaction.Transactional;
 
 @Service
 public class SponsorService {
 
     private final SponsorRepository sponsorRepository;
+    private final FinanceService financeService; // FinanceService 필드 추가
 
-    @Autowired
-    public SponsorService(SponsorRepository sponsorRepository) {
+    public SponsorService(SponsorRepository sponsorRepository, FinanceService financeService) {
         this.sponsorRepository = sponsorRepository;
+        this.financeService = financeService; // 생성자 주입
     }
 
     // 모든 스폰서 조회 (페이징 처리)
@@ -31,15 +35,41 @@ public class SponsorService {
         return sponsorRepository.findBySponsorNameContaining(sponsorName, pageable);
     }
 
-    // 기간으로 검색 (페이징 처리)
-    public Page<Sponsor> searchSponsorsByDateRange(Date startDate, Date endDate, Pageable pageable) {
-        return sponsorRepository.findByStartDateBetween(startDate, endDate, pageable);
+    // contractDate 기준으로 기간별 스폰서 검색 (페이징 처리)
+    public Page<Sponsor> searchSponsorsByContractDateRange(Date startDate, Date endDate, Pageable pageable) {
+        return sponsorRepository.findByContractDateBetween(startDate, endDate, pageable);
     }
 
     // 새로운 스폰서 추가
+    @Transactional  // 트랜잭션을 명확히 지정
     public Sponsor addSponsor(Sponsor sponsor) {
-        return sponsorRepository.save(sponsor);
+        Sponsor savedSponsor = sponsorRepository.save(sponsor);
+
+        // 중복 재정 항목이 있는지 확인 (trader와 시분초까지 포함한 financeDate 기준)
+        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());  // 시분초까지 포함한 현재 시간
+        
+        boolean exists = financeService.existsByTraderAndFinanceDate(savedSponsor.getSponsorName(), currentTimestamp);
+
+        if (!exists) {
+            Finance finance = Finance.builder()
+                .financeType("수입")
+                .financeDate(currentTimestamp)  // 시분초 포함 현재 시간
+                .amount(savedSponsor.getPrice())  // 스폰서 금액
+                .trader(savedSponsor.getSponsorName())  // 거래처 정보
+                .purpose("스폰서 계약")
+                .financeMemo("스폰서 계약에 따른 수입")
+                .build();
+
+            financeService.addIncome(finance);  // 재정 항목에 추가
+        } else {
+            System.out.println("Duplicate finance entry detected for sponsor: " + savedSponsor.getSponsorName());
+        }
+
+        return savedSponsor;
     }
+
+
+
 
     // 스폰서 업데이트
     public Sponsor updateSponsor(int sponsorIdx, Sponsor sponsorDetails) {

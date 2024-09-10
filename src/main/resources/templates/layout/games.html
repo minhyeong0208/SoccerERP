@@ -15,70 +15,69 @@
 
     <h3 class="mb-2 text-gray-800">경기 관리</h3>
 
-    <!-- 통계 카드 -->
-    <div class="row">
-      <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card card-left-border border-left-primary h-100 py-2">
-          <div class="card-body">
-            <div class="row no-gutters align-items-center">
-              <div class="col mr-2">
-                <div class="h6 font-weight-bold text-primary text-uppercase mb-1">경기 수</div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${matchCount}"></div>
-              </div>
-              <div class="col-auto">
-                <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
-              </div>
+  <!-- 통계 카드 -->
+  <div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card card-left-border border-left-primary h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="h6 font-weight-bold text-primary text-uppercase mb-1">경기 수</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${matchCount}"></div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card card-left-border border-left-success h-100 py-2">
-          <div class="card-body">
-            <div class="row no-gutters align-items-center">
-              <div class="col mr-2">
-                <div class="h6 font-weight-bold text-success text-uppercase mb-1">승패 마진</div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${winLossMargin}"></div>
-              </div>
-              <div class="col-auto">
-                <i class="fa-solid fa-chart-line fa-2x text-gray-300"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card card-left-border border-left-info h-100 py-2">
-          <div class="card-body">
-            <div class="row no-gutters align-items-center">
-              <div class="col mr-2">
-                <div class="h6 font-weight-bold text-info text-uppercase mb-1">팀 득점</div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${teamScore}"></div>
-              </div>
-              <div class="col-auto">
-                <i class="fas fa-futbol fa-2x text-gray-300"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card card-left-border border-left-warning h-100 py-2">
-          <div class="card-body">
-            <div class="row no-gutters align-items-center">
-              <div class="col mr-2">
-                <div class="h6 font-weight-bold text-warning text-uppercase mb-1">팀 실점</div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800" th:text="${teamConcede}"></div>
-              </div>
-              <div class="col-auto">
-                <i class="fa-solid fa-circle-exclamation fa-2x text-gray-300"></i>
-              </div>
+            <div class="col-auto">
+              <i class="fas fa-calendar-check fa-2x custom-icon1"></i> <!-- 클래스 추가 -->
             </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card card-left-border border-left-success h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="h6 font-weight-bold text-success text-uppercase mb-1">승패 마진</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${winLossMargin}"></div>
+            </div>
+            <div class="col-auto">
+              <i class="fa-solid fa-chart-line fa-2x custom-icon2"></i> <!-- 클래스 추가 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card card-left-border border-left-info h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="h6 font-weight-bold text-info text-uppercase mb-1">팀 득점</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${teamScore}"></div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-futbol fa-2x custom-icon3"></i> <!-- 클래스 추가 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card card-left-border border-left-warning h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="h6 font-weight-bold text-warning text-uppercase mb-1">팀 실점</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${teamConcede}"></div>
+            </div>
+            <div class="col-auto">
+              <i class="fa-solid fa-circle-exclamation fa-2x custom-icon4"></i> <!-- 클래스 추가 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
     <!-- 최근 경기 -->
     <div class="card shadow mb-4">
@@ -95,14 +94,23 @@
           <!-- 팀 정보 -->
           <div class="row align-items-center mb-3">
             <div class="col-4">
-<!--              <h4 th:text="${mostRecentGame.ownTeam}"></h4>-->
-              <h1>강원 FC</h1>
+              <div class="team-logo-container">
+                <img th:src="@{'/img/team/강원FC.png'}" alt="강원 FC 로고" class="team-logo">
+              </div>
+              <br>
+              <h2 class="text">강원 FC</h2>
             </div>
             <div class="col-4">
-              <h3>vs</h3>
+              <img th:src="@{'/img/team/versus.png'}" alt="versus" class="versus-logo">
             </div>
             <div class="col-4">
-              <h1 th:text="${mostRecentGame.opponent}"></h1>
+              <div class="team-logo-container">
+                <img th:src="@{'/img/team/' + ${@gameService.getTeamImageFileName(mostRecentGame.opponent)}}"
+                     th:alt="${mostRecentGame.opponent} + ' 로고'"
+                     class="team-logo">
+              </div>
+              <br>
+              <h2 th:text="${mostRecentGame.opponent}" class="text"></h2>
             </div>
           </div>
 

@@ -20,9 +20,14 @@ public class PageController {
         return "layout/login"; // 로그인 페이지 (login.html)
     }
     
-    @GetMapping("/finance")
+    @GetMapping("/admin/finance")
     public String adminFinance() {
     	return "layout/finance";
+    }
+    
+    @GetMapping("/admin/sponsor")
+    public String adminSponsor() {
+    	return "layout/sponsor";
     }
     
     @GetMapping("/dashboard")
@@ -72,5 +77,15 @@ public class PageController {
     @GetMapping("/train")
     public String train(){
         return "layout/train";
+    }
+
+    @GetMapping("/player")
+    public String player(){
+        return "layout/player";
+    }
+
+    @GetMapping("/coach")
+    public String coach(){
+        return "layout/coach";
     }
 }

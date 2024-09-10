@@ -7,11 +7,19 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import acorn.entity.Person;
@@ -23,7 +31,6 @@ public class PersonController {
 
 	private final PersonService personService;
 
-	@Autowired
 	public PersonController(PersonService personService) {
 		this.personService = personService;
 	}
@@ -40,17 +47,24 @@ public class PersonController {
 		return personService.getAllPersonsWithAbility();
 	}
 
-	// 선수만 조회 (이적 시 판매용)
-	@GetMapping("/players")
-	public List<Person> getAllPlayers() {
-		return personService.getPersonsByTypeCode("player");
-	}
+	// 선수만 조회 (이적 시 판매용, 페이징 처리)
+		@GetMapping("/players")
+		public Page<Person> getAllPlayers(Pageable pageable) {
+			return personService.getPersonsByTypeCode("player", pageable);
+		}
 
-	// 코치만 조회
-	@GetMapping("/coaches")
-	public List<Person> getAllCoaches() {
-		return personService.getPersonsByTypeCode("coach");
-	}
+		// 코치만 조회 (페이징 처리)
+		@GetMapping("/coaches")
+		public Page<Person> getAllCoaches(Pageable pageable) {
+			return personService.getPersonsByTypeCode("coach", pageable);
+		}
+
+		// 검색 기능: 이름 또는 포지션으로 검색 (페이징 처리)
+		@GetMapping("/search")
+		public Page<Person> searchPersons(@RequestParam(value = "personName", required = false) String personName,
+				@RequestParam(value = "position", required = false) String position, Pageable pageable) {
+			return personService.searchPersons(personName, position, pageable);
+		}
 
 	// 특정 사람 조회
 	@GetMapping("/{id}")
@@ -60,13 +74,6 @@ public class PersonController {
 			return ResponseEntity.notFound().build();
 		}
 		return ResponseEntity.ok().body(person);
-	}
-
-	// 검색 기능: 이름 또는 포지션으로 검색
-	@GetMapping("/search")
-	public List<Person> searchPersons(@RequestParam(value = "personName", required = false) String personName,
-			@RequestParam(value = "position", required = false) String position) {
-		return personService.searchPersons(personName, position);
 	}
 
 	// 새로운 사람 추가
