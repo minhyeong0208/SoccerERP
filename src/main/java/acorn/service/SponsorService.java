@@ -42,13 +42,14 @@ public class SponsorService {
     public Sponsor addSponsor(Sponsor sponsor) {
         Sponsor savedSponsor = sponsorRepository.save(sponsor);
 
-        // 중복 재정 항목이 있는지 확인
-        boolean exists = financeService.existsByTraderAndFinanceDate(savedSponsor.getSponsorName(), new Date(System.currentTimeMillis()));
+        // 중복 재정 항목이 있는지 확인 (날짜만 비교)
+        Date currentDate = new Date(System.currentTimeMillis());
+        boolean exists = financeService.existsByTraderAndFinanceDate(savedSponsor.getSponsorName(), currentDate);
 
         if (!exists) {
             Finance finance = Finance.builder()
                 .financeType("수입")
-                .financeDate(new Date(System.currentTimeMillis()))  // 현재 날짜 또는 계약 날짜
+                .financeDate(currentDate)  // 현재 날짜 (시간 제외)
                 .amount(savedSponsor.getPrice())  // 스폰서 금액
                 .trader(savedSponsor.getSponsorName())  // 거래처 정보
                 .purpose("스폰서 계약")
@@ -62,6 +63,7 @@ public class SponsorService {
 
         return savedSponsor;
     }
+
 
 
     // 스폰서 업데이트
