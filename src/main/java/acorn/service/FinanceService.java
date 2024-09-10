@@ -18,10 +18,19 @@ public class FinanceService {
 	@Autowired
 	private FinanceRepository financeRepository;
 
-	// 검색 기능 (Date -> Timestamp로 변경)
-    public Page<Finance> getFinancesByTypeAndDateAndKeyword(String type, Timestamp startDate, Timestamp endDate, String keyword, Pageable pageable) {
-        return financeRepository.findByTypeAndDate(type, startDate, endDate, keyword, pageable);
-    }
+	// 검색 기능 (Timestamp로 변환 후 endDate 처리)
+	public Page<Finance> getFinancesByTypeAndDateAndKeyword(String type, Timestamp startDate, Timestamp endDate, String keyword, Pageable pageable) {
+	    // endDate가 null이 아니면 23:59:59로 맞춰서 범위를 설정
+		if (endDate != null) {
+		    // endDate를 2024-09-16 00:00:00으로 설정 (15일 전체 포함)
+		    endDate = Timestamp.valueOf(endDate.toLocalDateTime().plusDays(1).withHour(0).withMinute(0).withSecond(0));
+		}
+
+	    System.out.println("Start Date: " + startDate);
+	    System.out.println("End Date: " + endDate);  // 이 부분을 추가
+	    return financeRepository.findByTypeAndDate(type, startDate, endDate, keyword, pageable);
+	}
+
 	
 	// 수입 항목 추가
     public Finance addIncome(Finance finance) {
