@@ -33,9 +33,9 @@ public class SponsorService {
         return sponsorRepository.findBySponsorNameContaining(sponsorName, pageable);
     }
 
-    // 기간으로 검색 (페이징 처리)
-    public Page<Sponsor> searchSponsorsByDateRange(Date startDate, Date endDate, Pageable pageable) {
-        return sponsorRepository.findByStartDateBetween(startDate, endDate, pageable);
+    // contractDate 기준으로 기간별 스폰서 검색 (페이징 처리)
+    public Page<Sponsor> searchSponsorsByContractDateRange(Date startDate, Date endDate, Pageable pageable) {
+        return sponsorRepository.findByContractDateBetween(startDate, endDate, pageable);
     }
 
     // 새로운 스폰서 추가

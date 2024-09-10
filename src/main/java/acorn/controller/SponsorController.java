@@ -42,14 +42,18 @@ public class SponsorController {
 
     // 스폰서 이름으로 검색 (페이징 처리)
     @GetMapping("/search")
-    public Page<Sponsor> searchSponsorsByName(@RequestParam String sponsorName, Pageable pageable) {
+    public Page<Sponsor> searchSponsorsByName(@RequestParam("sponsorName") String sponsorName, Pageable pageable) {
         return sponsorService.searchSponsorsByName(sponsorName, pageable);
     }
 
     // 기간으로 스폰서 검색 (페이징 처리)
-    @GetMapping("/search-by-date")
-    public Page<Sponsor> searchSponsorsByDateRange(@RequestParam Date startDate, @RequestParam Date endDate, Pageable pageable) {
-        return sponsorService.searchSponsorsByDateRange(startDate, endDate, pageable);
+ // contractDate 기준으로 기간별 스폰서 검색 (페이징 처리)
+    @GetMapping("/search-by-contract-date")
+    public Page<Sponsor> searchSponsorsByContractDateRange(
+            @RequestParam("startDate") Date startDate,
+            @RequestParam("endDate") Date endDate,
+            Pageable pageable) {
+        return sponsorService.searchSponsorsByContractDateRange(startDate, endDate, pageable);
     }
 
     // 새로운 스폰서 추가
