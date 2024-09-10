@@ -1,13 +1,13 @@
 package acorn.repository;
 
+import java.util.Date;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import acorn.entity.Sponsor;
 
-import java.util.Date;
-import java.util.List;
+import acorn.entity.Sponsor;
 
 @Repository
 public interface SponsorRepository extends JpaRepository<Sponsor, Integer> {

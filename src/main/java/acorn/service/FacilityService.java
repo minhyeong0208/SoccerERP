@@ -1,21 +1,20 @@
 package acorn.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import acorn.entity.Facility;
 import acorn.repository.FacilityRepository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FacilityService {
 
     private final FacilityRepository facilityRepository;
 
-    @Autowired
     public FacilityService(FacilityRepository facilityRepository) {
         this.facilityRepository = facilityRepository;
     }

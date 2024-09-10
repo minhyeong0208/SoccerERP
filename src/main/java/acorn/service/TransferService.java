@@ -3,7 +3,6 @@ package acorn.service;
 import java.sql.Date;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ public class TransferService {
     private final PersonRepository personRepository;
     private final FinanceService financeService; // 재정 서비스 추가
 
-    @Autowired
     public TransferService(TransferRepository transferRepository, PersonRepository personRepository, FinanceService financeService) {
         this.transferRepository = transferRepository;
         this.personRepository = personRepository;

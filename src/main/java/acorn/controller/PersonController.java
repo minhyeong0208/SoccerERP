@@ -47,17 +47,24 @@ public class PersonController {
 		return personService.getAllPersonsWithAbility();
 	}
 
-	// 선수만 조회 (이적 시 판매용)
-	@GetMapping("/players")
-	public List<Person> getAllPlayers() {
-		return personService.getPersonsByTypeCode("player");
-	}
+	// 선수만 조회 (이적 시 판매용, 페이징 처리)
+		@GetMapping("/players")
+		public Page<Person> getAllPlayers(Pageable pageable) {
+			return personService.getPersonsByTypeCode("player", pageable);
+		}
 
-	// 코치만 조회
-	@GetMapping("/coaches")
-	public List<Person> getAllCoaches() {
-		return personService.getPersonsByTypeCode("coach");
-	}
+		// 코치만 조회 (페이징 처리)
+		@GetMapping("/coaches")
+		public Page<Person> getAllCoaches(Pageable pageable) {
+			return personService.getPersonsByTypeCode("coach", pageable);
+		}
+
+		// 검색 기능: 이름 또는 포지션으로 검색 (페이징 처리)
+		@GetMapping("/search")
+		public Page<Person> searchPersons(@RequestParam(value = "personName", required = false) String personName,
+				@RequestParam(value = "position", required = false) String position, Pageable pageable) {
+			return personService.searchPersons(personName, position, pageable);
+		}
 
 	// 특정 사람 조회
 	@GetMapping("/{id}")
@@ -67,13 +74,6 @@ public class PersonController {
 			return ResponseEntity.notFound().build();
 		}
 		return ResponseEntity.ok().body(person);
-	}
-
-	// 검색 기능: 이름 또는 포지션으로 검색
-	@GetMapping("/search")
-	public List<Person> searchPersons(@RequestParam(value = "personName", required = false) String personName,
-			@RequestParam(value = "position", required = false) String position) {
-		return personService.searchPersons(personName, position);
 	}
 
 	// 새로운 사람 추가
