@@ -7,6 +7,7 @@ const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('con
 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
 function loadSponsorData(page) {
+	currentPage = page;
 	
 	const startDate = document.querySelector('#startDate').value;
 	const endDate = document.querySelector('#endDate').value;
@@ -90,9 +91,9 @@ document.getElementById("submitSponsor").onclick = function() {
 	const price = document.getElementById("contractPrice").value;
 	const contractCondition = document.getElementById("contractCondition").value;
 	const sponsorMemo = document.getElementById("sponsorMemo").value;
-	const startDate = document.getElementById("startDate").value;
-	const endDate = document.getElementById("endDate").value;
-
+	const startDate = document.getElementById("editStartDate").value;
+	const endDate = document.getElementById("editEndDate").value;
+	console.log(startDate);
 	const sponsorData = {
 		sponsorName: sponsorName,
 		contractDate: contractDate,
@@ -128,7 +129,18 @@ document.getElementById("submitSponsor").onclick = function() {
 		});
 }
 
+// 이전/다음 버튼 클릭 시 currentPage를 기반으로 페이지 이동
+document.querySelector("#prevGroup").onclick = () => {
+	if (currentPage > 0) {
+		loadSponsorData(currentPage - 1);
+	}
+};
 
+document.querySelector("#nextGroup").onclick = () => {
+	if (currentPage < totalPages - 1) {
+		loadSponsorData(currentPage + 1);
+	}
+};
 
 document.addEventListener("DOMContentLoaded", function() {
 	loadSponsorData(currentPage);

@@ -23,6 +23,8 @@ const formToObject = (form) =>
 
 // 전체 사람 정보 가져오기
 function fetchPlayerData(page) {
+	currentPage = page;
+	
     let url = `http://localhost/persons/players?page=${page}&size=${pageSize}`;
 
     fetch(url)
