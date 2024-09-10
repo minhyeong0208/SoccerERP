@@ -1,6 +1,6 @@
 package acorn.service;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,8 +18,8 @@ public class FinanceService {
 	@Autowired
 	private FinanceRepository financeRepository;
 
-	// 검색 기능
-	public Page<Finance> getFinancesByTypeAndDateAndKeyword(String type, Date startDate, Date endDate, String keyword, Pageable pageable) {
+	// 검색 기능 (Date -> Timestamp로 변경)
+    public Page<Finance> getFinancesByTypeAndDateAndKeyword(String type, Timestamp startDate, Timestamp endDate, String keyword, Pageable pageable) {
         return financeRepository.findByTypeAndDate(type, startDate, endDate, keyword, pageable);
     }
 	
@@ -30,7 +30,7 @@ public class FinanceService {
     }
     
     // 트레이더와 재정 날짜로 중복된 항목이 있는지 확인
-    public boolean existsByTraderAndFinanceDate(String trader, Date financeDate) {
+    public boolean existsByTraderAndFinanceDate(String trader, Timestamp financeDate) {
         return financeRepository.existsByTraderAndFinanceDate(trader, financeDate);
     }
 

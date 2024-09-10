@@ -1,6 +1,6 @@
 package acorn.service;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -35,7 +35,7 @@ public class TransferService {
         // 판매 후 재정 관리에 수입 기록 추가
         Finance income = Finance.builder()
             .financeType("수입")
-            .financeDate(new Date(System.currentTimeMillis()))
+            .financeDate(new Timestamp(System.currentTimeMillis())) // 시분초 포함한 날짜
             .amount(transfer.getPrice())
             .trader(transfer.getOpponent()) // 거래처는 상대팀
             .purpose("선수 판매")
@@ -55,7 +55,7 @@ public class TransferService {
         // 구매 후 재정 관리에 지출 기록 추가
         Finance expense = Finance.builder()
             .financeType("지출")
-            .financeDate(new Date(System.currentTimeMillis()))
+            .financeDate(new Timestamp(System.currentTimeMillis())) // 시분초 포함한 날짜
             .amount(dto.getTransfer().getPrice())
             .trader(dto.getTransfer().getOpponent()) // 거래처는 상대팀
             .purpose("선수 구매")

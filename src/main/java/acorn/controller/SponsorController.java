@@ -59,30 +59,9 @@ public class SponsorController {
     // 새로운 스폰서 추가
     @PostMapping
     public Sponsor createSponsor(@RequestBody Sponsor sponsor) {
-        // 스폰서 추가
-        Sponsor savedSponsor = sponsorService.addSponsor(sponsor);
-
-        // 로그 추가: 중복 호출을 확인
-        System.out.println("Adding income for sponsor: " + savedSponsor.getSponsorName());
-
-        // 재정 항목에 수입 기록 추가
-        Finance finance = Finance.builder()
-            .financeType("수입")
-            .financeDate(new java.sql.Date(System.currentTimeMillis()))  // 현재 날짜 또는 계약 날짜
-            .amount(savedSponsor.getPrice())  // 스폰서 금액
-            .trader(savedSponsor.getSponsorName())  // 거래처 정보
-            .purpose("스폰서 계약")
-            .financeMemo("스폰서 계약에 따른 수입")
-            .build();
-
-        // 재정 항목에 한 번만 수입 기록 추가
-        System.out.println("Finance entry is being added for sponsor: " + finance.getTrader());
-        financeService.addIncome(finance);  
-
-        return savedSponsor;
+        // 스폰서 추가는 SponsorService에서 처리 (재정 추가도 여기서 처리)
+        return sponsorService.addSponsor(sponsor);
     }
-
-
 
     // 스폰서 업데이트
     @PutMapping("/{id}")

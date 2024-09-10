@@ -1,6 +1,7 @@
 package acorn.service;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import acorn.entity.Finance;
 import acorn.entity.Sponsor;
 import acorn.repository.SponsorRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class SponsorService {
@@ -39,17 +41,19 @@ public class SponsorService {
     }
 
     // 새로운 스폰서 추가
+    @Transactional  // 트랜잭션을 명확히 지정
     public Sponsor addSponsor(Sponsor sponsor) {
         Sponsor savedSponsor = sponsorRepository.save(sponsor);
 
-        // 중복 재정 항목이 있는지 확인 (날짜만 비교)
-        Date currentDate = new Date(System.currentTimeMillis());
-        boolean exists = financeService.existsByTraderAndFinanceDate(savedSponsor.getSponsorName(), currentDate);
+        // 중복 재정 항목이 있는지 확인 (trader와 시분초까지 포함한 financeDate 기준)
+        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());  // 시분초까지 포함한 현재 시간
+        
+        boolean exists = financeService.existsByTraderAndFinanceDate(savedSponsor.getSponsorName(), currentTimestamp);
 
         if (!exists) {
             Finance finance = Finance.builder()
                 .financeType("수입")
-                .financeDate(currentDate)  // 현재 날짜 (시간 제외)
+                .financeDate(currentTimestamp)  // 시분초 포함 현재 시간
                 .amount(savedSponsor.getPrice())  // 스폰서 금액
                 .trader(savedSponsor.getSponsorName())  // 거래처 정보
                 .purpose("스폰서 계약")
@@ -63,6 +67,7 @@ public class SponsorService {
 
         return savedSponsor;
     }
+
 
 
 
