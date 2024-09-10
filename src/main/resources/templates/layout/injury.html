@@ -37,17 +37,17 @@
 					</tr>
 				</thead>
 				<tbody id="injuryTableBody">
-					<tr th:each="injury : ${injuries}">
+					<tr th:each="injury : ${injuries}" style="cursor: pointer;">
 						<td><input type="checkbox"></td>
 						<td th:text="${injury.person.backNumber}">등번호</td>
-						<td><a href="#" class="player-link"
-							th:data-id="${injury.person.personIdx}"
-							th:text="${injury.person.personName}">선수명</a></td>
+						<td th:data-id="${injury.person.personIdx}"
+							th:text="${injury.person.personName}">선수명</td>
 						<td
 							th:text="${#dates.format(injury.brokenDate, 'yyyy-MM-dd HH:mm')}">부상일시</td>
 					</tr>
 				</tbody>
 			</table>
+
 
 			<div class="row mb-3">
 				<!-- 검색 영역 -->
@@ -246,6 +246,65 @@
 						<button class="btn btn-primary" id="addInjuryButton">추가</button>
 						<button type="button" class="btn btn-secondary"
 							data-bs-dismiss="modal">취소</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 부상 추가 성공 모달 -->
+		<div class="modal fade" id="successModal" tabindex="-1"
+			aria-labelledby="successModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="successModalLabel">부상 추가 완료</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">부상 정보가 성공적으로 추가되었습니다.</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary"
+							data-bs-dismiss="modal">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 삭제 확인 모달 -->
+		<div class="modal fade" id="deleteConfirmModal" tabindex="-1"
+			aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="deleteConfirmModalLabel">삭제 확인</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">정말로 삭제하시겠습니까?</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">취소</button>
+						<button type="button" class="btn btn-danger"
+							id="confirmDeleteButton">삭제</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 업데이트 성공 모달 -->
+		<div class="modal fade" id="updateSuccessModal" tabindex="-1"
+			aria-labelledby="updateSuccessModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="updateSuccessModalLabel">수정 완료</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">부상 정보가 성공적으로 수정되었습니다.</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary"
+							data-bs-dismiss="modal">확인</button>
 					</div>
 				</div>
 			</div>

@@ -22,6 +22,7 @@ public class Facility {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int facilityIdx;
 
+    private String facilityLocation;
     private String facilityName;
     private Double latitude;
     private Double longitude;
