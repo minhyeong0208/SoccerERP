@@ -6,7 +6,7 @@ let totalPages = 1;
 function loadFinanceData(page) {
 	// 페이지 갱신
 	currentPage = page;
-
+	
 	const financeType = document.querySelector('input[name="financeType"]:checked').value;
 	const startDate = document.querySelector('#startDate').value;
 	const endDate = document.querySelector('#endDate').value;
@@ -50,6 +50,11 @@ function loadFinanceData(page) {
 			            <td class="editable" data-field="purpose">${finance.purpose}</td>
 			            <td class="editable" data-field="financeMemo">${finance.financeMemo}</td>
 			        </tr>`;
+			});
+
+			// 각 셀에 더블 클릭 시 편집 가능하도록 이벤트 리스너 추가
+			document.querySelectorAll('.editable').forEach(cell => {
+				cell.addEventListener('dblclick', editField);
 			});
 
 			// 페이지 버튼 초기화
