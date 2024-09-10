@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default2}">
+<th:block layout:fragment="customCss">
+	<style>
+    	.label-border-right { border-right: 2px solid black; padding-right: 10px; font-weight: bold; }
+  	</style>
+</th:block>
+
+<th:block layout:fragment="customContents">
+	<h3>스폰서 관리</h3>
+	
+</th:block>
+
+<th:block layout:fragment="customJs">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="/js/finance.js"></script>
+</th:block>
+</html>

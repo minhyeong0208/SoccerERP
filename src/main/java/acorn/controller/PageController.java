@@ -20,9 +20,14 @@ public class PageController {
         return "layout/login"; // 로그인 페이지 (login.html)
     }
     
-    @GetMapping("/finance")
+    @GetMapping("/admin/finance")
     public String adminFinance() {
     	return "layout/finance";
+    }
+    
+    @GetMapping("/admin/sponsor")
+    public String adminSponsor() {
+    	return "layout/sponsor";
     }
     
     @GetMapping("/dashboard")

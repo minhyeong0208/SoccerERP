@@ -43,12 +43,11 @@ public class TrainController {
     
     // 훈련명을 포함하는 훈련 검색 (페이징 처리)
     @GetMapping("/search")
-    public Page<Train> searchTrainsByName(@RequestParam String trainName, Pageable pageable) {
+    public Page<Train> searchTrainsByName(@RequestParam("trainName") String trainName, Pageable pageable) {
         return trainService.searchTrainsByName(trainName, pageable);
     }
     
-    // 훈련에 참가자를 추가하는 엔드포인트
- // 훈련에 참가자를 추가하는 엔드포인트 (참가자 제한 로직 추가)
+    // 훈련에 참가자를 추가하는 엔드포인트 (참가자 제한 로직 추가)
     @PostMapping("/{id}/add-participants")
     public ResponseEntity<String> addParticipantsToTraining(@PathVariable("id") int trainIdx, @RequestBody List<Integer> personIds) {
         Train train = trainService.getTrainById(trainIdx);

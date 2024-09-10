@@ -3,87 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <title>Sidebar Fragment</title>
+  <style>
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    ul li ul {
+      padding-left: 15px;
+      display: none; /* 기본 상태에서 하위 항목 숨김 */
+    }
+
+    ul li ul li {
+      display: block;
+      padding: 5px 0;
+    }
+
+    .link {
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 <div th:fragment="sidebar(gubun)" class="sidebar">
   <div class="sidebar-links">
     <ul>
+      <!-- 대시보드 -->
       <li>
         <a th:href="@{/dashboard}" title="Dashboard" class="custom_tooltip">
           <span class="link">대시보드</span>
           <span class="tooltip__content">Dashboard</span>
         </a>
       </li>
-      <!-- role이 ADMIN인 경우에만 Finance 탭 보이도록 -->
-      <!-- role이 어떻게 넘어올지 몰라서 일단 하드코딩, 수정 예정~ -->
+
+      <!-- 재정관리 (ADMIN 전용) -->
       <li th:if="${gubun == 'ADMIN'}">
-        <a th:href="@{/finance}" title="Finance" class="custom_tooltip">
-          <span class="link hide">재정 관리</span>
-          <span class="tooltip__content">재정 관리</span>
+        <a href="javascript:void(0);" onclick="toggleSubmenu('financeSubmenu')" class="custom_tooltip">
+          <span class="link">재정 관리</span>
         </a>
+        <ul id="financeSubmenu">
+          <li><a th:href="@{/admin/finance}">재정</a></li>
+          <li><a th:href="@{/admin/sponsor}">스폰서</a></li>
+        </ul>
       </li>
-      <li th:if="${gubun == 'ADMIN'}">
-        <a th:href="@{/sponsor}" title="Sponsor" class="custom_tooltip">
-          <span class="link hide">스폰서 관리</span>
-          <span class="tooltip__content">스폰서 관리</span>
-        </a>
-      </li>
+
+      <!-- 인적관리 -->
       <li>
-        <a th:href="@{/coach}" title="Settings" class="custom_tooltip">
-          <span class="link hide">코치 관리</span>
-          <span class="tooltip__content">코치 관리</span>
+        <a href="javascript:void(0);" onclick="toggleSubmenu('personnelSubmenu')" class="custom_tooltip">
+          <span class="link">인적 관리</span>
         </a>
+        <ul id="personnelSubmenu">
+          <li><a th:href="@{/player}">선수</a></li>
+          <li><a th:href="@{/coach}">코치</a></li>
+          <li th:if="${gubun == 'ADMIN'}"><a th:href="@{/transfer}">이적</a></li>
+          <li th:if="${gubun == 'USER'}"><a th:href="@{/injury}">부상</a></li>
+        </ul>
       </li>
+
+      <!-- 일정관리 -->
       <li>
-        <a th:href="@{/player}" title="Analytics" class="custom_tooltip">
-          <span class="link hide">선수 관리</span>
-          <span class="tooltip__content">선수 관리</span>
+        <a href="javascript:void(0);" onclick="toggleSubmenu('scheduleSubmenu')" class="custom_tooltip">
+          <span class="link">일정 관리</span>
         </a>
+        <ul id="scheduleSubmenu">
+          <li><a th:href="@{/schedule}">일정</a></li>
+          <li th:if="${gubun == 'USER'}"><a th:href="@{/train}">훈련</a></li>
+          <li><a th:href="@{/game}">경기</a></li>
+        </ul>
       </li>
-      <li th:if="${gubun == 'USER'}">
-        <a th:href="@{/injury}" title="Injury" class="custom_tooltip">
-          <span class="link hide">부상 관리</span>
-          <!-- <span class="tooltip__content">부상 관리</span>-->
-        </a>
-      </li>
-      <li th:if="${gubun == 'USER'}">
-        <a th:href="@{/train}" title="Train" class="custom_tooltip">
-          <span class="link hide">훈련 관리</span>
-          <span class="tooltip__content">훈련 관리</span>
-        </a>
-      </li>
+
+      <!-- 시설관리 -->
       <li>
-        <a th:href="@{/transfer}" title="Transfer" class="custom_tooltip">
-          <span class="link hide">이적 관리</span>
-          <span class="tooltip__content">이적 관리</span>
+        <a href="javascript:void(0);" onclick="toggleSubmenu('facilitySubmenu')" class="custom_tooltip">
+          <span class="link">시설 관리</span>
         </a>
-      </li>
-      <li>
-        <a th:href="@{/facility}" title="Reports" class="custom_tooltip">
-          <span class="link hide">시설 관리</span>
-          <span class="tooltip__content">시설 관리</span>
-        </a>
-      </li>
-      <li>
-        <a th:href="@{/game}" title="Industries" class="custom_tooltip">
-          <span class="link hide">경기 관리</span>
-          <span class="tooltip__content">경기 관리</span>
-        </a>
-      </li>
-      <li>
-        <a th:href="@{/schedule}" class="custom_tooltip">
-          <span class="link hide">일정 관리</span>
-          <span class="tooltip__content">일정 관리</span>
-        </a>
-      </li>
-      <li>
-        <a th:href="@{/team}" title="Notifications" class="custom_tooltip">
-          <span class="link hide">팀 정보</span>
-          <span class="tooltip__content">팀 정보</span>
-        </a>
+        <ul id="facilitySubmenu">
+          <li><a th:href="@{/facility}">시설</a></li>
+          <li><a th:href="@{/team}">팀</a></li>
+        </ul>
       </li>
     </ul>
   </div>
 </div>
+
+<!-- JavaScript -->
+<script>
+  function toggleSubmenu(submenuId) {
+    var submenu = document.getElementById(submenuId);
+    if (submenu.style.display === "none" || submenu.style.display === "") {
+      submenu.style.display = "block";  // 하위 항목을 보이도록 설정
+    } else {
+      submenu.style.display = "none";   // 하위 항목을 숨김
+    }
+  }
+</script>
 </body>
 </html>
