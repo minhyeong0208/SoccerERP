@@ -4,6 +4,9 @@ const maxVisiblePages = 10; // 최대 표시 페이지 수
 let totalPages = 1;
 
 function loadFinanceData(page) {
+	// 페이지 갱신
+	currentPage = page;
+
 	const financeType = document.querySelector('input[name="financeType"]:checked').value;
 	const startDate = document.querySelector('#startDate').value;
 	const endDate = document.querySelector('#endDate').value;
@@ -35,21 +38,18 @@ function loadFinanceData(page) {
 
 			// 새로운 데이터 추가
 			data.content.forEach(finance => {
+				// 날짜를 YYYY-MM-DD 형식으로 변환
+				const financeDate = new Date(finance.financeDate).toISOString().split('T')[0];
 				table.innerHTML += `
 			        <tr data-id="${finance.financeIdx}">
 			            <td><input type="checkbox" class="delete-checkbox" data-id="${finance.financeIdx}"></td>
 			            <td>${finance.financeType}</td>
-			            <td class="editable" data-field="financeDate">${finance.financeDate}</td>
+			            <td class="editable" data-field="financeDate">${financeDate}</td>
 			            <td class="editable" data-field="amount">${finance.amount}</td>
 			            <td class="editable" data-field="trader">${finance.trader}</td>
 			            <td class="editable" data-field="purpose">${finance.purpose}</td>
 			            <td class="editable" data-field="financeMemo">${finance.financeMemo}</td>
 			        </tr>`;
-			});
-
-			// 각 셀에 더블 클릭 시 편집 가능하도록 이벤트 리스너 추가
-			document.querySelectorAll('.editable').forEach(cell => {
-				cell.addEventListener('dblclick', editField);
 			});
 
 			// 페이지 버튼 초기화
@@ -292,17 +292,16 @@ document.querySelectorAll('input[name="financeType"]').forEach(radio => {
 	});
 });
 
+// 이전/다음 버튼 클릭 시 currentPage를 기반으로 페이지 이동
 document.querySelector("#prevGroup").onclick = () => {
 	if (currentPage > 0) {
-		currentPage--;
-		loadFinanceData(currentPage);
+		loadFinanceData(currentPage - 1);
 	}
 };
 
 document.querySelector("#nextGroup").onclick = () => {
 	if (currentPage < totalPages - 1) {
-		currentPage++;
-		loadFinanceData(currentPage);
+		loadFinanceData(currentPage + 1);
 	}
 };
 

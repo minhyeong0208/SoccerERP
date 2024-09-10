@@ -1,4 +1,3 @@
-/*
 package acorn.config;
 
 
@@ -32,4 +31,3 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         response.sendRedirect(redirectUrl);
     }
 }
-*/
