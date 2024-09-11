@@ -1,10 +1,9 @@
-// pagination
+// 페이징
 let currentPage = 0;
 const pageSize = 10;
-const maxVisiblePages = 10; // 최대 표시 페이지 수
+const maxVisiblePages = 10;
 let totalPages = 1;
 
-// coach data
 let totalPeople = [];
 let mappedPeople = [];
 
@@ -14,14 +13,14 @@ let url = `http://localhost:80/persons`;
 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-// form value to Object
+// form 입력값 객체로
 const formToObject = (form) =>
     Array.from(new FormData(form)).reduce(
         (acc, [key, value]) => ({...acc, [key]: value}),
         {}
     );
 
-// get whole data
+// 전체 데이터 불러오기
 function fetchCoachData(page, url) {
     currentPage = page;
 
@@ -88,6 +87,25 @@ function fetchCoachData(page, url) {
         })
         .catch(error => console.error('Error while fetching data', error))
 }
+
+// 검색
+document.getElementById('search-btn').addEventListener('click', function () {
+    const searchOption = document.getElementById('search-option').value;
+    const searchValue = document.getElementById('search-value').value;
+    url += `/search?`;
+
+    if (searchOption && !searchValue) {
+        alert('검색어를 입력하세요');
+        return;
+    } else {
+        url += `${searchOption}=${searchValue}&page=${currentPage}&size=${pageSize}`;
+        console.log(url);
+    }
+
+    fetchCoachData(currentPage, url);
+    url = `http://localhost:80/persons`;
+})
+
 
 // 데이트 피커 하루 전으로 나오는 문제
 function convertDate(date){
@@ -160,6 +178,7 @@ document.getElementById('submit-coach').addEventListener('click', function () {
     postCoach(formData);
 })
 
+// POST
 function postCoach(newPerson) {
     fetch(url + `/add-player-with-image`, {
         method: "POST",
@@ -199,6 +218,7 @@ document.getElementById('update-coach').addEventListener('click', function () {
     putCoach(coachInfo.personIdx, formData);
 });
 
+// PUT
 function putCoach(id, formData) {
     if (confirm('수정하시겠습니까?')) {
         fetch(url + `/${id}/with-image`, {
@@ -233,6 +253,7 @@ document.getElementById('delete-coach-btn').addEventListener('click', function (
     deletePerson();
 })
 
+// DELETE
 function deletePerson() {
     const selectedCheckboxes = document.querySelectorAll('.delete-checkbox:checked');
     const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute('data-id'));
@@ -279,6 +300,7 @@ document.querySelector("#selectAllCheckbox").addEventListener("change", function
     });
 });
 
+// 페이지 로드
 document.addEventListener('DOMContentLoaded', function () {
     fetchCoachData(currentPage, url);
 })
