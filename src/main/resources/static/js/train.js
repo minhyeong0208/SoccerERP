@@ -187,7 +187,8 @@ function loadPlayerData(trainIdx) {
                     playersToAdd = []; // 초기화
                     playersToRemove = []; // 초기화
 
-                    players.forEach(player => {
+                    players.content.forEach(player => {
+						console.log(players); // 응답 확인
                         const isChecked = participants.includes(player.personIdx) ? 'checked' : '';
                         const row = document.createElement('tr');
                         row.innerHTML = `
