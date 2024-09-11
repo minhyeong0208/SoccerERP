@@ -153,18 +153,36 @@ function updateTable(games) {
         return;
     }
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);  // 시간을 00:00:00으로 설정
+
     games.forEach(game => {
         if (game && typeof game === 'object') {
+            const gameDate = new Date(game.gameDate);
+            gameDate.setHours(0, 0, 0, 0);  // 시간을 00:00:00으로 설정
+
+            let goalDisplay = game.goal;
+            let concedeDisplay = game.concede;
+            let result;
+
+            if (gameDate > today) {
+                goalDisplay = '-';
+                concedeDisplay = '-';
+                result = '경기 예정';
+            } else {
+                result = game.goal > game.concede ? '승' : (game.goal < game.concede ? '패' : '무');
+            }
+
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><input type="checkbox" name="selectedMatches" value="${game.gameIdx || ''}"></td>
                 <td>${game.gameType || ''}</td>
-                <td>${game.goal || 0}</td>
-                <td>${game.concede || 0}</td>
+                <td>${goalDisplay}</td>
+                <td>${concedeDisplay}</td>
                 <td>${game.opponent || ''}</td>
                 <td>${game.stadium || ''}</td>
                 <td>${game.gameDate ? new Date(game.gameDate).toLocaleDateString() : ''}</td>
-                <td>${game.goal > game.concede ? '승' : (game.goal < game.concede ? '패' : '무')}</td>
+                <td>${result}</td>
               `;
             tableBody.appendChild(row);
         }
@@ -218,12 +236,11 @@ function addGame() {
     const gameType = document.querySelector('input[name="gameType"]:checked').value;
     const gameName = document.getElementById('game_name').value;
     const opponent = document.getElementById('opponent').value;
-    const gameDate = document.getElementById('gameDate').value;
+    const gameDate = document.getElementById('gameDate').value; // 'YYYY-MM-DD' 형식
     const stadium = document.getElementById('stadium').value;
-    const goal = document.getElementById('goal').value;
-    const concede = document.getElementById('concede').value;
+    let goal = document.getElementById('goal').value;
+    let concede = document.getElementById('concede').value;
 
-    // 일정에 떠야 할 game_name 추가
     const newGame = {
         gameName: gameName,
         gameType: gameType,
@@ -232,14 +249,14 @@ function addGame() {
         stadium: stadium,
         goal: goal,
         concede: concede
-
     };
 
+    // 경기 추가 POST 요청
     fetch('/games/add', {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json',
-		[csrfHeader]: csrfToken
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
         },
         body: JSON.stringify(newGame)
     })
@@ -250,10 +267,9 @@ function addGame() {
             return response.json();
         })
         .then(data => {
-            console.log('Success:', data);
-            loadGames(currentPage);
+            loadGames(currentPage); // 경기 목록 갱신
             const modal = bootstrap.Modal.getInstance(document.getElementById('addGameModal'));
-            modal.hide();
+            modal.hide(); // 모달 닫기
             alert('경기가 성공적으로 추가되었습니다.');
         })
         .catch((error) => {
@@ -268,22 +284,32 @@ function editGame() {
     const gameType = document.querySelector('input[name="editGameType"]:checked').value;
     const gameName = document.getElementById('editGameName').value;
     const opponent = document.getElementById('editOpponent').value;
-    const gameDate = new Date(document.getElementById('editGameDate').value).toISOString();
+    const gameDate = document.getElementById('editGameDate').value; // 'YYYY-MM-DD' 형식으로 입력 확인
     const stadium = document.getElementById('editStadium').value;
     const goal = document.getElementById('editGoal').value;
     const concede = document.getElementById('editConcede').value;
+
+    // 오늘 날짜와 비교
+    const today = new Date().toISOString().split('T')[0];
+
+    // 미래 경기의 경우 득점과 실점이 0인지 확인
+    if (gameDate > today && (goal !== "0" || concede !== "0")) {
+        alert('미래 경기의 득점과 실점은 0이어야 합니다.');
+        return;  // 유효성 검사를 통과하지 못하면 함수 실행 중지
+    }
 
     const newGame = {
         gameIdx: gameIdx,
         gameName: gameName,
         gameType: gameType,
         opponent: opponent,
-        gameDate: gameDate,
+        gameDate: gameDate,  // 날짜 값이 올바르게 설정되는지 확인
         stadium: stadium,
         goal: goal,
         concede: concede
     };
 
+    // 경기 수정 POST 요청
     fetch('/games/edit', {
         method: 'POST',
         headers: {
@@ -300,14 +326,43 @@ function editGame() {
         })
         .then(data => {
             console.log('Success:', data);
-            loadGames(currentPage);
+            loadGames(currentPage);  // 테이블 업데이트
             const modal = bootstrap.Modal.getInstance(document.getElementById('editGameModal'));
-            modal.hide();
+            modal.hide();  // 모달 닫기
             alert('경기가 성공적으로 수정되었습니다.');
+            updateMostRecentGame(); // 최근 경기 갱신
         })
         .catch((error) => {
             console.error('Error:', error);
-            alert('경기 수정 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'));
+            // 오류 메시지와 함께 오류 처리
+            alert('경기 수정 중 오류가 발생했습니다: ' + (error.message || '미래 경기의 득점과 실점은 0이어야 합니다.'));
+        });
+}
+
+// 최근 경기 정보를 업데이트하는 함수
+function updateMostRecentGame() {
+    fetch('/games/mostRecent')
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                const recentGameDateElement = document.querySelector('#recentGameDate');
+                const recentGameOpponentElement = document.querySelector('#recentGameOpponent');
+                const recentOpponentLogoElement = document.querySelector('#recentOpponentLogo');
+
+                // 날짜 포맷 (YYYY-MM-DD)
+                const formattedDate = formatDate(data.gameDate);
+
+                // 업데이트할 DOM 요소에 새로운 값 설정
+                recentGameDateElement.textContent = formattedDate;
+                recentGameOpponentElement.textContent = data.opponent;
+
+                // 상대 팀 로고 업데이트
+                recentOpponentLogoElement.src = `/img/team/${data.opponent}.png`;
+                recentOpponentLogoElement.alt = `${data.opponent} 로고`;
+            }
+        })
+        .catch(error => {
+            console.error('Error updating most recent game:', error);
         });
 }
 

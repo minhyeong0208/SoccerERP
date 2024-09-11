@@ -352,7 +352,7 @@ html {
     background-color: #fafafa;
     padding: 20px;
     border: 1px solid #ccc;
-    height: 95%; /* 90% of the height of grid-container */
+    height: 90%; /* 90% of the height of grid-container */
 }
 
 .grid-item-2 {
