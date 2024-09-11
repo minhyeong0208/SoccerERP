@@ -53,8 +53,9 @@ public class FinanceController {
             if (endDateStr != null) {
                 Date parsedEndDate = dateFormat.parse(endDateStr);
                 // endDate를 23:59:59.999로 설정
-                endDate = new Timestamp(parsedEndDate.getTime() + (24 * 60 * 60 * 1000) - 1);
+                endDate = new Timestamp(parsedEndDate.getTime() + (24 * 60 * 60 * 1000 - 1));
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

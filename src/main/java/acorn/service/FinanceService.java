@@ -22,7 +22,7 @@ public class FinanceService {
 	public Page<Finance> getFinancesByTypeAndDateAndKeyword(String type, Timestamp startDate, Timestamp endDate, String keyword, Pageable pageable) {
 	    // endDate가 null이 아니면 23:59:59로 맞춰서 범위를 설정
 		if (endDate != null) {
-		    // endDate를 2024-09-16 00:00:00으로 설정 (15일 전체 포함)
+		    // endDate를 2024-09-16 00:00:00으로 설정 
 		    endDate = Timestamp.valueOf(endDate.toLocalDateTime().plusDays(1).withHour(0).withMinute(0).withSecond(0));
 		}
 
