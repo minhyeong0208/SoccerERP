@@ -93,7 +93,7 @@ document.getElementById("submitSponsor").onclick = function() {
 	const sponsorMemo = document.getElementById("sponsorMemo").value;
 	const startDate = document.getElementById("editStartDate").value;
 	const endDate = document.getElementById("editEndDate").value;
-	console.log(startDate);
+
 	const sponsorData = {
 		sponsorName: sponsorName,
 		contractDate: contractDate,
