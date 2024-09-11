@@ -90,7 +90,7 @@ public class PersonController {
 
 	    // 이미지 파일 저장 경로 설정
 	    String fileName = file.getOriginalFilename();
-	    String uploadDir = "C:/Project/SoccerERP/src/main/resources/static/img/persons/";
+	    String uploadDir = "C:/spring/sprsou/SoccerERP/src/main/resources/static/img/persons/";
 	    Path filePath = Paths.get(uploadDir + fileName);
 	    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 

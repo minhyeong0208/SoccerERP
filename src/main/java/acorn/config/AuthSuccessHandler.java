@@ -1,9 +1,13 @@
-/*
 package acorn.config;
-
 
 import java.io.IOException;
 
+=======
+import jakarta.servlet.ServletException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+>>>>>>> f50e413e012dbe24eea0e3cc8527d243d8fbb057
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -33,4 +37,5 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         response.sendRedirect(redirectUrl);
     }
 }
-*/
+
+

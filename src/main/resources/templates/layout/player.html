@@ -9,18 +9,35 @@
 <th:block layout:fragment="customContents1">
     <h3>선수 관리</h3>
     <div class="container mb-4">
-        <!-- 추가/삭제 버튼을 오른쪽에 배치 -->
-        <div class="d-flex justify-content-end">
-            <button id="add-player-btn" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                    data-bs-target="#player-modal">
-                <i class="fas fa-plus fa-sm text-white-50"></i> 선수 추가
-            </button>&nbsp;
-            <button id="delete-player-btn" class="btn btn-danger btn-sm">
-                <i class="fas fa-trash fa-sm text-white-50"></i> 선택 삭제
-            </button>
+        <div class="row mb-3">
+            <div class="col d-flex justify-content-start align-items-center">
+                <!-- 검색 -->
+                <div class="input-group" style="max-width: 400px;">
+                    <select class="form-select" id="search-option" style="max-width: 150px;">
+                        <option value="personName">선수명</option>
+                        <option value="position">포지션</option>
+                    </select>
+                    <input type="text" class="form-control" id="search-value" placeholder="검색어 입력">
+                    <button class="btn btn-dark" id="search-btn">
+                        <i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </div>
+
+            <div class="col d-flex justify-content-end align-items-center">
+                <!-- 추가/삭제 버튼을 오른쪽에 배치 -->
+                <button id="add-player-btn" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#player-modal">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> 선수 추가
+                </button>&nbsp;
+                <button id="delete-player-btn" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash fa-sm text-white-50"></i> 선택 삭제
+                </button>
+            </div>
         </div>
+
     </div>
-    <div id="player-table-widget">
+    <div id="person-table-widget">
         <table class="table table-bordered table-hover" id="playerTable">
             <thead class="table table-bordered">
             <tr>
@@ -30,7 +47,7 @@
                 <th>등번호</th>
             </tr>
             </thead>
-            <tbody id="player-rows"></tbody>
+            <tbody id="person-rows"></tbody>
         </table>
     </div>
 
@@ -59,12 +76,12 @@
                 <div class="modal-body">
                     <!-- 공통 입력 필드 -->
                     <!-- ability, personImage -->
-                    <form id="add-player-info">
+                    <form action="#" id="add-player-info">
                         <input type="hidden" name="facilityIdx" value="999">
                         <input type="hidden" name="typeCode" value="player">
                         <div id="commonFields" class="mb-3">
                             <label for="add-personName" id="dateLabel" class="form-label">선수명</label>
-                            <input type="text" name="personName" id="add-personName" class="form-control">
+                            <input type="text" name="personName" id="add-personName" class="form-control" required>
 
                             <div class="row mb-3">
                                 <div class="col">
@@ -188,7 +205,8 @@
 
 <th:block layout:fragment="customContents2">
     <div class="grid-item-2">
-        <div class="grid-item-2-top-left d-flex flex-column align-items-center justify-content-between" style="height: 100%;">
+        <div class="grid-item-2-top-left d-flex flex-column align-items-center justify-content-between"
+             style="height: 100%;">
             <h3>
                 <p id="player-name-backnumber"></p>
             </h3>
@@ -216,22 +234,26 @@
                         <input type="hidden" id="detail-typeCode" name="typeCode" value="player">
 
                         <div class="mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="detail-personName" class="form-label me-2 custom-label">선수명</label>
-                                <input type="text" name="personName" id="detail-personName" class="form-control custom-input">
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <label for="detail-personName" class="form-label me-2 custom-label">선수명</label>
+                                    <input type="text" name="personName" id="detail-personName"
+                                           class="form-control custom-input">
+                                </div>
                             </div>
-
                             <div class="row mb-3">
                                 <div class="col">
                                     <div class="d-flex align-items-center mb-2">
                                         <label for="detail-teamIdx" class="form-label me-2 custom-label">팀명</label>
-                                        <input type="text" class="form-control custom-input" name="teamIdx" id="detail-teamIdx" value="GWO" required>
+                                        <input type="text" class="form-control custom-input" name="teamIdx"
+                                               id="detail-teamIdx" value="GWO" required>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="d-flex align-items-center mb-2">
                                         <label for="detail-backNumber" class="form-label me-2 custom-label">등번호</label>
-                                        <input type="text" class="form-control custom-input" name="backNumber" id="detail-backNumber" required>
+                                        <input type="text" class="form-control custom-input" name="backNumber"
+                                               id="detail-backNumber" required>
                                     </div>
                                 </div>
                             </div>
@@ -240,13 +262,15 @@
                                 <div class="col">
                                     <div class="d-flex align-items-center mb-2">
                                         <label for="detail-height" class="form-label me-2 custom-label">키</label>
-                                        <input type="number" class="form-control custom-input" name="height" id="detail-height" required>
+                                        <input type="number" class="form-control custom-input" name="height"
+                                               id="detail-height" required>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="d-flex align-items-center mb-2">
                                         <label for="detail-weight" class="form-label me-2 custom-label">몸무게</label>
-                                        <input type="number" class="form-control custom-input" name="weight" id="detail-weight" required>
+                                        <input type="number" class="form-control custom-input" name="weight"
+                                               id="detail-weight" required>
                                     </div>
                                 </div>
                             </div>
@@ -255,39 +279,43 @@
                                 <div class="col">
                                     <div class="d-flex align-items-center mb-2">
                                         <label for="detail-birth" class="form-label me-2 custom-label">생일</label>
-                                        <input type="date" class="form-control custom-input" name="birth" id="detail-birth" required>
+                                        <input type="date" class="form-control custom-input" name="birth"
+                                               id="detail-birth" required>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="d-flex align-items-center mb-2">
                                         <label for="detail-nationality" class="form-label me-2 custom-label">국적</label>
-                                        <input type="text" class="form-control custom-input" name="nationality" id="detail-nationality" required>
+                                        <input type="text" class="form-control custom-input" name="nationality"
+                                               id="detail-nationality" required>
                                     </div>
                                 </div>
                             </div>
+                            <!-- 포지션 구분 라디오 버튼 -->
+                            <div class="mb-3">
+                                <label class="form-label me-2 custom-label">포지션</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="detail-position-gk" name="position" value="GK"
+                                           class="form-check-input" checked>
+                                    <label for="detail-position-gk" class="form-check-label">GK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="detail-position-fw" name="position" value="FW"
+                                           class="form-check-input">
+                                    <label for="detail-position-fw" class="form-check-label">FW</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="detail-position-mf" name="position" value="MF"
+                                           class="form-check-input">
+                                    <label for="detail-position-mf" class="form-check-label">MF</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" id="detail-position-df" name="position" value="DF"
+                                           class="form-check-input">
+                                    <label for="detail-position-df" class="form-check-label">DF</label>
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- 포지션 구분 라디오 버튼 -->
-                        <div class="mb-3">
-                            <label class="form-label me-2 custom-label">포지션</label>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="detail-position-gk" name="position" value="GK" class="form-check-input" checked>
-                                <label for="detail-position-gk" class="form-check-label">GK</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="detail-position-fw" name="position" value="FW" class="form-check-input">
-                                <label for="detail-position-fw" class="form-check-label">FW</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="detail-position-mf" name="position" value="MF" class="form-check-input">
-                                <label for="detail-position-mf" class="form-check-label">MF</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" id="detail-position-df" name="position" value="DF" class="form-check-input">
-                                <label for="detail-position-df" class="form-check-label">DF</label>
-                            </div>
-                        </div>
-
                     </form>
                 </div>
                 <div class="d-flex justify-content-end">
@@ -296,10 +324,7 @@
                     </button>
                 </div>
             </div>
-
         </div>
-
-
     </div>
 </th:block>
 

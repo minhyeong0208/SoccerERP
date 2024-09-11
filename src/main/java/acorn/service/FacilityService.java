@@ -45,6 +45,7 @@ public class FacilityService {
         Facility facility = getFacilityById(facilityIdx);
         if (facility != null) {
             facility.setFacilityName(facilityDetails.getFacilityName());
+            facility.setFacilityLocation(facilityDetails.getFacilityLocation());
             facility.setLatitude(facilityDetails.getLatitude());
             facility.setLongitude(facilityDetails.getLongitude());
             facility.setCapacity(facilityDetails.getCapacity());

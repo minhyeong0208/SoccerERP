@@ -1,6 +1,6 @@
 package acorn.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -25,9 +25,9 @@ public class Game {
 
     private String gameName;
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date gameDate;
+    private LocalDate gameDate;
 
     private String stadium;
     private int goal;
