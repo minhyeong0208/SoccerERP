@@ -20,7 +20,7 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
     void deleteAllByIdInBatch(Iterable<Integer> ids);
 
     // 최근 하루 경기 조회
-    Game findFirstByGameDateBeforeOrderByGameDateDesc(LocalDate date);
+    Game findFirstByGameDateLessThanEqualOrderByGameDateDesc(LocalDate date);
 
     // 전체 경기 수 조회
     @Query("SELECT COUNT(g) FROM Game g")
