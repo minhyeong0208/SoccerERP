@@ -93,4 +93,9 @@ public class PageController {
     public String team(){
         return "layout/team";
     }
+
+    @GetMapping("/transfer")
+    public String transfer(){
+        return "layout/transfer";
+    }
 }

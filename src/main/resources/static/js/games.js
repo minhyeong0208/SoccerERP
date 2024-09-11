@@ -54,6 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 삭제 확인 버튼 이벤트 리스너
     document.getElementById('confirmDelete').addEventListener('click', deleteGame);
+
+    // 최근 경기 정보 초기 로드 및 주기적 업데이트
+    updateMostRecentGame();
+    setInterval(updateMostRecentGame, 30000); // 30초마다 업데이트
 });
 
 // 경기 수정 모달
@@ -345,20 +349,49 @@ function updateMostRecentGame() {
         .then(response => response.json())
         .then(data => {
             if (data) {
-                const recentGameDateElement = document.querySelector('#recentGameDate');
-                const recentGameOpponentElement = document.querySelector('#recentGameOpponent');
-                const recentOpponentLogoElement = document.querySelector('#recentOpponentLogo');
+                const recentGameElement = document.querySelector('#recent-game');
+                const today = new Date().setHours(0,0,0,0);
+                const gameDate = new Date(data.gameDate).setHours(0,0,0,0);
 
-                // 날짜 포맷 (YYYY-MM-DD)
-                const formattedDate = formatDate(data.gameDate);
+                // HTML 템플릿 생성
+                const html = `
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <h5>${formatDate(data.gameDate)}</h5>
+                        </div>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-4">
+                                <div class="team-logo-container">
+                                    <img src="/img/team/강원FC.png" alt="강원 FC 로고" class="team-logo">
+                                </div>
+                                <br>
+                                <h2 class="text">강원 FC</h2>
+                            </div>
+                            <div class="col-4">
+                                <img src="/img/team/versus.png" alt="versus" class="versus-logo">
+                            </div>
+                            <div class="col-4">
+                                <div class="team-logo-container">
+                                    <img src="/img/team/${getTeamImageFileName(data.opponent)}" alt="${data.opponent} 로고" class="team-logo">
+                                </div>
+                                <br>
+                                <h2 class="text">${data.opponent}</h2>
+                            </div>
+                        </div>
+                        <div>
+                            <h2>${gameDate > today ? '경기 예정' : `${data.goal} : ${data.concede}`}</h2>
+                        </div>
+                        <div class="mt-3">
+                            <p>${data.stadium}</p>
+                        </div>
+                    </div>
+                `;
 
-                // 업데이트할 DOM 요소에 새로운 값 설정
-                recentGameDateElement.textContent = formattedDate;
-                recentGameOpponentElement.textContent = data.opponent;
-
-                // 상대 팀 로고 업데이트
-                recentOpponentLogoElement.src = `/img/team/${data.opponent}.png`;
-                recentOpponentLogoElement.alt = `${data.opponent} 로고`;
+                // HTML 업데이트
+                recentGameElement.innerHTML = html;
+            } else {
+                const recentGameElement = document.querySelector('#recent-game');
+                recentGameElement.innerHTML = '<p class="text-center">최근 경기 정보가 없습니다.</p>';
             }
         })
         .catch(error => {

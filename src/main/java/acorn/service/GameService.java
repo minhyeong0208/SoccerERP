@@ -76,7 +76,7 @@ public class GameService {
 
     // 최근 경기
     public Game getMostRecentGame() {
-        return gameRepository.findFirstByGameDateBeforeOrderByGameDateDesc(LocalDate.now());
+        return gameRepository.findFirstByGameDateLessThanEqualOrderByGameDateDesc(LocalDate.now());
     }
 
     // 게임 저장 전 유효성 검사
