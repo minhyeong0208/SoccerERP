@@ -90,7 +90,7 @@ public class PersonController {
 
 	    // 이미지 파일 저장 경로 설정
 	    String fileName = file.getOriginalFilename();
-	    String uploadDir = "C:/spring/sprsou/SoccerERP/src/main/resources/static/img/persons/";
+	    String uploadDir = "/Users/yeobinsong/Desktop/송여빈/SoccerERP/src/main/resources/static/img/persons/";
 	    Path filePath = Paths.get(uploadDir + fileName);
 	    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
@@ -127,7 +127,7 @@ public class PersonController {
 	    // 파일이 있는 경우에만 이미지 업데이트
 	    if (file != null && !file.isEmpty()) {
 	        String fileName = file.getOriginalFilename();
-	        String uploadDir = "C:/Project/SoccerERP/src/main/resources/static/img/persons/";
+	        String uploadDir = "/Users/yeobinsong/Desktop/송여빈/SoccerERP/src/main/resources/static/img/persons/";
 	        Path filePath = Paths.get(uploadDir + fileName);
 	        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 	        personDetails.setPersonImage(fileName); // 새로운 이미지 경로 설정
