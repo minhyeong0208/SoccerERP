@@ -1,6 +1,9 @@
 package acorn.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +19,21 @@ public class PersonService {
 
     public PersonService(PersonRepository personRepository) {
         this.personRepository = personRepository;
+    }
+    
+    // 포지션별 선수 수 반환
+    public List<Map<String, Object>> getPlayersCountByPosition() {
+        List<Object[]> results = personRepository.countPlayersByPosition();
+        List<Map<String, Object>> positionCounts = new ArrayList<>();
+        
+        for (Object[] result : results) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("position", result[0]);
+            map.put("count", result[1]);
+            positionCounts.add(map);
+        }
+        
+        return positionCounts;
     }
     
     // 여러 ID로 선수 조회

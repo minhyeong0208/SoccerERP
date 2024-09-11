@@ -48,6 +48,23 @@ public class GameController {
 
         return "layout/games";
     }
+    
+    // 특정 경기 결과 조회
+    @GetMapping("/{id}/result")
+    public ResponseEntity<String> getGameResult(@PathVariable(value = "id") int gameIdx) {
+        Game game = gameService.getGameByIdWithResult(gameIdx);
+        if (game == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(game.getResult());
+    }
+    
+    // 미래 3경기 조회
+    @GetMapping("/future")
+    public ResponseEntity<List<Game>> getFuture3Games() {
+        List<Game> games = gameService.getFuture3Games();
+        return ResponseEntity.ok(games);
+    }
 
     // 모든 경기 조회 (페이징 처리)
     @GetMapping("/list")

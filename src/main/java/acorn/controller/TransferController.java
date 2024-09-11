@@ -1,9 +1,15 @@
 package acorn.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +19,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import acorn.dto.TransferWithPersonDto;
 import acorn.entity.Transfer;
@@ -53,7 +61,44 @@ public class TransferController {
         transferService.addPurchaseTransfer(dto);
         return ResponseEntity.ok("Purchase transfer created successfully.");
     }
+    
+    /*
+    // 선수 구매
+    @PostMapping("/purchase")
+    public ResponseEntity<String> createPurchaseTransfer(
+            @RequestPart("dto") TransferWithPersonDto dto, 
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        
+        // 이적 타입이 1인지 확인
+        if (dto.getTransfer().getTransferType() != 1) {
+            return ResponseEntity.badRequest().body("Invalid transfer type. Purchase transfers must have transferType set to 1.");
+        }
 
+        // 구매 타입을 1로 설정
+        dto.getTransfer().setTransferType(1);
+
+        // 파일이 있으면 저장 로직 추가
+        if (file != null && !file.isEmpty()) {
+            try {
+                // 파일 저장 경로 설정
+                String fileName = file.getOriginalFilename();
+                String uploadDir = "/path/to/save/files/";
+                Path filePath = Paths.get(uploadDir + fileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                // person 객체에 파일 경로를 저장
+                dto.getPerson().setPersonImage(fileName);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("File upload failed: " + e.getMessage());
+            }
+        }
+
+        // 이적 정보 추가
+        transferService.addPurchaseTransfer(dto);
+        return ResponseEntity.ok("Purchase transfer created successfully.");
+    }
+	*/
 
     // 특정 이적 정보 조회
     @GetMapping("/{id}")

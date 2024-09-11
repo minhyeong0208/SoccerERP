@@ -36,4 +36,8 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
    
     // 여러 ID에 해당하는 사람들을 한 번에 삭제
     void deleteAllByIdInBatch(Iterable<Integer> ids);
+    
+    // 포지션별 선수 수 집계
+    @Query("SELECT p.position, COUNT(p) FROM Person p WHERE p.typeCode = 'player' GROUP BY p.position")
+    List<Object[]> countPlayersByPosition();
 }

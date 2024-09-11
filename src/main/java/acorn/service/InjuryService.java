@@ -1,6 +1,9 @@
 package acorn.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -17,6 +20,21 @@ public class InjuryService {
 
     public InjuryService(InjuryRepository injuryRepository) {
         this.injuryRepository = injuryRepository;
+    }
+    
+    // 월별 부상 발생 빈도 반환
+    public List<Map<String, Object>> getInjuriesCountByMonth() {
+        List<Object[]> results = injuryRepository.countInjuriesByMonth();
+        List<Map<String, Object>> injuryCounts = new ArrayList<>();
+
+        for (Object[] result : results) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("month", result[0]);
+            map.put("count", result[1]);
+            injuryCounts.add(map);
+        }
+
+        return injuryCounts;
     }
     
     // 모든 부상 조회 (선수 정보 포함)

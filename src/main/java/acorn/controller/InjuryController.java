@@ -1,6 +1,7 @@
 package acorn.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,13 @@ public class InjuryController {
     public InjuryController(InjuryService injuryService, PersonService personService) {
         this.injuryService = injuryService;
         this.personService = personService;
+    }
+    
+    // 월별 부상 발생 빈도 조회
+    @GetMapping("/monthly-injury-counts")
+    public ResponseEntity<List<Map<String, Object>>> getInjuriesCountByMonth() {
+        List<Map<String, Object>> injuryCounts = injuryService.getInjuriesCountByMonth();
+        return ResponseEntity.ok(injuryCounts);
     }
     
     @GetMapping("/injuries")

@@ -21,6 +21,35 @@ public class GameService {
 
     @Autowired
     private GameRepository gameRepository;
+    
+    // 경기 결과 계산
+    public String getGameResult(Game game) {
+        if (game.getGoal() > game.getConcede()) {
+            return "승리";
+        } else if (game.getGoal() == game.getConcede()) {
+            return "무승부";
+        } else {
+            return "패배";
+        }
+    }
+
+    // 특정 경기 조회 및 결과 반환
+    public Game getGameByIdWithResult(int gameIdx) {
+        Optional<Game> gameOptional = gameRepository.findById(gameIdx);
+        if (gameOptional.isPresent()) {
+            Game game = gameOptional.get();
+            game.setResult(getGameResult(game)); // 결과를 게임 객체에 설정
+            return game;
+        } else {
+            return null;
+        }
+    }
+    
+    // 미래 3경기 조회
+    public List<Game> getFuture3Games() {
+        Pageable topThree = PageRequest.of(0, 3, Sort.by("gameDate").ascending());
+        return gameRepository.findTopByGameDateAfter(LocalDate.now(), topThree).getContent();
+    }
 
     // 모든 경기 조회(일정에 추가)
     public List<Game> getAllGames() {

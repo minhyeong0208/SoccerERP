@@ -35,4 +35,7 @@ public class Game {
     private String opponent;
     private String gameType;
     private int isHome;
+    
+    @Transient // DB에 저장하지 않고 임시로 사용
+    private String result;  // 경기 결과(승, 무, 패)
 }

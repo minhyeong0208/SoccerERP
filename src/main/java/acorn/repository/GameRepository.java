@@ -1,15 +1,17 @@
 package acorn.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import acorn.entity.Game;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Repository
 public interface GameRepository extends JpaRepository<Game, Integer> {
@@ -47,4 +49,9 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
     // 특정 기간 내의 팀 득점 조회
     @Query("SELECT SUM(g.goal) FROM Game g WHERE g.gameDate BETWEEN :startDate AND :endDate")
     Integer sumGoalsBetweenDates(LocalDateTime startDate, LocalDateTime endDate);
+    
+    // 미래 경기 중 가장 가까운 3개를 조회하는 메서드
+    @Query("SELECT g FROM Game g WHERE g.gameDate > :date ORDER BY g.gameDate ASC")
+    Page<Game> findTopByGameDateAfter(@Param("date") LocalDate date, Pageable pageable);
+
 }

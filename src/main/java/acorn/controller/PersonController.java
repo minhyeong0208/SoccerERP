@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,13 @@ public class PersonController {
 	public PersonController(PersonService personService) {
 		this.personService = personService;
 	}
+	
+	// 포지션별 선수 수 조회
+    @GetMapping("/positions/count")
+    public ResponseEntity<List<Map<String, Object>>> getPlayersCountByPosition() {
+        List<Map<String, Object>> positionCounts = personService.getPlayersCountByPosition();
+        return ResponseEntity.ok(positionCounts);
+    }
 
 	// 모든 사람 조회 (페이징 처리)
 	@GetMapping
@@ -48,23 +56,23 @@ public class PersonController {
 	}
 
 	// 선수만 조회 (이적 시 판매용, 페이징 처리)
-		@GetMapping("/players")
-		public Page<Person> getAllPlayers(Pageable pageable) {
-			return personService.getPersonsByTypeCode("player", pageable);
-		}
+	@GetMapping("/players")
+	public Page<Person> getAllPlayers(Pageable pageable) {
+		return personService.getPersonsByTypeCode("player", pageable);
+	}
 
-		// 코치만 조회 (페이징 처리)
-		@GetMapping("/coaches")
-		public Page<Person> getAllCoaches(Pageable pageable) {
-			return personService.getPersonsByTypeCode("coach", pageable);
-		}
+	// 코치만 조회 (페이징 처리)
+	@GetMapping("/coaches")
+	public Page<Person> getAllCoaches(Pageable pageable) {
+		return personService.getPersonsByTypeCode("coach", pageable);
+	}
 
-		// 검색 기능: 이름 또는 포지션으로 검색 (페이징 처리)
-		@GetMapping("/search")
-		public Page<Person> searchPersons(@RequestParam(value = "personName", required = false) String personName,
-				@RequestParam(value = "position", required = false) String position, Pageable pageable) {
-			return personService.searchPersons(personName, position, pageable);
-		}
+	// 검색 기능: 이름 또는 포지션으로 검색 (페이징 처리)
+	@GetMapping("/search")
+	public Page<Person> searchPersons(@RequestParam(value = "personName", required = false) String personName,
+			@RequestParam(value = "position", required = false) String position, Pageable pageable) {
+		return personService.searchPersons(personName, position, pageable);
+	}
 
 	// 특정 사람 조회
 	@GetMapping("/{id}")
