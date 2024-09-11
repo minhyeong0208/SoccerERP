@@ -4,11 +4,11 @@ const pageSize = 10;
 const maxVisiblePages = 10; // 최대 표시 페이지 수
 let totalPages = 1;
 
-let selectedPlayer = {};
-let totalPlayers = [];
-let mappedPlayers = [];
-let searchedPlayer = [];
-let mappedSearchedPlayers = [];
+let totalPeople = [];
+let mappedPeople = [];
+
+//
+let url = `http://localhost:80/persons`;
 
 // csrf
 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
@@ -22,46 +22,47 @@ const formToObject = (form) =>
     );
 
 // 전체 사람 정보 가져오기
-function fetchPlayerData(page) {
+function fetchPlayerData(page, url) {
 	currentPage = page;
 	
-    let url = `http://localhost/persons/players?page=${page}&size=${pageSize}`;
+    url += `/players?page=${page}&size=${pageSize}`;
 
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            totalPlayers = data.content;
+            totalPeople = data.content.filter(person => person.typeCode === 'player');
 
             const pageButtons = document.querySelector("#pageButtons");
             totalPages = data.totalPages;
 
-            let tableBody = document.getElementById('player-rows');
+            let tableBody = document.getElementById('person-rows');
+            tableBody.innerHTML = '';
 
             // 선수 데이터 테이블에 출력
-            mappedPlayers = data.content
+            mappedPeople = totalPeople
                 //.filter(person => person.typeCode === 'player')
                 .map(
-                    (player) => {
-                        return `<tr class="player-row" data-id="${player.personIdx}">
+                    (person) => {
+                        return `<tr class="player-row" data-id="${person.personIdx}">
                                         <td>
-                                            <input type="checkbox" class="delete-checkbox" data-id="${player.personIdx}">
+                                            <input type="checkbox" class="delete-checkbox" data-id="${person.personIdx}">
                                         </td>
                                         <td>
-                                            ${player.personName}
+                                            ${person.personName}
                                         </td>
                                         <td>
-                                            <span class="position position--${player.position}">
-                                                ${player.position}
+                                            <span class="position position--${person.position}">
+                                                ${person.position}
                                             </span>
                                         </td>
                                         <td>
-                                            ${player.backNumber}
+                                            ${person.backNumber}
                                         </td>
                                     </tr>`;
                     }
                 );
 
-            tableBody.innerHTML = mappedPlayers.join('');
+            tableBody.innerHTML = mappedPeople.join('');
 
             // 페이지 버튼 초기화
             pageButtons.innerHTML = '';
@@ -78,7 +79,7 @@ function fetchPlayerData(page) {
             for (let i = startPage; i < endPage; i++) {
                 pageButtons.innerHTML += `
 			        <li class="page-item ${i === page ? 'active' : ''}">
-			            <button class="page-link" onclick="fetchPlayerData(${i})">${i + 1}</button>
+			            <button class="page-link" onclick="fetchPlayerData(${i}, url)">${i + 1}</button>
 			        </li>`;
             }
 
@@ -87,8 +88,8 @@ function fetchPlayerData(page) {
             document.querySelector("#nextGroup").disabled = currentPage >= totalPages - 1;
 
             // 리스트 첫번째 데이터 상세보기
-            console.log(totalPlayers[0]);
-            showPlayerDetail(totalPlayers[0]);
+            console.log(totalPeople[0]);
+            showPlayerDetail(totalPeople[0]);
 
         })
         .catch(error => console.error('Error while fetching data', error))
@@ -96,91 +97,30 @@ function fetchPlayerData(page) {
 }
 
 // 검색
-function searchPlayer(page, url) {
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            searchedPlayer = data.content;
-
-            const pageButtons = document.querySelector("#pageButtons");
-            totalPages = data.totalPages;
-
-            let tableBody = document.getElementById('player-rows');
-
-            // 선수 데이터 테이블에 출력
-            mappedSearchedPlayers = data.content
-                //.filter(person => person.typeCode === 'player')
-                .map(
-                    (player) => {
-                        return `<tr class="player-row" data-id="${player.personIdx}">
-                                        <td>
-                                            <input type="checkbox" class="delete-checkbox" data-id="${player.personIdx}">
-                                        </td>
-                                        <td>
-                                            ${player.personName}
-                                        </td>
-                                        <td>
-                                            <span class="position position--${player.position}">
-                                                ${player.position}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            ${player.backNumber}
-                                        </td>
-                                    </tr>`;
-                    }
-                );
-
-            tableBody.innerHTML = mappedSearchedPlayers.join('');
-
-            // 페이지 버튼 초기화
-            pageButtons.innerHTML = '';
-
-            // 중앙을 기준으로 10페이지 생성
-            let startPage = Math.max(0, page - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages);
-
-            if (endPage - startPage < maxVisiblePages) {
-                startPage = Math.max(0, endPage - maxVisiblePages);
-            }
-
-            // 페이징 버튼 생성
-            for (let i = startPage; i < endPage; i++) {
-                pageButtons.innerHTML += `
-			        <li class="page-item ${i === page ? 'active' : ''}">
-			            <button class="page-link" onclick="searchPlayer(${i}, ${page})">${i + 1}</button>
-			        </li>`;
-            }
-
-            // 이전/다음 그룹 버튼 활성화/비활성화 설정
-            document.querySelector("#prevGroup").disabled = currentPage === 0;
-            document.querySelector("#nextGroup").disabled = currentPage >= totalPages - 1;
-
-            // 리스트 첫번째 데이터 상세보기
-            console.log(searchedPlayer[0]);
-            showPlayerDetail(searchedPlayer[0])
-        })
-        .catch(error => console.error('Error while fetching data', error))
-}
-
-// 검색 버튼 클릭 시
 document.getElementById('search-btn').addEventListener('click', function () {
     const searchOption = document.getElementById('search-option').value;
     const searchValue = document.getElementById('search-value').value;
-    let searchUrl = `http://localhost:80/persons/search?`;
+    url += `/search?`;
 
     if (searchOption && !searchValue) {
         alert(`검색어를 입력하세요`);
         return;
     } else {
-        searchUrl += `${searchOption}=${searchValue}`;
-        console.log(searchUrl);
+        url += `${searchOption}=${searchValue}&page=${currentPage}&size=${pageSize}`;
+        //console.log(url);
     }
 
-    searchPlayer(currentPage, searchUrl);
-
+    fetchPlayerData(currentPage, url);
+    url = `http://localhost:80/persons`;
 
 })
+
+// 데이트 피커 하루 전으로 나오는 문제
+function convertDate(date){
+    date = new Date(date);
+    let offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset);
+}
 
 // 선수 상세보기
 function showPlayerDetail(player) {
@@ -188,7 +128,7 @@ function showPlayerDetail(player) {
     document.getElementById('detail-height').value = player.height;
     document.getElementById('detail-weight').value = player.weight;
     document.getElementById('detail-position-' + player.position.toLowerCase()).checked = true;
-    document.getElementById('detail-birth').value = player.birth.split("T", 1);
+    document.getElementById('detail-birth').value = convertDate(player.birth).toISOString().split("T", 1);
     document.getElementById('detail-backNumber').value = player.backNumber;
     document.getElementById('detail-nationality').value = player.nationality;
     document.getElementById('detail-personIdx').value = player.personIdx;
@@ -212,9 +152,6 @@ function updateChart(data) {
     //
     // }
     const {abilityIdx, ...abilities} = data;
-    //console.log(abilities);
-    //console.log(Object.values(abilities));
-    //console.log(Object.keys(abilities));
 
     if (myChart) {
         myChart.data.datasets[0].data = Object.values(abilities);
@@ -248,8 +185,10 @@ function updateChart(data) {
                     r: {
                         angleLines: {
                             color: 'tomato',
-                            max: 100,
-                            min: 20,
+                        },
+                        suggestedMin: 20,
+                        suggestedMax: 100,
+                        ticks: {
                             stepSize: 20,
                         }
                     }
@@ -261,12 +200,12 @@ function updateChart(data) {
 }
 
 // 특정 선수 클릭 시 우측에 상세보기
-document.getElementById('player-table-widget').addEventListener('click', function (e) {
+document.getElementById('person-table-widget').addEventListener('click', function (e) {
     const row = e.target.closest('tr.player-row');
 
     if (row) {
         const personIdx = row.getAttribute('data-id');
-        const player = totalPlayers.find(player => player.personIdx === parseInt(personIdx));
+        const player = totalPeople.find(player => player.personIdx === parseInt(personIdx));
         if (player) {
             showPlayerDetail(player);
             updateChart(player.ability);
@@ -338,7 +277,7 @@ document.getElementById('submit-player').addEventListener('click', function () {
 })
 
 function postPlayer(newPerson) {
-    fetch(`http://localhost:80/persons/add-player-with-image`, {
+    fetch(url + `/add-player-with-image`, {
         method: "POST",
         headers: {
             [csrfHeader]: csrfToken
@@ -349,8 +288,6 @@ function postPlayer(newPerson) {
         .then(result => {
             if (result != null) {
                 alert("선수가 추가되었습니다!");
-
-                //fetchPlayerData(currentPage); // 새로 추가된 선수 데이터를 갱신
                 modal.style.display = "none";
                 location.reload(); // 페이지 갱신
             } else {
@@ -379,7 +316,7 @@ document.getElementById('update-player').addEventListener('click', function () {
 
 function putPlayer(id, formData) {
     if (confirm('수정하시겠습니까?')) {
-        fetch(`http://localhost:80/persons/${id}/with-image`, {
+        fetch(url + `/${id}/with-image`, {
             method: "PUT",
             headers: {
                 [csrfHeader]: csrfToken
@@ -391,7 +328,7 @@ function putPlayer(id, formData) {
                 if (result != null) {
                     alert("수정되었습니다!");
 
-                    fetchPlayerData(currentPage); // 수정 후 데이터 갱신
+                    fetchPlayerData(currentPage, url); // 수정 후 데이터 갱신
                     modal.style.display = "none";
                 } else {
                     alert("관리자에게 문의하세요");
@@ -407,10 +344,10 @@ function putPlayer(id, formData) {
 
 // 삭제
 document.getElementById('delete-player-btn').addEventListener('click', function () {
-    deletePlayer();
+    deletePerson();
 })
 
-function deletePlayer() {
+function deletePerson() {
     const selectedCheckboxes = document.querySelectorAll('.delete-checkbox:checked');
     const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute('data-id'));
 
@@ -422,7 +359,7 @@ function deletePlayer() {
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch('http://localhost:80/persons/delete-multiple', {
+        fetch(url + '/delete-multiple', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -434,7 +371,7 @@ function deletePlayer() {
             .then(result => {
                 if (result) {
                     alert('삭제 되었습니다!');
-                    fetchPlayerData(currentPage);
+                    fetchPlayerData(currentPage, url);
                 } else {
                     alert('ㅠㅠ');
                 }
@@ -460,7 +397,7 @@ document.querySelector("#selectAllCheckbox").addEventListener("change", function
 document.querySelector("#prevGroup").onclick = () => {
     if (currentPage > 0) {
         currentPage--;
-        fetchPlayerData(currentPage);
+        fetchPlayerData(currentPage, url);
     }
 };
 
@@ -468,13 +405,13 @@ document.querySelector("#prevGroup").onclick = () => {
 document.querySelector("#nextGroup").onclick = () => {
     if (currentPage < totalPages - 1) {
         currentPage++;
-        fetchPlayerData(currentPage);
+        fetchPlayerData(currentPage, url);
     }
 };
 
 // 페이지 로드
 document.addEventListener('DOMContentLoaded', function () {
-    fetchPlayerData(currentPage);
+    fetchPlayerData(currentPage, url);
 })
 
 
