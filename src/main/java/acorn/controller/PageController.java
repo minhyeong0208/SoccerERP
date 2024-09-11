@@ -88,4 +88,9 @@ public class PageController {
     public String coach(){
         return "layout/coach";
     }
+    
+    @GetMapping("/team")
+    public String team(){
+        return "layout/team";
+    }
 }
