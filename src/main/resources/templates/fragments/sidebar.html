@@ -54,17 +54,17 @@
           <span class="link">인적 관리</span>
         </a>
         <ul id="personnelSubmenu">
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/player}">선수</a></li>
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/player}">선수</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/player}">선수</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/player}">선수</a></li>
     
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/coach}">코치</a></li>
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/coach}">코치</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/coach}">코치</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/coach}">코치</a></li>
     
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/transfer}">이적</a></li>
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/transfer}">이적</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/transfer}">이적</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/transfer}">이적</a></li>
     
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/injury}">부상</a></li>
-		</ul>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/injury}">부상</a></li>
+        </ul>
       </li>
 
       <!-- 일정관리 -->
@@ -86,10 +86,10 @@
         </a>
         <ul id="facilitySubmenu">
           <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/facility}">시설</a></li>
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/facility}">시설</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/facility}">시설</a></li>
 
-		  <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/team}">팀</a></li>
-    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/team}">팀</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/team}">팀</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/team}">팀</a></li>
         </ul>
       </li>
     </ul>
@@ -98,6 +98,14 @@
 
 <!-- JavaScript -->
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 기본적으로 모든 하위 메뉴 숨김
+    var submenus = document.querySelectorAll('ul li ul');
+    submenus.forEach(function(submenu) {
+      submenu.style.display = 'none';
+    });
+  });
+
   function toggleSubmenu(submenuId) {
     var submenu = document.getElementById(submenuId);
     if (submenu.style.display === "none" || submenu.style.display === "") {

@@ -1,4 +1,3 @@
-/*
 package acorn.config;
 
 import java.io.IOException;
@@ -36,6 +35,4 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         response.sendRedirect(redirectUrl);
     }
 }
-*/
-
 
