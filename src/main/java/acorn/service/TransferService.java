@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import acorn.dto.TransferWithPersonDto;
 import acorn.entity.Finance;
@@ -19,20 +20,20 @@ public class TransferService {
 
     private final TransferRepository transferRepository;
     private final PersonRepository personRepository;
-    private final FinanceService financeService; // 재정 서비스 추가
+    private final FinanceService financeService;
 
     public TransferService(TransferRepository transferRepository, PersonRepository personRepository, FinanceService financeService) {
         this.transferRepository = transferRepository;
         this.personRepository = personRepository;
-        this.financeService = financeService; // 생성자 주입
+        this.financeService = financeService;
     }
 
     // 판매 이적 처리
+    @Transactional
     public Transfer addSaleTransfer(Transfer transfer) {
         Transfer savedTransfer = transferRepository.save(transfer);
-        personRepository.deleteById(transfer.getPerson().getPersonIdx()); // 수정된 부분
+        personRepository.deleteById(transfer.getPerson().getPersonIdx());
 
-        // 판매 후 재정 관리에 수입 기록 추가
         Finance income = Finance.builder()
                 .financeType("수입")
                 .financeDate(new Timestamp(System.currentTimeMillis()))
@@ -47,40 +48,43 @@ public class TransferService {
     }
 
     // 구매 이적 처리
+    @Transactional
     public Transfer addPurchaseTransfer(TransferWithPersonDto dto) {
         Person newPerson = personRepository.save(dto.getPerson());
-        dto.getTransfer().setPerson(newPerson); // 수정된 부분
+        dto.getTransfer().setPerson(newPerson);
         Transfer savedTransfer = transferRepository.save(dto.getTransfer());
 
-        // 구매 후 재정 관리에 지출 기록 추가
         Finance expense = Finance.builder()
-            .financeType("지출")
-            .financeDate(new Timestamp(System.currentTimeMillis())) // 시분초 포함한 날짜
-            .amount(dto.getTransfer().getPrice())
-            .trader(dto.getTransfer().getOpponent()) // 거래처는 상대팀
-            .purpose("선수 구매")
-            .financeMemo("선수 구매에 따른 지출")
-            .build();
+                .financeType("지출")
+                .financeDate(new Timestamp(System.currentTimeMillis()))
+                .amount(dto.getTransfer().getPrice())
+                .trader(dto.getTransfer().getOpponent())
+                .purpose("선수 구매")
+                .financeMemo("선수 구매에 따른 지출")
+                .build();
         financeService.addExpense(expense);
 
         return savedTransfer;
     }
 
     // 특정 이적 정보 조회
+    @Transactional(readOnly = true)
     public Transfer getTransferById(int transferIdx) {
         return transferRepository.findById(transferIdx).orElse(null);
     }
 
     // 모든 이적 정보 조회 (페이징 처리)
+    @Transactional(readOnly = true)
     public Page<Transfer> getAllTransfers(Pageable pageable) {
         return transferRepository.findAllWithPerson(pageable);
     }
 
     // 이적 정보 업데이트
+    @Transactional
     public Transfer updateTransfer(int transferIdx, Transfer transferDetails) {
         Transfer transfer = getTransferById(transferIdx);
         if (transfer != null) {
-            transfer.setPerson(transferDetails.getPerson()); // 수정된 부분
+            transfer.setPerson(transferDetails.getPerson());
             transfer.setTransferType(transferDetails.getTransferType());
             transfer.setTradingDate(transferDetails.getTradingDate());
             transfer.setOpponent(transferDetails.getOpponent());
@@ -92,22 +96,32 @@ public class TransferService {
     }
 
     // 추가: 모든 이적 정보 조회 (리스트)
+    @Transactional(readOnly = true)
     public List<Transfer> getAllTransfers() {
         return transferRepository.findAll();
     }
 
     // 이적 정보 삭제
+    @Transactional
     public void deleteTransfer(int transferIdx) {
         transferRepository.deleteById(transferIdx);
     }
-    
+
     // 선택된 이적 기록 삭제
+    @Transactional
     public void deleteTransfers(List<Integer> transferIds) {
         transferRepository.deleteAllById(transferIds);
     }
 
     // 선수 이름으로 이적 정보 검색 (페이징 처리 지원)
+    @Transactional(readOnly = true)
     public Page<Transfer> searchTransfersByPersonName(String name, Pageable pageable) {
         return transferRepository.findByPersonNameContaining(name, pageable);
+    }
+
+    // 추가된 메소드: 통합 검색 (선수 이름 또는 상대팀)
+    @Transactional(readOnly = true)
+    public Page<Transfer> searchTransfers(String term, Pageable pageable) {
+        return transferRepository.searchTransfers(term, pageable);
     }
 }
