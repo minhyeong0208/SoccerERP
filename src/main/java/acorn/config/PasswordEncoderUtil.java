@@ -1,4 +1,3 @@
-/*
 package acorn.config;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,4 +11,3 @@ public class PasswordEncoderUtil {
 		System.out.println("Encoded password : " + encodedPassword); // Java Application 실행
 	}
 }
-*/
