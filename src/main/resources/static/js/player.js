@@ -24,9 +24,11 @@ const formToObject = (form) =>
 // 전체 사람 정보 가져오기
 function fetchPlayerData(page, url) {
 	currentPage = page;
-	
-    url += `/players?page=${page}&size=${pageSize}`;
 
+	// 수정하기
+	url += `/players?page=${page}&size=${pageSize}`;
+
+	console.log(url);
     fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -98,8 +100,13 @@ function fetchPlayerData(page, url) {
 
 // 검색
 document.getElementById('search-btn').addEventListener('click', function () {
-    const searchOption = document.getElementById('search-option').value;
-    const searchValue = document.getElementById('search-value').value;
+	const searchOption = document.getElementById('search-option').value;
+	const searchValue = document.getElementById('search-value').value;
+	
+	console.log(searchOption, searchValue);
+	currentPage = 0;
+	
+	// 수정하기
     url += `/search?`;
 
     if (searchOption && !searchValue) {
