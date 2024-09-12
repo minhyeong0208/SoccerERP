@@ -33,6 +33,16 @@ public class SponsorController {
         this.sponsorService = sponsorService;
         this.financeService = financeService;
     }
+    
+    // 스폰서 이름과 기간으로 검색 (페이징 처리)
+    @GetMapping("/search-by-name-and-date")
+    public Page<Sponsor> searchSponsorsByNameAndContractDate(
+            @RequestParam("sponsorName") String sponsorName,
+            @RequestParam("startDate") Date startDate,
+            @RequestParam("endDate") Date endDate,
+            Pageable pageable) {
+        return sponsorService.searchSponsorsByNameAndContractDate(sponsorName, startDate, endDate, pageable);
+    }
 
     // 모든 스폰서 조회 (페이징 처리)
     @GetMapping

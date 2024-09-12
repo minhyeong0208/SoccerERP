@@ -49,6 +49,16 @@ public class FinanceService {
         return financeRepository.save(finance);
     }
     
+    // 특정 스폰서 이름과 날짜로 재정 항목 조회
+    public Finance getFinanceByTraderAndDate(String trader, Timestamp financeDate) {
+        return financeRepository.findByTraderAndFinanceDate(trader, financeDate);
+    }
+
+    // 재정 항목 업데이트
+    public void updateFinance(Finance finance) {
+        financeRepository.save(finance); // 재정 항목 저장
+    }
+    
     // 수입/지출 데이터 수정
     public Finance updateFinance(int id, Finance entity) {
     	Optional<Finance> financeData = financeRepository.findById(id);
