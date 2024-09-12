@@ -6,85 +6,133 @@ let totalPages = 1;
 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
+// 스폰서 데이터를 로드하는 함수
 function loadSponsorData(page) {
-	currentPage = page;
-	
-	const startDate = document.querySelector('#startDate').value;
-	const endDate = document.querySelector('#endDate').value;
-	const keyword = document.querySelector('#searchKeyword').value;
+    currentPage = page;
 
-	// 날짜 비교: startDate가 있고, endDate가 있으며, startDate가 endDate보다 클 경우
-	if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-		alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
-		return; // 더 이상 진행하지 않음
-	}
+    const startDate = document.querySelector('#startDate').value;
+    const endDate = document.querySelector('#endDate').value;
+    const keyword = document.querySelector('#searchKeyword').value;
 
-	let url = `/sponsors?page=${page}&size=${pageSize}`;
-	if (startDate) url += `&startDate=${startDate}`;
-	if (endDate) url += `&endDate=${endDate}`;
-//	if (keyword) url += `&keyword=${keyword}`;
+    // 날짜 비교: startDate가 있고, endDate가 있으며, startDate가 endDate보다 클 경우
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+        alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
+        return;
+    }
 
-	fetch(url)
-		.then(response => response.json())
-		.then(data => {
-			const table = document.querySelector("#sponsorTable tbody");
-			const pageButtons = document.querySelector("#pageButtons");
+    let url = `/sponsors?page=${page}&size=${pageSize}`;
+    if (startDate && endDate) {
+        url = `/sponsors/search-by-contract-date?startDate=${startDate}&endDate=${endDate}&page=${page}&size=${pageSize}`;
+    } else if (keyword) {
+        url = `/sponsors/search?sponsorName=${keyword}&page=${page}&size=${pageSize}`;
+    }
 
-			// 총 페이지 수 계산
-			totalPages = data.totalPages;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const table = document.querySelector("#sponsorTable tbody");
+            const pageButtons = document.querySelector("#pageButtons");
 
-			// 기존 테이블 내용 지우기
-			table.innerHTML = '';
+            totalPages = data.totalPages;
+            table.innerHTML = '';
 
-			// 새로운 데이터 추가
-			data.content.forEach(sponsor => {
-				// 날짜 데이터를 YYYY-MM-DD 형식으로 변환
-				const contractDate = new Date(sponsor.contractDate).toISOString().substring(0, 10);
-				const startDate = new Date(sponsor.startDate).toISOString().substring(0, 10);
-				const endDate = new Date(sponsor.endDate).toISOString().substring(0, 10);
-				
-				table.innerHTML += `
-			        <tr data-id="${sponsor.sponsorIdx}">
-			            <td><input type="checkbox" class="delete-checkbox" data-id="${sponsor.sponsorIdx}"></td>
-			            <td class="editable" data-field="sponsorName">${sponsor.sponsorName}</td>
-			            <td class="editable" data-field="contractDate">${contractDate}</td>
-			            <td class="editable" data-field="price">${sponsor.price}</td>
-			            <td class="editable" data-field="contractCondition">${sponsor.contractCondition}</td>
-			            <td class="editable" data-field="startDate">${startDate}</td>
-						<td class="editable" data-field="endDate">${endDate}</td>
-			            <td class="editable" data-field="sponsorMemo">${sponsor.sponsorMemo}</td>
-			        </tr>`;
-			});
+            // 각 스폰서 데이터를 테이블에 추가
+            data.content.forEach(sponsor => {
+                const contractDate = formatDate(sponsor.contractDate);
+                const startDate = formatDate(sponsor.startDate);
+                const endDate = formatDate(sponsor.endDate);
 
-			// 페이지 버튼 초기화
-			pageButtons.innerHTML = '';
+                table.innerHTML += `
+                    <tr data-id="${sponsor.sponsorIdx}">
+                        <td><input type="checkbox" class="delete-checkbox" data-id="${sponsor.sponsorIdx}"></td>
+                        <td><input type="text" class="editable" data-field="sponsorName" value="${sponsor.sponsorName}"></td>
+                        <td><input type="date" class="editable" data-field="contractDate" value="${contractDate}"></td>
+                        <td><input type="text" class="editable" data-field="price" value="${sponsor.price}"></td>
+                        <td><input type="text" class="editable" data-field="contractCondition" value="${sponsor.contractCondition}"></td>
+                        <td><input type="date" class="editable" data-field="startDate" value="${startDate}"></td>
+                        <td><input type="date" class="editable" data-field="endDate" value="${endDate}"></td>
+                        <td><input type="text" class="editable" data-field="sponsorMemo" value="${sponsor.sponsorMemo}"></td>
+                    </tr>`;
+            });
 
-			// 중앙을 기준으로 10페이지 생성
-			let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
-			let endPage = Math.min(totalPages, startPage + maxVisiblePages);
+            pageButtons.innerHTML = '';
+            let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages);
 
-			if (endPage - startPage < maxVisiblePages) {
-				startPage = Math.max(0, endPage - maxVisiblePages);
-			}
+            if (endPage - startPage < maxVisiblePages) {
+                startPage = Math.max(0, endPage - maxVisiblePages);
+            }
 
-			for (let i = startPage; i < endPage; i++) {
-				pageButtons.innerHTML += `
-			        <li class="page-item ${i === page ? 'active' : ''}">
-			            <button class="page-link" onclick="loadSponsorData(${i})">${i + 1}</button>
-			        </li>`;
-			}
+            for (let i = startPage; i < endPage; i++) {
+                pageButtons.innerHTML += `
+                    <li class="page-item ${i === page ? 'active' : ''}">
+                        <button class="page-link" onclick="loadSponsorData(${i})">${i + 1}</button>
+                    </li>`;
+            }
 
-			// 이전/다음 그룹 버튼 활성화/비활성화 설정
-			document.querySelector("#prevGroup").disabled = currentPage === 0;
-			document.querySelector("#nextGroup").disabled = currentPage >= totalPages - 1;
-		})
-		.catch(error => console.error('Error fetching data:', error));
+            document.querySelector("#prevGroup").disabled = currentPage === 0;
+            document.querySelector("#nextGroup").disabled = currentPage >= totalPages - 1;
+        })
+        .catch(error => console.error('Error fetching data:', error));
 }
+
+// Unix 타임스탬프를 YYYY-MM-DD 형식으로 변환하는 함수
+function formatDate(timestamp) {
+	const date = new Date(timestamp);
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+	const day = String(date.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+}
+
+document.querySelector("#searchButton").onclick = () => {
+	currentPage = 0;
+	loadSponsorData(currentPage);
+};
+
+// 선택 삭제 기능
+document.getElementById("deleteSponsorButton").onclick = function() {
+	const selectedCheckboxes = document.querySelectorAll(".delete-checkbox:checked");
+	const idsToDelete = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute("data-id"));
+
+	if (idsToDelete.length > 0) {
+		if (confirm(`선택한 ${idsToDelete.length}개의 항목을 삭제하시겠습니까?`)) {
+			fetch(`/sponsors/delete-multiple`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					[csrfHeader]: csrfToken
+				},
+				body: JSON.stringify(idsToDelete)
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				loadSponsorData(currentPage); // 삭제 후 데이터 재로드
+			})
+			.catch(error => {
+				console.error('Error deleting data:', error);
+			});
+		}
+	} else {
+		alert("삭제할 항목을 선택하세요.");
+	}
+};
+
+// 전체 선택/해제 기능
+document.getElementById("selectAllCheckbox").onclick = function() {
+	const checkboxes = document.querySelectorAll(".delete-checkbox");
+	const isChecked = this.checked;
+	checkboxes.forEach(checkbox => {
+		checkbox.checked = isChecked;
+	});
+};
 
 // 모달 인스턴스를 생성
 const sponsorModal = new bootstrap.Modal(document.getElementById('sponsorModal'));
 
-// 추가 버튼 클릭 시 데이터 처리
+// 스폰서 추가 시 날짜 그대로 사용
 document.getElementById("submitSponsor").onclick = function() {
 	const sponsorName = document.getElementById("sponsorName").value;
 	const contractDate = document.getElementById("contractDate").value;
@@ -96,12 +144,12 @@ document.getElementById("submitSponsor").onclick = function() {
 
 	const sponsorData = {
 		sponsorName: sponsorName,
-		contractDate: contractDate,
+		contractDate: contractDate, // 입력값 그대로 사용
 		price: parseInt(price),
 		contractCondition: contractCondition,
 		sponsorMemo: sponsorMemo,
-		startDate: startDate,
-		endDate: endDate
+		startDate: startDate, // 입력값 그대로 사용
+		endDate: endDate // 입력값 그대로 사용
 	};
 
 	fetch(`/sponsors`, {
@@ -128,6 +176,49 @@ document.getElementById("submitSponsor").onclick = function() {
 			console.error('Error:', error);
 		});
 }
+
+document.getElementById("updateAllButton").onclick = function() {
+    // 모든 수정된 셀의 데이터를 수집
+    const rows = document.querySelectorAll("#sponsorTable tbody tr");
+    const updatedSponsors = Array.from(rows).map(row => {
+        const sponsorIdx = row.getAttribute('data-id');
+        return {
+            sponsorIdx: sponsorIdx,
+            sponsorName: row.querySelector('input[data-field="sponsorName"]').value,
+            contractDate: row.querySelector('input[data-field="contractDate"]').value,
+            price: parseInt(row.querySelector('input[data-field="price"]').value),
+            contractCondition: row.querySelector('input[data-field="contractCondition"]').value,
+            startDate: row.querySelector('input[data-field="startDate"]').value,
+            endDate: row.querySelector('input[data-field="endDate"]').value,
+            sponsorMemo: row.querySelector('input[data-field="sponsorMemo"]').value
+        };
+    });
+
+    // 수정 확인 메시지
+    if (confirm("수정하시겠습니까?")) {
+        // 변경된 데이터를 서버로 전송
+        updatedSponsors.forEach(sponsorData => {
+            fetch(`/sponsors/${sponsorData.sponsorIdx}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(sponsorData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                loadSponsorData(currentPage); // 수정 후 데이터 재로드
+            })
+            .catch(error => {
+                console.error('Error updating data:', error);
+            });
+        });
+    }
+};
+
 
 // 이전/다음 버튼 클릭 시 currentPage를 기반으로 페이지 이동
 document.querySelector("#prevGroup").onclick = () => {

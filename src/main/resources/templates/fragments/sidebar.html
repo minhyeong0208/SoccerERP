@@ -54,11 +54,17 @@
           <span class="link">인적 관리</span>
         </a>
         <ul id="personnelSubmenu">
-          <li><a th:href="@{/player}">선수</a></li>
-          <li><a th:href="@{/coach}">코치</a></li>
-          <li th:if="${gubun == 'ADMIN'}"><a th:href="@{/transfer}">이적</a></li>
-          <li th:if="${gubun == 'USER'}"><a th:href="@{/injury}">부상</a></li>
-        </ul>
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/player}">선수</a></li>
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/player}">선수</a></li>
+    
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/coach}">코치</a></li>
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/coach}">코치</a></li>
+    
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/transfer}">이적</a></li>
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/transfer}">이적</a></li>
+    
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/injury}">부상</a></li>
+		</ul>
       </li>
 
       <!-- 일정관리 -->
@@ -68,8 +74,8 @@
         </a>
         <ul id="scheduleSubmenu">
           <li><a th:href="@{/schedule}">일정</a></li>
-          <li th:if="${gubun == 'USER'}"><a th:href="@{/train}">훈련</a></li>
-          <li><a th:href="@{/game}">경기</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/train}">훈련</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/game}">경기</a></li>
         </ul>
       </li>
 
@@ -79,8 +85,11 @@
           <span class="link">시설 관리</span>
         </a>
         <ul id="facilitySubmenu">
-          <li><a th:href="@{/facility}">시설</a></li>
-          <li><a th:href="@{/team}">팀</a></li>
+          <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/facility}">시설</a></li>
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/facility}">시설</a></li>
+
+		  <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/team}">팀</a></li>
+    	  <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"><a th:href="@{/user/team}">팀</a></li>
         </ul>
       </li>
     </ul>
