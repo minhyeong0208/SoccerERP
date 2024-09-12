@@ -12,7 +12,10 @@ import acorn.entity.Transfer;
 public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
     // 선수 이름으로 이적 정보 검색 (페이징 처리 지원)
-	// 이적 정보엔 선수 이름 칼럼이 없어서 조인해서 사용
-    @Query("SELECT t FROM Transfer t JOIN Person p ON t.personIdx = p.personIdx WHERE p.personName LIKE %:name%")
+    @Query("SELECT t FROM Transfer t JOIN t.person p WHERE p.personName LIKE %:name%")
     Page<Transfer> findByPersonNameContaining(String name, Pageable pageable);
+
+    // 모든 이적 정보 조회 (페이징 처리)
+    @Query("SELECT t FROM Transfer t JOIN FETCH t.person")
+    Page<Transfer> findAllWithPerson(Pageable pageable);
 }

@@ -1,10 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
     <title>이적 관리</title>
 </head>
 <body>
+<th:block layout:fragment="customContents1">
+    <!-- 이적 관리 테이블 -->
+    <div class="container mb-4">
+        <div class="row mb-3">
+            <!-- 이적 리스트 제목 -->
+            <h3 class="section-title">이적 리스트</h3>
+        </div>
 
+        <!-- 추가/삭제 버튼을 오른쪽에 배치 -->
+        <div class="d-flex justify-content-end mb-3">
+            <button id="openAddInjuryModalButton" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addInjuryModal">
+                <i class="fas fa-plus"></i> 이적 추가
+            </button>
+            <button id="openDeleteButton" class="btn btn-danger">
+                <i class="fas fa-trash"></i> 선택 삭제
+            </button>
+        </div>
+
+        <!-- 이적 리스트 테이블 -->
+        <table class="table table-bordered table-hover text-center">
+            <thead class="table-light">
+            <tr>
+                <th><input type="checkbox" id="selectAllCheckbox"></th>
+                <th>이적 타입</th>
+                <th>선수명</th>
+                <th>상대팀</th>
+                <th>이적 일자</th>
+            </tr>
+            </thead>
+            <tbody id="transferTableBody">
+            <tr th:each="transfer : ${transfers}">
+                <td><input type="checkbox" name="selectedTransfers" th:value="${transfer.transferIdx}"></td>
+                <td th:text="${transfer.transferType == 1 ? '영입' : '방출'}"></td>
+                <td th:text="${transfer.person != null ? transfer.person.personName : ''}"></td>
+                <td th:text="${transfer.opponent}"></td>
+                <td th:text="${#dates.format(transfer.tradingDate, 'yyyy-MM-dd')}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <div class="row mb-3">
+            <!-- 검색 영역 -->
+            <div class="d-flex justify-content-center mb-3">
+                <div class="input-group">
+                    <select class="form-select" id="searchField" style="max-width: 150px;">
+                        <option value="name">선수명</option>
+                        <option value="position">포지션</option>
+                    </select> <input type="text" class="form-control" id="searchInput" placeholder="검색어 입력">
+                    <button class="btn btn-dark" id="searchButton">
+                        <i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 페이지 네비게이션 추가 -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <button id="prevGroup" class="page-link" disabled>이전</button>
+                </li>
+                <span id="pageButtons" class="pagination"></span>
+                <li class="page-item">
+                    <button id="nextGroup" class="page-link" disabled>다음</button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</th:block>
+
+
+
+<th:block layout:fragment="customContents2">
+    <!-- 선수 상세 정보 -->
+    <div class="container-fluid d-flex flex-column" style="height: 100%;">
+        <!-- 선수 정보 컨테이너 (content1) -->
+        <div class="injury-form-container player-info-container bg-light p-3 rounded shadow-sm" style="flex: 0 0 auto; overflow-y: hidden; margin-bottom: 20px; max-height: 300px;">
+            <h2 class="section-title text-primary">선수 정보</h2>
+
+            <!-- 선수 이미지 및 테이블을 Flex로 가로 배치 -->
+            <div class="d-flex align-items-center">
+                <!-- 선수 이미지 추가 -->
+                <div class="player-image-container text-center me-4">
+                    <img id="playerImage" th:src="${selectedPerson != null ? '/img/persons/' + selectedPerson.personImage : '/img/persons/default.png'}" alt="선수 이미지" class="img-fluid rounded-circle" style="width: 100px; height: 100px;">
+                </div>
+
+                <!-- 선수 정보 테이블 -->
+                <table class="table table-striped table-hover mb-0" style="flex: 1;">
+                    <tbody>
+                    <tr>
+                        <th>등번호</th>
+                        <td data-field="backNumber"></td>
+                    </tr>
+                    <tr>
+                        <th>이름</th>
+                        <td data-field="personName"></td>
+                    </tr>
+                    <tr>
+                        <th>포지션</th>
+                        <td data-field="position"></td>
+                    </tr>
+                    <tr>
+                        <th>키</th>
+                        <td data-field="height"></td>
+                    </tr>
+                    <tr>
+                        <th>몸무게</th>
+                        <td data-field="weight"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- 이적 정보 수정 폼 컨테이너 (content2) -->
+        <div class="injury-form-container bg-light p-3 rounded shadow-sm" style="flex: 1; overflow-y: auto;">
+            <h3 class="section-title text-primary">이적 정보 수정</h3>
+            <div class="form-group mb-3">
+                <label for="editTransferType" class="form-label">이적 타입</label>
+                <select class="form-control" id="editTransferType">
+                    <option value="0">판매</option>
+                    <option value="1">구매</option>
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="tradingDate" class="form-label">이적 일자</label>
+                <input type="date" class="form-control" id="tradingDate" name="trading_date">
+            </div>
+            <div class="form-group mb-3">
+                <label for="price" class="form-label">이적료</label>
+                <input type="number" class="form-control" id="price" name="price">
+            </div>
+            <div class="form-group mb-3">
+                <label for="opponent" class="form-label">상대팀명</label>
+                <input type="text" class="form-control" id="opponent" name="opponent">
+            </div>
+            <div class="form-group mb-3">
+                <label for="transferMemo" class="form-label">관련 메모</label>
+                <textarea class="form-control" id="transferMemo" name="transfer_memo"></textarea>
+            </div>
+            <input type="hidden" id="transferId">
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-primary" id="updateTransferButton">수정하기</button>
+            </div>
+    </div>
+
+        <!-- TODO: 이적 정보 추가 모달  -->
+        <!-- 이적 정보 추가 모달 -->
+        <div id="addTransferModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">이적 정보 추가</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label class="form-label">이적 타입</label>
+                            <div class="d-flex">
+                                <div class="form-check me-2">
+                                    <input class="form-check-input" type="radio" name="addTransferType" value="1" id="addTypePurchase">
+                                    <label class="form-check-label" for="addTypePurchase">영입</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="addTransferType" value="0" id="addTypeSale">
+                                    <label class="form-check-label" for="addTypeSale">방출</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPersonName" class="form-label">선수명</label>
+                            <select class="form-control" id="addPersonName">
+                                <option value="">선수명 선택</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addOpponent" class="form-label">상대팀</label>
+                            <input type="text" class="form-control" id="addOpponent">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addTradingDate" class="form-label">이적 일자</label>
+                            <input type="date" class="form-control" id="addTradingDate">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPrice" class="form-label">이적료</label>
+                            <input type="number" class="form-control" id="addPrice">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addTransferMemo" class="form-label">관련 메모</label>
+                            <textarea class="form-control" id="addTransferMemo"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="addTransferButton">추가</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block layout:fragment="customJs">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/transfer.js"></script>
+</th:block>
 </body>
 </html>
