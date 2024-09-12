@@ -25,9 +25,26 @@ public class SponsorService {
         this.financeService = financeService; // 생성자 주입
     }
     
-    // 스폰서 이름과 계약 기간으로 검색 (페이징 처리)
+ // 스폰서 이름과 계약 기간으로 검색 (빈 값일 경우 전체 결과 반환)
     public Page<Sponsor> searchSponsorsByNameAndContractDate(
             String sponsorName, Date startDate, Date endDate, Pageable pageable) {
+
+        // 스폰서 이름과 날짜가 모두 null이거나 빈 값이면 전체 결과 반환
+        if ((sponsorName == null || sponsorName.isEmpty()) && startDate == null && endDate == null) {
+            return sponsorRepository.findAll(pageable);
+        }
+
+        // 스폰서 이름이 비어 있을 때는 기간으로만 검색
+        if (sponsorName == null || sponsorName.isEmpty()) {
+            return sponsorRepository.findByContractDateBetween(startDate, endDate, pageable);
+        }
+
+        // 기간이 비어 있을 때는 이름으로만 검색
+        if (startDate == null || endDate == null) {
+            return sponsorRepository.findBySponsorNameContaining(sponsorName, pageable);
+        }
+
+        // 이름과 기간이 모두 있을 때는 이름과 기간으로 검색
         return sponsorRepository.findBySponsorNameContainingAndContractDateBetween(
                 sponsorName, startDate, endDate, pageable);
     }
@@ -75,10 +92,6 @@ public class SponsorService {
         return savedSponsor;
     }
 
-
-
-
-
     // 스폰서 업데이트 (재정 정보와 연동)
     @Transactional
     public Sponsor updateSponsor(int sponsorIdx, Sponsor sponsorDetails) {
@@ -108,7 +121,6 @@ public class SponsorService {
             } else {
                 System.out.println("재정 항목을 찾지 못했습니다: " + oldSponsorName + " / " + oldContractDate);
             }
-
             return sponsorRepository.save(sponsor);
         }
         return null;
