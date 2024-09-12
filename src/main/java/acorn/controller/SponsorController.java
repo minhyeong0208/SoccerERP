@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import acorn.entity.Finance;
 import acorn.entity.Sponsor;
-import acorn.service.SponsorService;
 import acorn.service.FinanceService; // FinanceService 추가
+import acorn.service.SponsorService;
 
 @RestController
 @RequestMapping("/sponsors")
@@ -34,13 +33,14 @@ public class SponsorController {
         this.financeService = financeService;
     }
     
-    // 스폰서 이름과 기간으로 검색 (페이징 처리)
+ // 스폰서 이름과 기간으로 검색 (페이징 처리)
     @GetMapping("/search-by-name-and-date")
     public Page<Sponsor> searchSponsorsByNameAndContractDate(
-            @RequestParam("sponsorName") String sponsorName,
-            @RequestParam("startDate") Date startDate,
-            @RequestParam("endDate") Date endDate,
+            @RequestParam(value = "sponsorName", required = false) String sponsorName,
+            @RequestParam(value = "startDate", required = false) Date startDate,
+            @RequestParam(value = "endDate", required = false) Date endDate,
             Pageable pageable) {
+        // SponsorService에 있는 검색 메서드를 호출
         return sponsorService.searchSponsorsByNameAndContractDate(sponsorName, startDate, endDate, pageable);
     }
 
@@ -57,7 +57,7 @@ public class SponsorController {
     }
 
     // 기간으로 스폰서 검색 (페이징 처리)
- // contractDate 기준으로 기간별 스폰서 검색 (페이징 처리)
+    // contractDate 기준으로 기간별 스폰서 검색 (페이징 처리)
     @GetMapping("/search-by-contract-date")
     public Page<Sponsor> searchSponsorsByContractDateRange(
             @RequestParam("startDate") Date startDate,

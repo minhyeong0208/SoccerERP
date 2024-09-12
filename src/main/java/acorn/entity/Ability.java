@@ -22,7 +22,7 @@ public class Ability {
     private int physical;
     private int shoot;
     private int speed;
-    private int dribble;
+    private int dribble; 
     private int defence;
 
     // Person과의 연관 관계 설정

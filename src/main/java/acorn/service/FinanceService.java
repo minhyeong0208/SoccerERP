@@ -31,7 +31,6 @@ public class FinanceService {
 	    return financeRepository.findByTypeAndDate(type, startDate, endDate, keyword, pageable);
 	}
 
-	
 	// 수입 항목 추가
     public Finance addIncome(Finance finance) {
         finance.setFinanceType("수입");
