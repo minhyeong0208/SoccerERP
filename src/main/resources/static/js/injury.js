@@ -159,6 +159,7 @@ $(document).ready(function() {
 			pageButtons.append(pageButton);
 		}
 	}
+
 	// 페이지 이동 버튼 클릭 시 이벤트 처리
 	$(document).on('click', '.page-link', function() {
 		currentPage = $(this).data('page');
@@ -188,7 +189,24 @@ $(document).ready(function() {
 		});
 	}
 
-	// 테이블 행 클릭 시, 해당 선수 정보와 부상 정보를 표시
+	// 선수의 이미지를 동적으로 로드하는 함수
+	function loadPlayerImage(playerName) {
+	    // 이미지 경로 설정
+	    let imagePath = `/img/persons/${playerName}.png`;
+	    
+	    // 이미지 태그 선택
+	    let playerImage = document.getElementById('playerImage');
+	    
+	    // 이미지 경로 설정 및 에러 시 대체 이미지 설정
+	    playerImage.src = imagePath;
+	    playerImage.onerror = function() {
+	        this.onerror = null;  // 무한 루프 방지
+	        this.src = '/img/persons/default.png';  // 대체 이미지 설정
+	    };
+	}
+
+
+	// 테이블 행 클릭 시, 해당 선수 정보와 부상 정보를 표시 및 이미지 로드
 	$('#injuryTableBody').on('click', 'tr', function() {
 		let playerId = $(this).data('id');  // tr에 저장된 data-id 값 가져오기
 
@@ -200,6 +218,9 @@ $(document).ready(function() {
 			$('#playerPosition').text(player.position || '--');
 			$('#playerHeight').text(player.height ? player.height + 'cm' : '--');
 			$('#playerWeight').text(player.weight ? player.weight + 'kg' : '--');
+
+			// 선수 이미지 로드
+			loadPlayerImage(player.personName);
 
 			if (player.injuries && player.injuries.length > 0) {
 				let injury = player.injuries[0];
@@ -218,7 +239,7 @@ $(document).ready(function() {
 			console.error("해당 선수 정보를 찾을 수 없습니다.");
 		}
 	});
-	
+
 	// 선수 목록을 가져와서 선택 필드에 추가하는 함수 (부상 추가용)
 	function loadPlayerOptions() {
 		$.ajax({

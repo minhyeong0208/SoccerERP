@@ -87,20 +87,21 @@
 			<div
 				class="injury-form-container player-info-container bg-light p-3 rounded shadow-sm"
 				style="flex: 0 0 auto; overflow-y: hidden; margin-bottom: 20px; max-height: 300px;">
-				<h2 class="section-title text-primary">선수 정보</h2>
 
 				<!-- 선수 이미지 및 테이블을 Flex로 가로 배치 -->
 				<div class="d-flex align-items-center">
 					<!-- 선수 이미지 추가 -->
-					<div class="player-image-container text-center me-4">
+					<div class="player-image-container text-center me-4"
+						style="width: 200px; height: 200px; overflow: hidden; display: inline-block; vertical-align: top;">
 						<img id="playerImage" src="default-image.png" alt="선수 이미지"
-							class="img-fluid rounded-circle"
-							style="width: 100px; height: 100px;">
+							class="img-fluid"
+							style="width: 100%; height: 100%; object-fit: contain;"
+							onerror="this.onerror=null; this.src='/img/persons/default.png';">
 					</div>
 
 					<!-- 선수 정보 테이블 -->
 					<table class="table table-striped table-hover mb-0"
-						style="flex: 1;">
+						style="flex: 1; table-layout: fixed; width: 100%;">
 						<tbody>
 							<tr>
 								<th>등번호</th>
@@ -127,11 +128,9 @@
 				</div>
 			</div>
 
-
 			<!-- 부상 정보 수정 폼 컨테이너 (content2) -->
 			<div class="injury-form-container bg-light p-3 rounded shadow-sm"
 				style="flex: 1; overflow-y: auto;">
-				<h3 class="section-title text-primary">부상 정보 수정</h3>
 				<div class="form-group mb-3">
 					<label for="editInjuryPlayer" class="form-label">선수명</label> <input
 						type="text" class="form-control" id="editInjuryPlayer" readonly>
