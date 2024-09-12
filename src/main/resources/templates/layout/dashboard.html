@@ -1,16 +1,45 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/default2}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default2}">
 <th:block layout:fragment="customCss">
-    
+
 </th:block>
 
 <th:block layout:fragment="customContents">
-    
+	<div>
+		<p>
+			전체 선수 수 : <span id="player-count"></span>
+		</p>
+
+
+	</div>
+	<div>
+		<span>부상자 수</span>
+
+	</div>
+	<div>
+		<p>upcoming games</p>
+		<table>
+			<tbody id="upcoming-3-games"></tbody>
+		</table>
+
+	</div>
+	<div style="width: 500px;">
+		<span>월별 부상자 추이</span>
+		<!-- 차트 크기는 확인용 하드코딩 -->
+		<canvas id="monthly-injury-counts"></canvas>
+	</div>
+	<div style="width: 500px;">
+		<span>포지션별 선수 수</span>
+		<!-- 차트 크기는 확인용 하드코딩 -->
+		<canvas id="position-count"></canvas>
+	</div>
 </th:block>
 
 <th:block layout:fragment="customJs">
-    
+	<script
+		src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+	<script src="/js/dashboard.js"></script>
 </th:block>
 </html>
