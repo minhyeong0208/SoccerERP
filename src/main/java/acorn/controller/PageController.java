@@ -16,26 +16,22 @@ public class PageController {
     private GameService gameService;
 
     @GetMapping("/login")
-    public String login() {
-        return "layout/login"; // 로그인 페이지 (login.html)
-    }
+    public String login() { return "layout/login"; } // 로그인 페이지 (login.html)
     
+    // 관리자 : 재정 관리
     @GetMapping("/admin/finance")
-    public String adminFinance() {
-    	return "layout/finance";
-    }
+    public String adminFinance() { return "layout/finance"; }
     
+    // 관리자 : 스폰서 관리
     @GetMapping("/admin/sponsor")
-    public String adminSponsor() {
-    	return "layout/sponsor";
-    }
+    public String adminSponsor() { return "layout/sponsor"; }
     
+    // 공통 : 대시보드
     @GetMapping("/dashboard")
-    public String dashboard() {
-    	return "layout/dashboard";
-    }
+    public String dashboard() { return "layout/dashboard"; }
     
-    @GetMapping("/game")
+    // 사용자 : 경기 관리
+    @GetMapping("/user/game")
     public String gameList(Model model) {
         // 게임 구분 문자열을 메소드 내부에 정의
         String gameTypeStr = "전체,리그,토너먼트";
@@ -59,43 +55,45 @@ public class PageController {
         return "layout/games";
     }
 
+    // 공통 : 일정 관리
     @GetMapping("/schedule")
-    public String schedule(){
-        return "layout/schedule";
-    }
+    public String schedule(){ return "layout/schedule"; }
     
-    @GetMapping("/injury")
-    public String injury() {
-    	return "layout/injury";
-    }
+    // 사용자 : 부상 관리
+    @GetMapping("/user/injury")
+    public String injury() { return "layout/injury"; }
     
-    @GetMapping("/facility")
-    public String facility() {
-    	return "layout/facility";
-    }
-
-    @GetMapping("/train")
-    public String train(){
-        return "layout/train";
-    }
-
-    @GetMapping("/player")
-    public String player(){
-        return "layout/player";
-    }
-
-    @GetMapping("/coach")
-    public String coach(){
-        return "layout/coach";
-    }
+    // 관리자, 사용자 : 시설 관리
+    @GetMapping("/admin/facility")
+    public String adminFacility() { return "layout/facility"; }
+    @GetMapping("/user/facility")
+    public String userFacility() { return "layout/facility"; }
     
-    @GetMapping("/team")
-    public String team(){
-        return "layout/team";
-    }
+    // 사용자 : 훈련 관리
+    @GetMapping("/user/train")
+    public String train(){ return "layout/train"; }
 
-    @GetMapping("/transfer")
-    public String transfer(){
-        return "layout/transfer";
-    }
+    // 관리자, 사용자 : 선수 관리
+    @GetMapping("/admin/player")
+    public String adminPlayer(){ return "layout/player"; }
+    @GetMapping("/user/player")
+    public String userPlayer(){ return "layout/player"; }
+
+    // 관리자, 사용자 : 코치 관리
+    @GetMapping("/admin/coach")
+    public String adminCoach(){ return "layout/coach"; }
+    @GetMapping("/user/coach")
+    public String userCoach(){ return "layout/coach"; }
+    
+    // 관리자, 사용자 : 팀 정보 수정
+    @GetMapping("/admin/team")
+    public String adminTeam(){ return "layout/team"; }
+    @GetMapping("/user/team")
+    public String userTeam(){ return "layout/team"; }
+
+    // 관리자, 사용자 : 이적 관리
+    @GetMapping("/admin/transfer")
+    public String adminTransfer(){ return "layout/transfer"; }
+    @GetMapping("/user/transfer")
+    public String userTransfer(){ return "layout/transfer"; }
 }
