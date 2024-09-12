@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import acorn.entity.Transfer;
@@ -11,11 +12,15 @@ import acorn.entity.Transfer;
 @Repository
 public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
-    // 선수 이름으로 이적 정보 검색 (페이징 처리 지원)
-    @Query("SELECT t FROM Transfer t JOIN t.person p WHERE p.personName LIKE %:name%")
-    Page<Transfer> findByPersonNameContaining(String name, Pageable pageable);
-
-    // 모든 이적 정보 조회 (페이징 처리)
-    @Query("SELECT t FROM Transfer t JOIN FETCH t.person")
+    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p")
     Page<Transfer> findAllWithPerson(Pageable pageable);
+
+    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE p.personName LIKE %:name%")
+    Page<Transfer> findByPersonNameContaining(@Param("name") String name, Pageable pageable);
+
+    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE p.personName LIKE %:term% OR t.opponent LIKE %:term%")
+    Page<Transfer> searchTransfers(@Param("term") String term, Pageable pageable);
+
+    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person WHERE t.transferIdx = :id")
+    Transfer findByIdWithPerson(@Param("id") int id);
 }

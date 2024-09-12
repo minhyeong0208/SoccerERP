@@ -1,22 +1,24 @@
 package acorn.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import acorn.dto.TransferWithPersonDto;
 import acorn.entity.Transfer;
+import acorn.entity.Person;
 import acorn.service.TransferService;
 
 @RestController
@@ -25,11 +27,14 @@ public class TransferController {
 
     private final TransferService transferService;
 
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
     public TransferController(TransferService transferService) {
         this.transferService = transferService;
     }
-    
-    // 선수 판매 
+
+    // 선수 판매
     @PostMapping("/sale")
     public ResponseEntity<String> createSaleTransfer(@RequestBody Transfer transfer) {
         // 이적 타입이 0인지 확인
@@ -41,14 +46,28 @@ public class TransferController {
         return ResponseEntity.ok("Sale transfer created successfully.");
     }
 
-    // 선수 구매
+    // 선수 구매 (파일 업로드 기능 추가)
     @PostMapping("/purchase")
-    public ResponseEntity<String> createPurchaseTransfer(@RequestBody TransferWithPersonDto dto) {
+    public ResponseEntity<String> createPurchaseTransfer(
+            @RequestPart("transfer") Transfer transfer,
+            @RequestPart("person") Person person,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+
         // 이적 타입이 1인지 확인
-        if (dto.getTransfer().getTransferType() != 1) {
+        if (transfer.getTransferType() != 1) {
             return ResponseEntity.badRequest().body("Invalid transfer type. Purchase transfers must have transferType set to 1.");
         }
-        dto.getTransfer().setTransferType(1);  // 구매 타입을 1로 설정
+        transfer.setTransferType(1);  // 구매 타입을 1로 설정
+
+        TransferWithPersonDto dto = new TransferWithPersonDto(transfer, person, file);
+
+        if (file != null && !file.isEmpty()) {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            Path path = Paths.get(uploadDir + java.io.File.separator + fileName);
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            person.setPersonImage(fileName);
+        }
+
         transferService.addPurchaseTransfer(dto);
         return ResponseEntity.ok("Purchase transfer created successfully.");
     }
@@ -59,7 +78,6 @@ public class TransferController {
         Transfer transfer = transferService.getTransferById(id);
         return transfer != null ? ResponseEntity.ok(transfer) : ResponseEntity.notFound().build();
     }
-
 
     // 모든 이적 정보 조회 (페이징 처리)
     @GetMapping
@@ -81,7 +99,7 @@ public class TransferController {
         transferService.deleteTransfer(id);
         return ResponseEntity.ok().build();
     }
-    
+
     // 선택된 이적 기록 삭제
     @DeleteMapping("/delete-multiple")
     public ResponseEntity<Void> deleteTransfers(@RequestBody List<Integer> transferIds) {
@@ -93,5 +111,12 @@ public class TransferController {
     @GetMapping("/search")
     public Page<Transfer> searchTransfersByPersonName(@RequestParam String name, Pageable pageable) {
         return transferService.searchTransfersByPersonName(name, pageable);
+    }
+
+    @GetMapping("/detail/{id}")
+    public String getTransferDetail(@PathVariable int id, Model model) {
+        Transfer selectedTransfer = transferService.getTransferById(id);
+        model.addAttribute("selectedTransfer", selectedTransfer);
+        return "transfer"; // transfer.html 뷰 이름
     }
 }
