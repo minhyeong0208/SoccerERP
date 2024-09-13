@@ -10,6 +10,16 @@ function getPlayerCount(){
 	})
 }
 
+// 전체 부상자 수
+function getInjured(){
+	fetch('http://localhost:80/injuries')
+		.then(response => response.json())
+		.then(data => {
+			console.log(`getInjured : ${data.totalElements}`);
+			document.getElementById('injury-count').textContent = `${data.totalElements}명~`;
+		})
+}
+
 // 월별 부상자
 let monthlyInjuryCount = [];
 let injuryByMonth = [];
@@ -140,9 +150,37 @@ function getFuturGames(){
 	})
 }
 
+// 순위표
+function getRankTable(){
+	fetch('http://localhost:80/rank')
+		.then(response => response.json())
+		.then(data => {
+			console.table(data);
+
+			// 랭킹, 팀명, 승점, 승무패
+			let tableBody = document.getElementById('rank-table-rows');
+			let mappedData = data.map((rankData) => {
+				return `<tr>
+							<td>${rankData.rank}</td>
+							<td>${rankData.title}</td>
+							<td>${rankData.victoryPoint}</td>
+							<td>${rankData.victory}</td>
+							<td>${rankData.draw}</td>
+							<td>${rankData.defeat}</td>
+						</tr>`;
+			});
+
+			tableBody.innerHTML = mappedData.join('');
+		})
+}
+
+
+// 페이지 로드
 document.addEventListener('DOMContentLoaded', function() {
 	monthlyInjury();
 	countPosition();
 	getPlayerCount();
 	getFuturGames();
+	getRankTable();
+	getInjured();
 })

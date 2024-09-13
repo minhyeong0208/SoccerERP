@@ -175,7 +175,7 @@ function loadPlayerData(trainIdx) {
         console.error("Invalid trainIdx");
         return;
     }
-    fetch('/persons/players')
+    fetch('/persons/players?page=0&size=500')
         .then(response => response.json())
         .then(players => {
             return fetch(`/trains/${trainIdx}`)

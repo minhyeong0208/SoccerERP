@@ -35,13 +35,13 @@ public class PersonController {
 	public PersonController(PersonService personService) {
 		this.personService = personService;
 	}
-	
+
 	// 포지션별 선수 수 조회
-    @GetMapping("/positions/count")
-    public ResponseEntity<List<Map<String, Object>>> getPlayersCountByPosition() {
-        List<Map<String, Object>> positionCounts = personService.getPlayersCountByPosition();
-        return ResponseEntity.ok(positionCounts);
-    }
+	@GetMapping("/positions/count")
+	public ResponseEntity<List<Map<String, Object>>> getPlayersCountByPosition() {
+		List<Map<String, Object>> positionCounts = personService.getPlayersCountByPosition();
+		return ResponseEntity.ok(positionCounts);
+	}
 
 	// 모든 사람 조회 (페이징 처리)
 	@GetMapping
@@ -70,7 +70,7 @@ public class PersonController {
 	// 검색 기능: 이름 또는 포지션으로 검색 (페이징 처리)
 	@GetMapping("/search")
 	public Page<Person> searchPersons(@RequestParam(value = "personName", required = false) String personName,
-			@RequestParam(value = "position", required = false) String position, Pageable pageable) {
+									  @RequestParam(value = "position", required = false) String position, Pageable pageable) {
 		return personService.searchPersons(personName, position, pageable);
 	}
 
@@ -93,60 +93,62 @@ public class PersonController {
 	// JSON + 이미지 파일 업로드를 받는 새로운 방식
 	@PostMapping("/add-player-with-image")
 	public ResponseEntity<Person> createPersonWithImage(
-	        @RequestPart("person") Person person, 
-	        @RequestPart("file") MultipartFile file) throws IOException {
+			@RequestPart("person") Person person,
+			@RequestPart("file") MultipartFile file) throws IOException {
 
-	    // 이미지 파일 저장 경로 설정
-	    String fileName = file.getOriginalFilename();
-	    String uploadDir = "C:/spring/sprsou/SoccerERP/src/main/resources/static/img/persons/";
-	    Path filePath = Paths.get(uploadDir + fileName);
-	    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+		// 이미지 파일 저장 경로 설정
+		String fileName = file.getOriginalFilename();
 
-	    // DB에 저장할 경로 설정
-	    person.setPersonImage(fileName);
+		String uploadDir = "C:/Project/SoccerERP/src/main/resources/static/img/persons/";
+		//String uploadDir = "C:/spring/sprsou/SoccerERP/src/main/resources/static/img/persons/";
+		Path filePath = Paths.get(uploadDir + fileName);
+		Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-	    // 새로운 사람 추가
-	    Person savedPerson = personService.addPerson(person);
-	    return ResponseEntity.ok(savedPerson);
+		// DB에 저장할 경로 설정
+		person.setPersonImage(fileName);
+
+		// 새로운 사람 추가
+		Person savedPerson = personService.addPerson(person);
+		return ResponseEntity.ok(savedPerson);
 	}
 
 	// 사람 업데이트
 	@PutMapping("/{id}")
 	public ResponseEntity<Person> updatePerson(@PathVariable(value = "id") int personIdx,
-			@RequestBody Person personDetails) {
+											   @RequestBody Person personDetails) {
 		Person updatedPerson = personService.updatePerson(personIdx, personDetails);
 		if (updatedPerson == null) {
 			return ResponseEntity.notFound().build();
 		}
 		return ResponseEntity.ok(updatedPerson);
 	}
-	
+
 	@PutMapping("/{id}/with-image")
 	public ResponseEntity<Person> updatePersonWithImage(
-	    @PathVariable(value = "id") int personIdx,
-	    @RequestPart("person") Person personDetails,
-	    @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
-	    
-	    Person existingPerson = personService.getPersonById(personIdx);
-	    if (existingPerson == null) {
-	        return ResponseEntity.notFound().build();
-	    }
-	    
-	    // 파일이 있는 경우에만 이미지 업데이트
-	    if (file != null && !file.isEmpty()) {
-	        String fileName = file.getOriginalFilename();
-	        String uploadDir = "C:/spring/sprsou/SoccerERP/src/main/resources/static/img/persons/";
-	        Path filePath = Paths.get(uploadDir + fileName);
-	        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-	        personDetails.setPersonImage(fileName); // 새로운 이미지 경로 설정
-	    } else {
-	        // 이미지가 없을 경우 기존 이미지를 유지
-	        personDetails.setPersonImage(existingPerson.getPersonImage());
-	    }
-	    
-	    // 기타 정보 업데이트
-	    Person updatedPerson = personService.updatePerson(personIdx, personDetails);
-	    return ResponseEntity.ok(updatedPerson);
+			@PathVariable(value = "id") int personIdx,
+			@RequestPart("person") Person personDetails,
+			@RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+
+		Person existingPerson = personService.getPersonById(personIdx);
+		if (existingPerson == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		// 파일이 있는 경우에만 이미지 업데이트
+		if (file != null && !file.isEmpty()) {
+			String fileName = file.getOriginalFilename();
+			String uploadDir = "C:/spring/sprsou/SoccerERP/src/main/resources/static/img/persons/";
+			Path filePath = Paths.get(uploadDir + fileName);
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			personDetails.setPersonImage(fileName); // 새로운 이미지 경로 설정
+		} else {
+			// 이미지가 없을 경우 기존 이미지를 유지
+			personDetails.setPersonImage(existingPerson.getPersonImage());
+		}
+
+		// 기타 정보 업데이트
+		Person updatedPerson = personService.updatePerson(personIdx, personDetails);
+		return ResponseEntity.ok(updatedPerson);
 	}
 
 
