@@ -59,7 +59,7 @@ public class TransferController {
         }
         transfer.setTransferType(1);  // 구매 타입을 1로 설정
 
-        TransferWithPersonDto dto = new TransferWithPersonDto(transfer, person, file);
+        TransferWithPersonDto dto = new TransferWithPersonDto(transfer, person, null);
 
         if (file != null && !file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());

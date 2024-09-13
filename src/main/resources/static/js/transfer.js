@@ -19,7 +19,7 @@ $(document).ready(function() {
     }
 
     // 이적료 입력 필드에 콤마 추가 이벤트 리스너
-    $('#editPrice').on('input', function() {
+    $('#editPrice, #addBuyPrice, #addSellPrice').on('input', function() {
         let value = removeCommas($(this).val());
         if (value !== '') {
             value = parseInt(value, 10);
@@ -166,7 +166,7 @@ $(document).ready(function() {
         };
     }
 
-    // 테이블 행 클릭 이벤트
+// 테이블 행 클릭 이벤트
     $('#transferTableBody').on('click', 'tr', function() {
         let transferId = $(this).data('id');
         let transfer = transferData.find(t => t.transferIdx == transferId);
@@ -181,7 +181,12 @@ $(document).ready(function() {
             loadPlayerImage(transfer.person ? transfer.person.personName : 'default');
 
             $('#editTransferPlayer').val(transfer.person ? transfer.person.personName : '');
-            $('#editTransferDate').val(new Date(transfer.tradingDate).toISOString().split('T')[0]);
+
+            // 날짜 처리 수정
+            let date = new Date(transfer.tradingDate);
+            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+            $('#editTransferDate').val(date.toISOString().split('T')[0]);
+
             $('#editTransferType').val(transfer.transferType);
             $('#editOpponent').val(transfer.opponent);
             $('#editPrice').val(addCommas(transfer.price));
@@ -197,36 +202,43 @@ $(document).ready(function() {
         resetAddTransferForm();
     });
 
+    // 이적 타입 변경 이벤트
+    $('input[name="transferType"]').on('change', function() {
+        if (this.value === "1") {
+            $('#buyForm').show();
+            $('#sellForm').hide();
+        } else {
+            $('#buyForm').hide();
+            $('#sellForm').show();
+        }
+    });
+
     // 이적 추가 이벤트
     $('#addTransferButton').on('click', function() {
-        let newTransfer = {
-            person: { personIdx: $('#addTransferPlayer').val() },
-            transferType: $('#addTransferType').val(),
-            tradingDate: $('#addTransferDate').val(),
-            opponent: $('#addOpponent').val(),
-            price: removeCommas($('#addPrice').val()),
-            transferMemo: $('#addTransferMemo').val()
-        };
+        let transferType = $('input[name="transferType"]:checked').val();
+        let transferData = {};
 
-        $.ajax({
-            url: '/transfers',
-            method: 'POST',
-            contentType: 'application/json',
-            headers: {
-                [csrfHeader]: csrfToken
-            },
-            data: JSON.stringify(newTransfer),
-            success: function() {
-                $('#addTransferModal').modal('hide');
-                $('#successModal').modal('show');
-                loadTransferData(currentPage);
-                resetAddTransferForm();
-            },
-            error: function(error) {
-                console.error('이적 정보 추가 중 오류 발생:', error);
-                alert('이적 정보 추가 중 오류가 발생했습니다.');
-            }
-        });
+        if (transferType === "1") { // 구매
+            transferData = {
+                transferType: transferType,
+                playerName: $('#addBuyPlayerName').val(),
+                transferDate: $('#addBuyTransferDate').val(),
+                price: removeCommas($('#addBuyPrice').val()),
+                opponent: $('#addBuyOpponent').val(),
+                memo: $('#addBuyMemo').val()
+            };
+            $('#buyAdditionalInfoModal').modal('show');
+        } else { // 판매
+            transferData = {
+                transferType: transferType,
+                personIdx: $('#addSellPlayer').val(),
+                transferDate: $('#addSellTransferDate').val(),
+                price: removeCommas($('#addSellPrice').val()),
+                opponent: $('#addSellOpponent').val(),
+                memo: $('#addSellMemo').val()
+            };
+            saveTransfer(transferData);
+        }
     });
 
     // 이적 정보 업데이트 이벤트
@@ -262,13 +274,13 @@ $(document).ready(function() {
     // 선수 옵션 로드
     function loadPlayerOptions() {
         $.ajax({
-            url: '/players',
+            url: '/persons',
             method: 'GET',
-            success: function(players) {
-                let playerSelect = $('#addTransferPlayer');
+            success: function(persons) {
+                let playerSelect = $('#addSellPlayer');
                 playerSelect.empty().append('<option value="">선수명 선택</option>');
-                players.forEach(player => {
-                    playerSelect.append(`<option value="${player.personIdx}">${player.personName}</option>`);
+                persons.forEach(person => {
+                    playerSelect.append(`<option value="${person.personIdx}">${person.personName}</option>`);
                 });
             },
             error: function(error) {
@@ -277,16 +289,21 @@ $(document).ready(function() {
         });
     }
 
-    // 팀 옵션 로드
+    // 팀 옵션 로드 (강원FC 제외)
     function loadTeamOptions() {
         $.ajax({
             url: '/teams',
             method: 'GET',
             success: function(teams) {
-                let teamSelect = $('#addOpponent');
-                teamSelect.empty().append('<option value="">상대팀 선택</option>');
+                let buyTeamSelect = $('#addBuyOpponent');
+                let sellTeamSelect = $('#addSellOpponent');
+                buyTeamSelect.empty().append('<option value="">상대팀 선택</option>');
+                sellTeamSelect.empty().append('<option value="">상대팀 선택</option>');
                 teams.forEach(team => {
-                    teamSelect.append(`<option value="${team.teamName}">${team.teamName}</option>`);
+                    if (team.teamName !== '강원FC') {
+                        buyTeamSelect.append(`<option value="${team.teamName}">${team.teamName}</option>`);
+                        sellTeamSelect.append(`<option value="${team.teamName}">${team.teamName}</option>`);
+                    }
                 });
             },
             error: function(error) {
@@ -297,12 +314,82 @@ $(document).ready(function() {
 
     // 이적 추가 폼 초기화
     function resetAddTransferForm() {
-        $('#addTransferPlayer').val('');
-        $('#addTransferDate').val('');
-        $('#addTransferType').val('');
-        $('#addOpponent').val('');
-        $('#addPrice').val('');
-        $('#addTransferMemo').val('');
+        $('#addBuyPlayerName, #addSellPlayer').val('');
+        $('#addBuyTransferDate, #addSellTransferDate').val('');
+        $('input[name="transferType"]').prop('checked', false);
+        $('#addBuyOpponent, #addSellOpponent').val('');
+        $('#addBuyPrice, #addSellPrice').val('');
+        $('#addBuyMemo, #addSellMemo').val('');
+    }
+
+    // 추가 정보 저장 버튼 클릭 이벤트
+    $('#saveAdditionalInfoButton').on('click', function() {
+        let additionalData = {
+            birthdate: $('#addPlayerBirthdate').val(),
+            nationality: $('#addPlayerNationality').val(),
+            backNumber: $('#addPlayerBackNumber').val(),
+            position: $('input[name="playerPosition"]:checked').val(),
+            contractStart: $('#addPlayerContractStart').val(),
+            contractEnd: $('#addPlayerContractEnd').val(),
+            height: $('#addPlayerHeight').val(),
+            weight: $('#addPlayerWeight').val()
+        };
+
+        let formData = new FormData();
+        formData.append('transferData', JSON.stringify({
+            transferType: "1",
+            playerName: $('#addBuyPlayerName').val(),
+            transferDate: $('#addBuyTransferDate').val(),
+            price: removeCommas($('#addBuyPrice').val()),
+            opponent: $('#addBuyOpponent').val(),
+            memo: $('#addBuyMemo').val()
+        }));
+        formData.append('additionalData', JSON.stringify(additionalData));
+
+        let imageFile = $('#addPlayerImage')[0].files[0];
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
+        $.ajax({
+            url: '/transfers/buy',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                [csrfHeader]: csrfToken
+            },
+            success: function(response) {
+                $('#buyAdditionalInfoModal').modal('hide');
+                $('#addTransferModal').modal('hide');
+                loadTransferData();
+            },
+            error: function(error) {
+                console.error('이적 정보 저장 중 오류 발생:', error);
+                alert('이적 정보 저장 중 오류가 발생했습니다.');
+            }
+        });
+    });
+
+    function saveTransfer(transferData) {
+        $.ajax({
+            url: '/transfers/sell',
+            method: 'POST',
+            data: JSON.stringify(transferData),
+            contentType: 'application/json',
+            headers: {
+                [csrfHeader]: csrfToken
+            },
+            success: function(response) {
+                $('#addTransferModal').modal('hide');
+                loadTransferData();
+            },
+            error: function(error) {
+                console.error('이적 정보 저장 중 오류 발생:', error);
+                alert('이적 정보 저장 중 오류가 발생했습니다.');
+            }
+        });
     }
 
     // 파일 업로드 처리
@@ -315,40 +402,6 @@ $(document).ready(function() {
             }
             reader.readAsDataURL(file);
         }
-    });
-
-// FormData 객체 사용하여 파일 업로드
-    $('#confirmAdditionalInfoButton').on('click', function() {
-        var formData = new FormData();
-
-        var transferData = {
-            // ... 기존 transfer 데이터 ...
-        };
-        formData.append('transfer', new Blob([JSON.stringify(transferData)], {type: "application/json"}));
-
-        var personData = {
-            // ... 기존 person 데이터 ...
-        };
-        formData.append('person', new Blob([JSON.stringify(personData)], {type: "application/json"}));
-
-        var fileInput = $('#addPlayerImage')[0];
-        if (fileInput.files[0]) {
-            formData.append('file', fileInput.files[0]);
-        }
-
-        $.ajax({
-            url: '/transfers/purchase',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                // ... 성공 처리 ...
-            },
-            error: function(xhr, status, error) {
-                // ... 에러 처리 ...
-            }
-        });
     });
 
     // 초기 데이터 로드 호출
