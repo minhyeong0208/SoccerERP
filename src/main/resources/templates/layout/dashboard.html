@@ -97,7 +97,22 @@
 				</div>
 			</div>
 			<div class="layout-item">
-
+				<p>
+					<span>오늘의 일정</span>
+					<span id="today-schedule-overview"></span>
+				</p>
+				<div>
+					<p id="today-schedule-count"></p>
+					<p>
+						<span id="today-schedule-games"></span>
+					</p>
+					<p>
+						<span id="today-schedule-trainings"></span>
+					</p>
+					<p>
+						<span id="today-schedule-injuries"></span>
+					</p>
+				</div>
 			</div>
 			<div class="layout-item">
 				<div style="width: 300px;">
@@ -107,7 +122,11 @@
 				</div>
 			</div>
 			<div class="layout-item">
-				그래프 4
+				<div style="width: 300px;">
+					<span>부위별 부상자 수 비교(전월)</span>
+					<!-- 차트 크기는 확인용 하드코딩 -->
+					<canvas id="injuries-count-compare"></canvas>
+				</div>
 			</div>
 		</div>
 	</div>
