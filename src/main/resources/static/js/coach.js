@@ -206,6 +206,9 @@ document.getElementById('submit-coach').addEventListener('click', function() {
 	} else if (!document.getElementById('add-personImage').value) {
 		alert('사진을 입력하세요')
 		return;
+	} else if (!document.getElementById('add-id').value) {
+		alert('ID를 입력하세요')
+		return;
 	}
 
 	const coachInfo = formToObject(document.getElementById('add-coach-info'));
