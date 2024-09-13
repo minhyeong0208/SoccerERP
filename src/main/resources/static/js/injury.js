@@ -30,7 +30,7 @@ $(document).ready(function() {
 		});
 
 		if (selectedIds.length === 0) {
-			alert("삭제할 항목을 선택하세요.");
+			$('#deleteConfirmationModal').modal('show');  // 선택되지 않은 경우 모달을 띄우기
 			return;
 		}
 
@@ -38,32 +38,37 @@ $(document).ready(function() {
 		const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
 		deleteConfirmModal.show();
 	});
-
-	// 삭제 확인 모달에서 '삭제' 버튼 클릭 시 삭제 작업 실행
+	
+	// 삭제 확인 버튼 클릭 시
 	$('#confirmDeleteButton').on('click', function() {
-		selectedIds.forEach(function(id) {
-			$.ajax({
-				url: `/injuries/${id}`,
-				method: 'DELETE',
-				headers: {
-					'Content-Type': 'application/json',
-					[csrfHeader]: csrfToken
-				},
-				success: function(response) {
-					console.log(`Injury ID ${id} 삭제 완료`);
-					$(`input[value="${id}"]`).closest('tr').remove();
-				},
-				error: function(error) {
-					console.error(`Injury ID ${id} 삭제 중 오류 발생:`, error);
-				}
-			});
+		let deleteRequests = [];
+
+		selectedIds.forEach(id => {
+			deleteRequests.push(
+				$.ajax({
+					url: `/injuries/${id}`,
+					method: 'DELETE',
+					headers: { [csrfHeader]: csrfToken }
+				})
+			);
 		});
 
-		// 삭제 후 모달 닫기
-		const deleteConfirmModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
-		deleteConfirmModal.hide();
-	});
+		// 모든 삭제 요청이 완료된 후 삭제 완료 모달을 띄운다
+		$.when.apply($, deleteRequests).done(function() {
+			// 삭제 확인 모달 닫기
+			bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+			// 삭제 완료 모달 띄우기
+			const deleteCompleteModal = new bootstrap.Modal(document.getElementById('deleteCompleteModal'));
+			deleteCompleteModal.show();
 
+			// 테이블에서 삭제된 항목 제거 (필요시)
+			selectedIds.forEach(id => {
+				$(`input[value="${id}"]`).closest('tr').remove();
+			});
+		}).fail(function(error) {
+			console.error("삭제 중 오류 발생:", error);
+		});
+	});
 
 	// 검색 버튼 클릭 시 검색어에 맞는 데이터 필터링 및 페이지네이션 조정
 	$('#searchButton').on('click', function() {
@@ -176,7 +181,7 @@ $(document).ready(function() {
 
 			let backNumber = player.backNumber || '--';
 			let personName = player.personName || '--';
-			let brokenDate = injury.brokenDate ? new Date(injury.brokenDate).toLocaleString('ko-KR') : '--';
+			let brokenDate = injury.brokenDate ? new Date(injury.brokenDate).toISOString().split('T')[0] : '--';
 
 			let tableRow = `
 				<tr style="cursor: pointer;" data-id="${player.personIdx || ''}">  <!-- 마우스 커서를 클릭하는 손 모양으로 변경 -->
@@ -191,18 +196,18 @@ $(document).ready(function() {
 
 	// 선수의 이미지를 동적으로 로드하는 함수
 	function loadPlayerImage(playerName) {
-	    // 이미지 경로 설정
-	    let imagePath = `/img/persons/${playerName}.png`;
-	    
-	    // 이미지 태그 선택
-	    let playerImage = document.getElementById('playerImage');
-	    
-	    // 이미지 경로 설정 및 에러 시 대체 이미지 설정
-	    playerImage.src = imagePath;
-	    playerImage.onerror = function() {
-	        this.onerror = null;  // 무한 루프 방지
-	        this.src = '/img/persons/default.png';  // 대체 이미지 설정
-	    };
+		// 이미지 경로 설정
+		let imagePath = `/img/persons/${playerName}.png`;
+
+		// 이미지 태그 선택
+		let playerImage = document.getElementById('playerImage');
+
+		// 이미지 경로 설정 및 에러 시 대체 이미지 설정
+		playerImage.src = imagePath;
+		playerImage.onerror = function() {
+			this.onerror = null;  // 무한 루프 방지
+			this.src = '/img/persons/default.png';  // 대체 이미지 설정
+		};
 	}
 
 
@@ -211,6 +216,8 @@ $(document).ready(function() {
 		let playerId = $(this).data('id');  // tr에 저장된 data-id 값 가져오기
 
 		let player = playerData.find(p => p.personIdx == playerId);
+		console.log('First Injury Data:', injuryData[0]);
+		console.log('Player Data:', playerData);
 
 		if (player) {
 			$('#playerNumber').text(player.backNumber || '--');
@@ -233,7 +240,7 @@ $(document).ready(function() {
 				$('#editRecoveryPeriod').val(injury.recovery || 0);
 				$('#injuryId').val(injury.injuryIdx);
 			} else {
-				alert("선수에게 부상 정보가 없습니다.");
+				$('#noInjuryInfoModal').modal('show');
 			}
 		} else {
 			console.error("해당 선수 정보를 찾을 수 없습니다.");
@@ -260,6 +267,12 @@ $(document).ready(function() {
 			}
 		});
 	}
+	
+	// 오류 발생 시 모달을 띄우는 함수
+	function showErrorModal(message) {
+	    $('#errorModalBody').text(message); // 모달에 오류 메시지 설정
+	    $('#errorModal').modal('show'); // 모달을 띄우기
+	}
 
 	// 모달창 열 때 선수 목록 로드
 	$('#openAddInjuryModalButton').on('click', function() {
@@ -279,18 +292,18 @@ $(document).ready(function() {
 	$('#addInjuryButton').on('click', function() {
 		let playerId = $('#addInjuryPlayer').val();
 		if (!playerId) {
-			alert("선수를 선택해 주세요.");
+			$('#playerSelectionModal').modal('show');
 			return;
 		}
 
 		let newInjury = {
 			person: { personIdx: playerId },
 			brokenDate: $('#addInjuryDate').val(),
-			memo: $('#addInjuryPart').val(),
+			injuryPart: $('#addInjuryPart').val(),
 			severity: $('input[name="addSeverity"]:checked').val(),
 			doctor: $('#addDoctor').val(),
 			recovery: $('#addRecoveryPeriod').val(),
-			note: $('#addMemo').val()
+			memo: $('#addMemo').val()
 		};
 
 		$.ajax({
@@ -321,7 +334,7 @@ $(document).ready(function() {
 			},
 			error: function(error) {
 				console.error('부상 정보를 추가하는 중 오류 발생:', error);
-				alert('부상 정보를 추가하는 중 오류가 발생했습니다.');
+			    showErrorModal('부상 정보를 추가하는 중 오류가 발생했습니다.');
 			}
 		});
 	});

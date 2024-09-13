@@ -7,6 +7,8 @@ body {
 .card {
     border-radius: 0.35rem;
     box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    max-width: 100%; /* 최대 너비를 화면에 맞게 설정 */
+    max-height: calc(100vh - 120px); /* 최대 높이를 화면에 맞게 설정 (헤더와 여백을 고려) */
 }
 .card-left-border {
     border-left: 0.25rem solid;

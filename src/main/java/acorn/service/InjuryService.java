@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,15 +16,17 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import acorn.entity.Injury;
+import acorn.entity.Person;
 import acorn.repository.InjuryRepository;
 
 @Service
 public class InjuryService {
 
-    private final InjuryRepository injuryRepository;
-
+	private final InjuryRepository injuryRepository;
+	
     public InjuryService(InjuryRepository injuryRepository) {
         this.injuryRepository = injuryRepository;
     }
@@ -78,63 +81,82 @@ public class InjuryService {
         return injuryComparison;
     }
 
-    // 월별 부상 발생 빈도 반환
-    public List<Map<String, Object>> getInjuriesCountByMonth() {
-        List<Object[]> results = injuryRepository.countInjuriesByMonth();
-        List<Map<String, Object>> injuryCounts = new ArrayList<>();
+	// 월별 부상 발생 빈도 반환
+	public List<Map<String, Object>> getInjuriesCountByMonth() {
+		List<Object[]> results = injuryRepository.countInjuriesByMonth();
+		List<Map<String, Object>> injuryCounts = new ArrayList<>();
 
-        for (Object[] result : results) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("month", result[0]);
-            map.put("count", result[1]);
-            injuryCounts.add(map);
-        }
+		for (Object[] result : results) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("month", result[0]);
+			map.put("count", result[1]);
+			injuryCounts.add(map);
+		}
 
-        return injuryCounts;
-    }
-    
-    // 모든 부상 조회 (선수 정보 포함)
-    public List<Injury> findAllInjuriesWithPerson() {
-        return injuryRepository.findAllInjuriesWithPerson();
-    }
+		return injuryCounts;
+	}
 
-    // 모든 부상 조회 (페이징 처리)
-    public Page<Injury> getAllInjuries(Pageable pageable) {
-        return injuryRepository.findAll(pageable);
-    }
+	// 모든 부상 조회 (선수 정보 포함)
+	public List<Injury> findAllInjuriesWithPerson() {
+		return injuryRepository.findAllInjuriesWithPerson();
+	}
 
-    public List<Injury> getAllInjuries() {
-        return injuryRepository.findAll();
-    }
+	// 모든 부상 조회 (페이징 처리)
+	public Page<Injury> getAllInjuries(Pageable pageable) {
+		return injuryRepository.findAll(pageable);
+	}
 
-    // 특정 부상 조회
-    public Injury getInjuryById(int injuryIdx) {
-        Optional<Injury> injury = injuryRepository.findById(injuryIdx);
-        return injury.orElse(null);
-    }
+	public List<Injury> getAllInjuries() {
+		return injuryRepository.findAll();
+	}
 
-    // 새로운 부상 추가
-    public Injury addInjury(Injury injury) {
-        return injuryRepository.save(injury);
-    }
+	// 특정 부상 조회
+	public Injury getInjuryById(int injuryIdx) {
+		Optional<Injury> injury = injuryRepository.findById(injuryIdx);
+		return injury.orElse(null);
+	}
 
-    // 부상 업데이트
-    public Injury updateInjury(int injuryIdx, Injury injuryDetails) {
-        Injury injury = getInjuryById(injuryIdx);
-        if (injury != null) {
-            injury.setBrokenDate(injuryDetails.getBrokenDate());
-            injury.setSeverity(injuryDetails.getSeverity());
-            injury.setDoctor(injuryDetails.getDoctor());
-            injury.setRecovery(injuryDetails.getRecovery());
-            injury.setInjuryPart(injuryDetails.getInjuryPart()); // 부상 부위 업데이트
-            injury.setMemo(injuryDetails.getMemo());
-            return injuryRepository.save(injury);
-        }
-        return null;
-    }
+	// 새로운 부상 추가
+	public Injury addInjury(Injury injury) {
+		return injuryRepository.save(injury);
+	}
 
-    // 부상 삭제
+	// 부상 업데이트
+	public Injury updateInjury(int injuryIdx, Injury injuryDetails) {
+		Injury injury = getInjuryById(injuryIdx);
+		if (injury != null) {
+			injury.setBrokenDate(injuryDetails.getBrokenDate());
+			injury.setSeverity(injuryDetails.getSeverity());
+			injury.setDoctor(injuryDetails.getDoctor());
+			injury.setRecovery(injuryDetails.getRecovery());
+			injury.setInjuryPart(injuryDetails.getInjuryPart()); // 부상 부위 업데이트
+			injury.setMemo(injuryDetails.getMemo());
+			return injuryRepository.save(injury);
+		}
+		return null;
+	}
+
+	// 부상 삭제
+	/*
+    @Transactional
     public void deleteInjury(int injuryIdx) {
         injuryRepository.deleteById(injuryIdx);
+    }
+    */
+	
+	@Transactional
+    public void deleteInjury(int injuryIdx) {
+        System.out.println("Attempting to delete injury with ID: " + injuryIdx);
+        Injury injury = injuryRepository.findById(injuryIdx).orElse(null);
+        if (injury != null) {
+            Person person = injury.getPerson();
+            if (person != null) {
+                person.getInjuries().remove(injury); // Person의 injuries 컬렉션에서 제거
+            }
+            injuryRepository.delete(injury);
+            System.out.println("Injury with ID: " + injuryIdx + " deleted.");
+        } else {
+            System.out.println("Injury with ID: " + injuryIdx + " not found.");
+        }
     }
 }

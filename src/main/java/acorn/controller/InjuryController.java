@@ -85,11 +85,22 @@ public class InjuryController {
     }
 
     // 부상 삭제
+    /*
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInjury(@PathVariable(value = "id") int injuryIdx) {
         injuryService.deleteInjury(injuryIdx);
         return ResponseEntity.ok().build();
     }
+     */
+    
+ // 부상 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInjury(@PathVariable(value = "id") int injuryIdx) {
+        System.out.println("Deleting injury with ID: " + injuryIdx);
+        injuryService.deleteInjury(injuryIdx);
+        return ResponseEntity.ok().build();
+    }
+
 
     // 모든 선수 조회 (부상 추가 시 선택할 수 있도록)
     @GetMapping("/players")
