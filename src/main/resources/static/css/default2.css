@@ -1,18 +1,35 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
+    /* 추가 */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure body takes full viewport height */
 }
 .header {
     background-color: #f1f1f1;
+     /* 추가 */
+    height: 40px; /* Adjust according to your header height */
 }
 .sidebar {
     background-color: #f1f1f1;
     padding: 10px;
     border-right: 1px solid #ddd;
     width: 200px;
-    height: calc(100vh - 40px); /* Adjust for header height */
+    height: calc(110vh - 40px); /* Adjust for header height */
     float: left;
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: 1.5rem 1rem;
+    user-select: none;
+    display: flex;
+    color: var(--white);
+    flex-direction: column;
+    background-color: var(--sidebar-background);
+    transition: max-width 0.2s ease-in-out;
 }
+
 /*================================================================*/
 :root {
     --primary-color: #191919;
@@ -37,21 +54,6 @@ html {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-.sidebar {
-    position: sticky;
-    top: 0;
-    left: 0;
-    padding: 1.5rem 1rem;
-    user-select: none;
-    max-width: 18rem;
-    min-width: 4rem;
-    display: flex;
-    color: var(--white);
-    flex-direction: column;
-    background-color: var(--sidebar-background);
-    transition: max-width 0.2s ease-in-out;
 }
 
 .sidebar-top {
@@ -110,7 +112,7 @@ html {
 }
 
 .sidebar-links li a {
-    color: var(--text-link) ;
+    color: var(--text-link);
     width: 100%;
     padding-left: 0.6rem;
     font-size: 1rem;
@@ -333,13 +335,20 @@ html {
 
 }
 /*================================================================*/
+
 .content {
+	flex: 1;
     margin-left: 200px;
     padding: 10px;
-    height: calc(100vh - 40px); /* Adjust for header height */
+    min-height: calc(100vh - 40px); /* Adjust for header height */
+    margin-top: 40px; /* 헤더의 높이만큼 content를 아래로 내림 */
     display: flex;
-    align-items: center; /* Center items vertically */
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: auto;
+    box-sizing: border-box; /* 패딩과 콘텐츠 영역이 겹치지 않도록 설정 */
 }
+
 .grid-container {
     display: grid;
     grid-template-columns: 1fr;
@@ -347,9 +356,10 @@ html {
     width: 100%; /* Full width of the content area */
     height: 100%; /* Full height of the content area */
 }
+
 .grid-item {
     background-color: #ffffff;
     padding: 20px;
     border: 1px solid #ccc;
-    height: 95%; /* 90% of the height of grid-container */
+    min-height: 95%; /* Make sure it fills most of the grid container */
 }

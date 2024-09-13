@@ -3,6 +3,10 @@ const pageSize = 10;
 const maxVisiblePages = 10; // 최대 표시 페이지 수
 let totalPages = 1;
 
+// CSRF 토큰과 헤더를 가져옴
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
 function loadFinanceData(page) {
 	// 페이지 갱신
 	currentPage = page;
@@ -18,7 +22,7 @@ function loadFinanceData(page) {
 		return; // 더 이상 진행하지 않음
 	}
 
-	let url = `http://localhost/finances?page=${page}&size=${pageSize}`;
+	let url = `/finances?page=${page}&size=${pageSize}`;
 	if (financeType) url += `&type=${financeType}`;
 	if (startDate) url += `&startDate=${startDate}`;
 	if (endDate) url += `&endDate=${endDate}`;
@@ -44,18 +48,14 @@ function loadFinanceData(page) {
 			        <tr data-id="${finance.financeIdx}">
 			            <td><input type="checkbox" class="delete-checkbox" data-id="${finance.financeIdx}"></td>
 			            <td>${finance.financeType}</td>
-			            <td class="editable" data-field="financeDate">${financeDate}</td>
-			            <td class="editable" data-field="amount">${finance.amount}</td>
-			            <td class="editable" data-field="trader">${finance.trader}</td>
-			            <td class="editable" data-field="purpose">${finance.purpose}</td>
-			            <td class="editable" data-field="financeMemo">${finance.financeMemo}</td>
+			            <td><input type="date" class="editable" data-field="financeDate" value="${financeDate}"></td>
+			            <td><input type="text" class="editable" data-field="amount" value="${finance.amount}"></td>
+			            <td><input type="text" class="editable" data-field="trader" value="${finance.trader}"></td>
+			            <td><input type="text" class="editable" data-field="purpose" value="${finance.purpose}"></td>
+			            <td><input type="text" class="editable" data-field="financeMemo" value="${finance.financeMemo}"></td>
 			        </tr>`;
 			});
 
-			// 각 셀에 더블 클릭 시 편집 가능하도록 이벤트 리스너 추가
-			document.querySelectorAll('.editable').forEach(cell => {
-				cell.addEventListener('dblclick', editField);
-			});
 
 			// 페이지 버튼 초기화
 			pageButtons.innerHTML = '';
@@ -82,84 +82,46 @@ function loadFinanceData(page) {
 		.catch(error => console.error('Error fetching data:', error));
 }
 
-// 셀을 더블 클릭 시 인라인 편집 가능하도록 설정하는 함수
-function editField(event) {
-	const cell = event.target;
-	const originalValue = cell.textContent;
-	const field = cell.getAttribute('data-field');
-	const row = cell.closest('tr');
-	const id = row.getAttribute('data-id');
+document.getElementById("updateAllButton").onclick = function() {
+    // 모든 수정된 셀의 데이터를 수집
+    const rows = document.querySelectorAll("#financeTable tbody tr");
+    const updatedFinances = Array.from(rows).map(row => {
+        const financeIdx = row.getAttribute('data-id');
+        return {
+            financeIdx: financeIdx,
+            financeDate: row.querySelector('input[data-field="financeDate"]').value,
+            amount: parseInt(row.querySelector('input[data-field="amount"]').value),
+            trader: row.querySelector('input[data-field="trader"]').value,
+            purpose: row.querySelector('input[data-field="purpose"]').value,
+            financeMemo: row.querySelector('input[data-field="financeMemo"]').value
+        };
+    });
 
-	const inputType = field === 'financeDate' ? 'date' : 'text';
-	cell.innerHTML = `<input type="${inputType}" class="editable-input" value="${originalValue}">`;
-
-	const input = cell.querySelector('input');
-	input.focus(); // 인풋 필드에 포커스
-
-	input.addEventListener('blur', function() {
-		const newValue = input.value.trim();
-		cell.textContent = newValue; // 인풋 필드를 원래 텍스트로 변환
-
-		if (newValue !== originalValue) {
-			updateFinanceData(id, field, newValue); // 값이 변경되었을 경우 서버에 업데이트
-		}
-	});
-
-	input.addEventListener('keydown', function(e) {
-		if (e.key === 'Enter') {
-			input.blur(); // 엔터를 누르면 포커스 해제
-		}
-	});
-}
-
-function updateFinanceData(id) {
-	const row = document.querySelector(`tr[data-id="${id}"]`);
-
-	const financeDate = row.querySelector('[data-field="financeDate"]').textContent;
-	const amount = row.querySelector('[data-field="amount"]').textContent;
-	const trader = row.querySelector('[data-field="trader"]').textContent;
-	const purpose = row.querySelector('[data-field="purpose"]').textContent;
-	const financeMemo = row.querySelector('[data-field="financeMemo"]').textContent;
-
-	// 금액이 숫자인지 확인
-	if (isNaN(amount) || amount.trim() === "") {
-		showAlertModal("금액은 숫자만 입력 가능합니다.");
-		
-		return; // 숫자가 아닌 경우 함수 종료
-	}
-
-	const updatedData = {
-		financeDate: financeDate,
-		amount: amount,
-		trader: trader,
-		purpose: purpose,
-		financeMemo: financeMemo
-	};
-
-	const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-	const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-	fetch(`http://localhost/finances/${id}`, {
-		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-			[csrfHeader]: csrfToken
-		},
-		body: JSON.stringify(updatedData)
-	})
-		.then(response => {
-			if (!response.ok) {
-				throw new Error('Error updating data');
-			}
-			return response.json();
-		})
-		.then(data => {
-			console.log('수정 완료:', data);
-		})
-		.catch(error => {
-			console.error('수정 오류:', error);
-		});
-}
+    // 수정 확인 메시지
+    if (confirm("수정하시겠습니까?")) {
+        // 변경된 데이터를 서버로 전송
+        updatedFinances.forEach(financeData => {
+            fetch(`/finances/${financeData.financeIdx}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(financeData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                loadFinanceData(currentPage); // 수정 후 데이터 재로드
+            })
+            .catch(error => {
+                console.error('Error updating data:', error);
+            });
+        });
+    }
+	
+};
 
 // 삭제 기능 추가
 function deleteSelectedFinances() {
@@ -175,7 +137,7 @@ function deleteSelectedFinances() {
 		const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 		const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-		fetch(`http://localhost/finances`, {
+		fetch(`/finances`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
