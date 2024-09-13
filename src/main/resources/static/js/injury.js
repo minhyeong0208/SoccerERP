@@ -226,7 +226,7 @@ $(document).ready(function() {
 				let injury = player.injuries[0];
 				$('#editInjuryPlayer').val(player.personName);
 				$('#editInjuryDate').val(new Date(injury.brokenDate).toISOString().split('T')[0]);
-				$('#editInjuryPart').val(injury.memo || '');
+				$('#editInjuryPart').val(injury.injuryPart || '');
 				$('input[name="editSeverity"][value="' + injury.severity + '"]').prop('checked', true);
 				$('#editDoctor').val(injury.doctor || '');
 				$('#editMemo').val(injury.memo || '');
@@ -331,6 +331,7 @@ $(document).ready(function() {
 		let injuryIdx = $('#injuryId').val();
 		let updatedInjury = {
 			brokenDate: $('#editInjuryDate').val(),
+			injuryPart: $('#editInjuryPart').val(),
 			memo: $('#editMemo').val(),
 			severity: $('input[name="editSeverity"]:checked').val(),
 			doctor: $('#editDoctor').val(),
