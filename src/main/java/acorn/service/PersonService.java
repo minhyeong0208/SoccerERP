@@ -5,26 +5,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import acorn.entity.Login;
 import acorn.entity.Person;
-import acorn.repository.LoginRepository;
 import acorn.repository.PersonRepository;
-import jakarta.transaction.Transactional;
 
 @Service
 public class PersonService {
 
-	@Autowired
-	private LoginService loginService;
     private final PersonRepository personRepository;
+    private final LoginService loginService;
 
-    public PersonService(PersonRepository personRepository) {
+    public PersonService(PersonRepository personRepository, LoginService loginService) {
         this.personRepository = personRepository;
+        this.loginService = loginService;
     }
     
     // 포지션별 선수 수 반환
@@ -83,7 +80,6 @@ public class PersonService {
         if (person.getAbility() != null) {
             person.getAbility().setPerson(person);
         }
-        
         return personRepository.save(person);
         
     }*/
