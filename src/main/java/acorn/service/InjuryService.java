@@ -21,7 +21,7 @@ public class InjuryService {
     public InjuryService(InjuryRepository injuryRepository) {
         this.injuryRepository = injuryRepository;
     }
-    
+
     // 월별 부상 발생 빈도 반환
     public List<Map<String, Object>> getInjuriesCountByMonth() {
         List<Object[]> results = injuryRepository.countInjuriesByMonth();
@@ -46,7 +46,7 @@ public class InjuryService {
     public Page<Injury> getAllInjuries(Pageable pageable) {
         return injuryRepository.findAll(pageable);
     }
-    
+
     public List<Injury> getAllInjuries() {
         return injuryRepository.findAll();
     }
@@ -66,11 +66,11 @@ public class InjuryService {
     public Injury updateInjury(int injuryIdx, Injury injuryDetails) {
         Injury injury = getInjuryById(injuryIdx);
         if (injury != null) {
-            // injury.setPerson(injuryDetails.getPerson());  // 수정된 부분
             injury.setBrokenDate(injuryDetails.getBrokenDate());
             injury.setSeverity(injuryDetails.getSeverity());
             injury.setDoctor(injuryDetails.getDoctor());
             injury.setRecovery(injuryDetails.getRecovery());
+            injury.setInjuryPart(injuryDetails.getInjuryPart()); // 부상 부위 업데이트
             injury.setMemo(injuryDetails.getMemo());
             return injuryRepository.save(injury);
         }

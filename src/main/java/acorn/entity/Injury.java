@@ -1,9 +1,7 @@
 package acorn.entity;
 
 import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,17 +23,18 @@ public class Injury {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "injury_idx") //수정 
+    @Column(name = "injury_idx")
     private int injuryIdx;
 
     @ManyToOne
-    @JoinColumn(name = "person_idx") // 정확한 물리적 컬럼 이름 사용
+    @JoinColumn(name = "person_idx")
     @JsonBackReference
-    private Person person; // `personIdx` 대신 `person`으로 수정
+    private Person person;
 
     private Date brokenDate;
     private String severity;
     private String doctor;
     private int recovery;
+    private String injuryPart;
     private String memo;
 }
