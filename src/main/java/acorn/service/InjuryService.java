@@ -1,10 +1,16 @@
 package acorn.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +26,56 @@ public class InjuryService {
 
     public InjuryService(InjuryRepository injuryRepository) {
         this.injuryRepository = injuryRepository;
+    }
+    
+ // 부상 부위별 저번달 vs 이번달 부상자 수 비교
+    public Map<String, Map<String, Integer>> compareInjuriesByMonth() {
+        // 이번 달과 저번 달 날짜 계산
+        LocalDate now = LocalDate.now();
+        LocalDate startOfThisMonth = now.withDayOfMonth(1);
+        LocalDate startOfLastMonth = now.minusMonths(1).withDayOfMonth(1);
+        LocalDate endOfLastMonth = now.withDayOfMonth(1).minusDays(1);
+
+        // Date 형식으로 변환
+        Date startOfThisMonthDate = Date.from(startOfThisMonth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date startOfLastMonthDate = Date.from(startOfLastMonth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date endOfLastMonthDate = Date.from(endOfLastMonth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        // 저번달 부상 데이터 조회
+        List<Injury> lastMonthInjuries = injuryRepository.findByBrokenDateBetween(startOfLastMonthDate, endOfLastMonthDate);
+
+        // 이번달 부상 데이터 조회
+        List<Injury> thisMonthInjuries = injuryRepository.findByBrokenDateBetween(startOfThisMonthDate, new Date());
+
+        // 부상 부위별로 데이터를 비교하기 위해 맵 생성
+        Map<String, Map<String, Integer>> injuryComparison = new HashMap<>();
+
+        // 저번 달 부상 데이터 처리
+        Map<String, Long> lastMonthInjuryCount = lastMonthInjuries.stream()
+                .collect(Collectors.groupingBy(Injury::getInjuryPart, Collectors.counting()));
+
+        // 이번 달 부상 데이터 처리
+        Map<String, Long> thisMonthInjuryCount = thisMonthInjuries.stream()
+                .collect(Collectors.groupingBy(Injury::getInjuryPart, Collectors.counting()));
+
+        // 모든 부상 부위에 대해 저번달과 이번달 데이터를 비교
+        Set<String> allInjuryParts = new HashSet<>();
+        allInjuryParts.addAll(lastMonthInjuryCount.keySet());
+        allInjuryParts.addAll(thisMonthInjuryCount.keySet());
+
+        for (String part : allInjuryParts) {
+            int lastMonthCount = lastMonthInjuryCount.getOrDefault(part, 0L).intValue();
+            int thisMonthCount = thisMonthInjuryCount.getOrDefault(part, 0L).intValue();
+
+            // 부상 부위별로 저번달과 이번달 데이터를 저장
+            Map<String, Integer> counts = new HashMap<>();
+            counts.put("저번달", lastMonthCount);
+            counts.put("이번달", thisMonthCount);
+
+            injuryComparison.put(part, counts);
+        }
+
+        return injuryComparison;
     }
 
     // 월별 부상 발생 빈도 반환
