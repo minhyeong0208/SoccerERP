@@ -100,13 +100,14 @@ public class PersonController {
 		String fileName = file.getOriginalFilename();
 
 		String uploadDir = "C:/Project/SoccerERP/src/main/resources/static/img/persons/";
-		//String uploadDir = "C:/spring/sprsou/SoccerERP/src/main/resources/static/img/persons/";
+		
 		Path filePath = Paths.get(uploadDir + fileName);
 		Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
 		// DB에 저장할 경로 설정
 		person.setPersonImage(fileName);
-
+		System.out.println("Received file: " + file.getOriginalFilename());
+		System.out.println("Received person data: " + person);
 		// 새로운 사람 추가
 		Person savedPerson = personService.addPerson(person);
 		return ResponseEntity.ok(savedPerson);

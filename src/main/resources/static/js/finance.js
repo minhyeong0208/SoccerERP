@@ -48,11 +48,11 @@ function loadFinanceData(page) {
 			        <tr data-id="${finance.financeIdx}">
 			            <td><input type="checkbox" class="delete-checkbox" data-id="${finance.financeIdx}"></td>
 			            <td>${finance.financeType}</td>
-			            <td><input type="date" class="editable" data-field="financeDate" value="${financeDate}"></td>
-			            <td><input type="text" class="editable" data-field="amount" value="${finance.amount}"></td>
-			            <td><input type="text" class="editable" data-field="trader" value="${finance.trader}"></td>
-			            <td><input type="text" class="editable" data-field="purpose" value="${finance.purpose}"></td>
-			            <td><input type="text" class="editable" data-field="financeMemo" value="${finance.financeMemo}"></td>
+			            <td><input type="date" class="editable form-control form-control-sm" data-field="financeDate" value="${financeDate}"></td>
+			            <td><input type="text" class="editable form-control form-control-sm" data-field="amount" value="${finance.amount}"></td>
+			            <td><input type="text" class="editable form-control form-control-sm" data-field="trader" value="${finance.trader}"></td>
+			            <td><input type="text" class="editable form-control form-control-sm" data-field="purpose" value="${finance.purpose}"></td>
+			            <td><input type="text" class="editable form-control form-control-sm" data-field="financeMemo" value="${finance.financeMemo}"></td>
 			        </tr>`;
 			});
 

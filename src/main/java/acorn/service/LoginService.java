@@ -13,6 +13,11 @@ public class LoginService {
 	private LoginRepository loginRepository;
 	
 	public Login addUser(Login login) {
-		return loginRepository.save(login);
+	    try {
+	        return loginRepository.save(login);
+	    } catch (Exception e) {
+	        e.printStackTrace();  // 예외 발생 시 스택 트레이스를 출력
+	        return null;
+	    }
 	}
 }

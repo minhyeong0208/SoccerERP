@@ -5,16 +5,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import acorn.entity.Login;
 import acorn.entity.Person;
+import acorn.repository.LoginRepository;
 import acorn.repository.PersonRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PersonService {
 
+	@Autowired
+	private LoginService loginService;
     private final PersonRepository personRepository;
 
     public PersonService(PersonRepository personRepository) {
@@ -72,14 +78,40 @@ public class PersonService {
     }
 
     // 새로운 사람 추가
-    public Person addPerson(Person person) {
+    /*public Person addPerson(Person person) {
         // 양방향 관계 설정
         if (person.getAbility() != null) {
             person.getAbility().setPerson(person);
         }
+        
         return personRepository.save(person);
-    }
+        
+    }*/
 
+    public Person addPerson(Person person) {
+        Person savedPerson = personRepository.save(person);  // person 테이블 저장
+        
+        // Debugging log
+        System.out.println("Person saved: " + savedPerson.getId());
+        
+        try {
+            Login login = Login.builder()
+                .loginId(savedPerson.getId())
+                .pw(null)
+                .role("USER")
+                .build();
+            
+            loginService.addUser(login);  // login 테이블 저장
+            System.out.println("Login data added: " + login.getLoginId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        // transfer나 다른 관련 데이터 삽입 시도 (외래 키 오류 발생 가능)
+        
+        return savedPerson;
+    }
+    
     // 사람 업데이트
     public Person updatePerson(int personIdx, Person personDetails) {
         Person person = getPersonById(personIdx); // 기존의 데이터를 가져옴
