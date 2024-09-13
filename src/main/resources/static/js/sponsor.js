@@ -20,13 +20,35 @@ function loadSponsorData(page) {
         return;
     }
 
-    let url = `/sponsors?page=${page}&size=${pageSize}`;
-    if (startDate && endDate) {
-        url = `/sponsors/search-by-contract-date?startDate=${startDate}&endDate=${endDate}&page=${page}&size=${pageSize}`;
-    } else if (keyword) {
-        url = `/sponsors/search?sponsorName=${keyword}&page=${page}&size=${pageSize}`;
+    // 시작일 또는 종료일이 하나만 입력된 경우, 경고를 표시하고 종료
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+        alert("기간 검색을 하려면 시작일과 종료일을 모두 입력하세요.");
+        return;
     }
 
+    // 기본 URL 설정
+    let url = `/sponsors/search-by-name-and-date?page=${page}&size=${pageSize}`;
+
+    // 조건에 따라 URL에 파라미터 추가 (필터 조건 결합)
+    const params = [];
+
+    // 스폰서 이름 추가
+    if (keyword) {
+        params.push(`sponsorName=${encodeURIComponent(keyword)}`);
+    }
+
+    // 시작일과 종료일이 모두 있을 때만 기간 검색 파라미터 추가
+    if (startDate && endDate) {
+        params.push(`startDate=${startDate}`);
+        params.push(`endDate=${endDate}`);
+    }
+
+    // 조건이 있는 경우 URL에 추가
+    if (params.length > 0) {
+        url += `&${params.join('&')}`;
+    }
+
+    // fetch로 데이터 요청
     fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -55,6 +77,7 @@ function loadSponsorData(page) {
                     </tr>`;
             });
 
+            // 페이지네이션 버튼 처리
             pageButtons.innerHTML = '';
             let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
             let endPage = Math.min(totalPages, startPage + maxVisiblePages);

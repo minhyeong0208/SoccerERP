@@ -85,7 +85,7 @@ public class PageController {
     @GetMapping("/user/coach")
     public String userCoach(){ return "layout/coach"; }
     
-    // 관리자, 사용자 : 팀 정보 수정
+    // 관리자, 사용자 : 팀 정보
     @GetMapping("/admin/team")
     public String adminTeam(){ return "layout/team"; }
     @GetMapping("/user/team")
@@ -96,4 +96,7 @@ public class PageController {
     public String adminTransfer(){ return "layout/transfer"; }
     @GetMapping("/user/transfer")
     public String userTransfer(){ return "layout/transfer"; }
+    
+    @GetMapping("/admin/test")
+    public String test(){ return "layout/default2"; }
 }

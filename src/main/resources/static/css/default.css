@@ -1,17 +1,33 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
+    /* 추가 */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure body takes full viewport height */
 }
 .header {
     background-color: #f1f1f1;
+    /* 추가 */
+    height: 40px; /* Adjust according to your header height */
 }
 .sidebar {
     background-color: #f1f1f1;
     padding: 10px;
     border-right: 1px solid #ddd;
     width: 200px;
-    height: calc(100vh - 40px); /* Adjust for header height */
+    height: calc(110vh - 40px); /* Adjust for header height */
     float: left;
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: 1.5rem 1rem;
+    user-select: none;
+    display: flex;
+    color: var(--white);
+    flex-direction: column;
+    background-color: var(--sidebar-background);
+    transition: max-width 0.2s ease-in-out;
 }
 
 /*================================================================*/
@@ -335,11 +351,16 @@ html {
 }
 /*================================================================*/
 .content {
+	flex: 1;
     margin-left: 200px;
     padding: 10px;
-    height: calc(100vh - 40px); /* Adjust for header height */
+    min-height: calc(100vh - 40px); /* Adjust for header height */
+    margin-top: 40px; /* 헤더의 높이만큼 content를 아래로 내림 */
     display: flex;
-    align-items: center; /* Center items vertically */
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: auto;
+    box-sizing: border-box; /* 패딩과 콘텐츠 영역이 겹치지 않도록 설정 */
 }
 .grid-container {
     display: grid;
@@ -352,7 +373,7 @@ html {
     background-color: #fafafa;
     padding: 20px;
     border: 1px solid #ccc;
-    height: 90%; /* 90% of the height of grid-container */
+    min-height: 95%; /* Make sure it fills most of the grid container */
 }
 
 .grid-item-2 {
