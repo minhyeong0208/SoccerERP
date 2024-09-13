@@ -64,7 +64,7 @@ public class SponsorService {
         return sponsorRepository.findByContractDateBetween(startDate, endDate, pageable);
     }
 
- // 새로운 스폰서 추가
+    // 새로운 스폰서 추가
     @Transactional  // 트랜잭션을 명확히 지정
     public Sponsor addSponsor(Sponsor sponsor) {
         Sponsor savedSponsor = sponsorRepository.save(sponsor);
