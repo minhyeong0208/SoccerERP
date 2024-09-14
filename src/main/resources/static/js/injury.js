@@ -72,23 +72,30 @@ $(document).ready(function() {
 
 	// 검색 버튼 클릭 시 검색어에 맞는 데이터 필터링 및 페이지네이션 조정
 	$('#searchButton').on('click', function() {
-		let searchField = $('#searchField').val();
-		let searchTerm = $('#searchInput').val().toLowerCase();
+	    let searchField = $('#searchField').val();
+	    let searchTerm = $('#searchInput').val().toLowerCase();
+	    
+	    // 검색어가 비어있을 경우 모달 표시
+	    if (!searchTerm) {
+	        // 검색어 입력 요청 모달 표시
+	        showErrorModal('검색어를 입력해주세요.');
+	        return; // 검색어가 없으면 함수 종료
+	    }
 
-		let filteredData = injuryData.filter(function(injury) {
-			let player = playerData.find(p => p.injuries.some(i => i.injuryIdx === injury.injuryIdx)) || {};
+	    let filteredData = injuryData.filter(function(injury) {
+	        let player = playerData.find(p => p.injuries.some(i => i.injuryIdx === injury.injuryIdx)) || {};
 
-			if (searchField === 'name') {
-				return player.personName && player.personName.toLowerCase().includes(searchTerm);
-			}
-			if (searchField === 'position') {
-				return player.position && player.position.toLowerCase().includes(searchTerm);
-			}
-			return false;
-		});
+	        if (searchField === 'name') {
+	            return player.personName && player.personName.toLowerCase().includes(searchTerm);
+	        }
+	        if (searchField === 'position') {
+	            return player.position && player.position.toLowerCase().includes(searchTerm);
+	        }
+	        return false;
+	    });
 
-		// 필터링된 데이터를 페이징 처리하여 테이블과 페이지네이션을 다시 렌더링
-		renderTableWithPagination(filteredData);
+	    // 필터링된 데이터를 페이징 처리하여 테이블과 페이지네이션을 다시 렌더링
+	    renderTableWithPagination(filteredData);
 	});
 
 
@@ -270,6 +277,7 @@ $(document).ready(function() {
 	
 	// 오류 발생 시 모달을 띄우는 함수
 	function showErrorModal(message) {
+	    console.log('Error message:', message); // 메시지가 제대로 전달되는지 확인
 	    $('#errorModalBody').text(message); // 모달에 오류 메시지 설정
 	    $('#errorModal').modal('show'); // 모달을 띄우기
 	}

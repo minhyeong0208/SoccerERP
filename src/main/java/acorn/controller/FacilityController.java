@@ -44,10 +44,21 @@ public class FacilityController {
     // (value = "facilityName") 추가 - 09-09
     // 시설명으로 검색
     @GetMapping("/search")
-    public List<Facility> searchFacilitiesByName(@RequestParam(value = "facilityName") String facilityName) {
-        return facilityService.searchFacilitiesByName(facilityName);
+    public Page<Facility> searchFacilitiesByName(@RequestParam(value = "facilityName") String facilityName, Pageable pageable) {
+        return facilityService.searchFacilitiesByName(facilityName, pageable);
     }
 
+    // 특정 시설 조회 추가 - 09-14
+    @GetMapping("/{id}")
+    public ResponseEntity<Facility> getFacilityById(@PathVariable(value = "id") int facilityIdx) {
+        Facility facility = facilityService.getFacilityById(facilityIdx);
+        if (facility != null) {
+            return ResponseEntity.ok(facility);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
     // 새로운 시설 추가
     @PostMapping
     public Facility createFacility(@RequestBody Facility facility) {
