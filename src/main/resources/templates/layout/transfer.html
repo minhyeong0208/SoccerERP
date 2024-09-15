@@ -171,82 +171,111 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group mb-3">
-                        <label class="form-label">이적 타입</label>
-                        <div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="transferType" id="transferTypeBuy" value="1" checked>
-                                <label class="form-check-label" for="transferTypeBuy">구매</label>
+                    <div class="form" id="addForm1">
+                        <div class="form-group mb-3">
+                            <label class="form-label">이적 타입</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="transferType" id="transferTypeBuy" value="buy" checked>
+                                    <label class="form-check-label" for="transferTypeBuy">구매</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="transferType" id="transferTypeSell" value="sell" >
+                                    <label class="form-check-label" for="transferTypeSell">판매</label>
+                                </div>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="transferType" id="transferTypeSell" value="0">
-                                <label class="form-check-label" for="transferTypeSell">판매</label>
-                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="addPlayerName" class="form-label">선수명</label>
+                            <input type="text" class="form-control" id="addPlayerName" autocomplete="off">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addTransferDate" class="form-label">이적 일자</label>
+                            <input type="date" class="form-control" id="addTransferDate">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPrice" class="form-label">이적료</label>
+                            <input type="text" class="form-control" id="addPrice" autocomplete="off">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addOpponent" class="form-label">상대팀</label>
+                            <select class="form-control" id="addOpponent">
+                                <option value="">상대팀 선택</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addMemo" class="form-label">관련 메모</label>
+                            <textarea class="form-control" id="addMemo" autocomplete="off"></textarea>
                         </div>
                     </div>
 
-
-                <!-- 구매 폼 -->
-                <div id="buyForm">
-                    <div class="form-group mb-3">
-                        <label for="addBuyPlayerName" class="form-label">선수명</label>
-                        <input type="text" class="form-control" id="addBuyPlayerName">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addBuyTransferDate" class="form-label">이적 일자</label>
-                        <input type="date" class="form-control" id="addBuyTransferDate">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addBuyPrice" class="form-label">이적료</label>
-                        <input type="text" class="form-control" id="addBuyPrice">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addBuyOpponent" class="form-label">상대팀</label>
-                        <select class="form-control" id="addBuyOpponent">
-                            <option value="">상대팀 선택</option>
-                        </select>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addBuyMemo" class="form-label">관련 메모</label>
-                        <textarea class="form-control" id="addBuyMemo"></textarea>
+                    <div class="form" id="addForm2">
+                        <div class="form-group mb-3">
+                            <label for="addPlayerBirthdate" class="form-label">생년월일</label>
+                            <input type="date" class="form-control" id="addPlayerBirthdate">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPlayerNationality" class="form-label">국적</label>
+                            <input type="text" class="form-control" id="addPlayerNationality">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPlayerBackNumber" class="form-label">등번호</label>
+                            <input type="text" class="form-control" id="addPlayerBackNumber">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">포지션</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="playerPosition" id="positionGK" value="GK">
+                                    <label class="form-check-label" for="positionGK">GK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="playerPosition" id="positionFW" value="FW">
+                                    <label class="form-check-label" for="positionFW">FW</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="playerPosition" id="positionMF" value="MF">
+                                    <label class="form-check-label" for="positionMF">MF</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="playerPosition" id="positionDF" value="DF">
+                                    <label class="form-check-label" for="positionDF">DF</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPlayerContractStart" class="form-label">계약 시작일</label>
+                            <input type="date" class="form-control" id="addPlayerContractStart">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPlayerContractEnd" class="form-label">계약 만료일</label>
+                            <input type="date" class="form-control" id="addPlayerContractEnd">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPlayerHeight" class="form-label">키 (cm)</label>
+                            <input type="number" step="0.1" class="form-control" id="addPlayerHeight">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPlayerWeight" class="form-label">몸무게 (kg)</label>
+                            <input type="number" step="0.1" class="form-control" id="addPlayerWeight">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPlayerImage" class="form-label">프로필 사진</label>
+                            <input type="file" class="form-control" id="addPlayerImage" accept="image/*">
+                        </div>
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button class="btn btn-primary" id="addTransferButton">다음</button>
+                    <button class="btn btn-primary" id="nextInfoButton">다음</button>
+                    <button class="btn btn-primary" id="backInfoButton">이전</button>
+                    <button class="btn btn-primary" id="saveButton">저장</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                </div>
-            </div>
-
-             <!-- 판매 폼 -->
-            <div id="sellForm" style="display:none;">
-                <div class="form-group mb-3">
-                    <label for="addSellPlayer" class="form-label">선수명</label>
-                    <select class="form-control" id="addSellPlayer">
-                        <option value="">선수명 선택</option>
-                    </select>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="addSellTransferDate" class="form-label">이적 일자</label>
-                    <input type="date" class="form-control" id="addSellTransferDate">
-                </div>
-                <div class="form-group mb-3">
-                    <label for="addSellPrice" class="form-label">이적료</label>
-                    <input type="text" class="form-control" id="addSellPrice">
-                </div>
-                <div class="form-group mb-3">
-                    <label for="addSellOpponent" class="form-label">상대팀</label>
-                    <select class="form-control" id="addSellOpponent">
-                        <option value="">상대팀 선택</option>
-                    </select>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="addSellMemo" class="form-label">관련 메모</label>
-                    <textarea class="form-control" id="addSellMemo"></textarea>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- 이적 추가 성공 모달 -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
@@ -259,77 +288,6 @@
                 <div class="modal-body">이적 정보가 성공적으로 추가되었습니다.</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TODO: 2024. 09. 12 추가 이적 정보 모달 -->
-    <div id="buyAdditionalInfoModal" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">추가 선수 정보</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group mb-3">
-                        <label for="addPlayerBirthdate" class="form-label">생년월일</label>
-                        <input type="date" class="form-control" id="addPlayerBirthdate">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addPlayerNationality" class="form-label">국적</label>
-                        <input type="text" class="form-control" id="addPlayerNationality">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addPlayerBackNumber" class="form-label">등번호</label>
-                        <input type="text" class="form-control" id="addPlayerBackNumber">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label class="form-label">포지션</label>
-                        <div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="playerPosition" id="positionGK" value="GK">
-                                <label class="form-check-label" for="positionGK">GK</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="playerPosition" id="positionFW" value="FW">
-                                <label class="form-check-label" for="positionFW">FW</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="playerPosition" id="positionMF" value="MF">
-                                <label class="form-check-label" for="positionMF">MF</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="playerPosition" id="positionDF" value="DF">
-                                <label class="form-check-label" for="positionDF">DF</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addPlayerContractStart" class="form-label">계약 시작일</label>
-                        <input type="date" class="form-control" id="addPlayerContractStart">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addPlayerContractEnd" class="form-label">계약 만료일</label>
-                        <input type="date" class="form-control" id="addPlayerContractEnd">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addPlayerHeight" class="form-label">키 (cm)</label>
-                        <input type="number" step="0.1" class="form-control" id="addPlayerHeight">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addPlayerWeight" class="form-label">몸무게 (kg)</label>
-                        <input type="number" step="0.1" class="form-control" id="addPlayerWeight">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="addPlayerImage" class="form-label">프로필 사진</label>
-                        <input type="file" class="form-control" id="addPlayerImage" accept="image/*">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" id="saveAdditionalInfoButton">저장</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                 </div>
             </div>
         </div>

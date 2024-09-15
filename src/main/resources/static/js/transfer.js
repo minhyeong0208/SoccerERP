@@ -19,7 +19,7 @@ $(document).ready(function() {
     }
 
     // 이적료 입력 필드에 콤마 추가 이벤트 리스너
-    $('#editPrice, #addBuyPrice, #addSellPrice').on('input', function() {
+    $('#editPrice, #addPrice, #addSellPrice').on('input', function() {
         let value = removeCommas($(this).val());
         if (value !== '') {
             value = parseInt(value, 10);
@@ -197,48 +197,82 @@ $(document).ready(function() {
 
     // 이적 추가 모달 오픈 이벤트
     $('#openAddTransferModalButton').on('click', function() {
-        loadPlayerOptions();
         loadTeamOptions();
-        resetAddTransferForm();
+        // loadPlayerOptions();
+        // resetAddTransferForm();
+        switchFormMode('buy');
+        var addForm2 = $('#addForm2');
+        addForm2.hide();
     });
+
+    function switchFormMode(selectedValue) {
+        var nextInfoButton = $('#nextInfoButton');
+        var backInfoButton = $('#backInfoButton');
+        var saveButton = $('#saveButton');
+
+        switch(selectedValue) {
+            case 'buy':
+                console.log('구매가 선택되었습니다.');
+                nextInfoButton.show();
+                saveButton.hide();
+                break;
+            case 'sell':
+                console.log('판매가 선택되었습니다.');
+                nextInfoButton.hide();
+                saveButton.show();
+                break;
+            default:
+                console.log('알 수 없는 값입니다.');
+        }
+        backInfoButton.hide();
+    }
 
     // 이적 타입 변경 이벤트
     $('input[name="transferType"]').on('change', function() {
-        if (this.value === "1") {
-            $('#buyForm').show();
-            $('#sellForm').hide();
-        } else {
-            $('#buyForm').hide();
-            $('#sellForm').show();
-        }
+        var selectedValue = $(this).val();
+        console.log('Selected transfer type:', selectedValue);
+
+        switchFormMode(selectedValue);
     });
 
-    // 이적 추가 이벤트
-    $('#addTransferButton').on('click', function() {
-        let transferType = $('input[name="transferType"]:checked').val();
-        let transferData = {};
+    /**
+     * 다음 버튼 이벤트
+     * - 선수 기본 정보 폼 비활성화
+     * - 선수 추가 정보 폼 활성화
+     */
+    $('#nextInfoButton').on('click', function() {
+        console.log('선수 추가 정보 버튼 클릭 (다음 버튼)');
+        var nextInfoButton = $('#nextInfoButton');
+        var backInfoButton = $('#backInfoButton');
 
-        if (transferType === "1") { // 구매
-            transferData = {
-                transferType: transferType,
-                playerName: $('#addBuyPlayerName').val(),
-                transferDate: $('#addBuyTransferDate').val(),
-                price: removeCommas($('#addBuyPrice').val()),
-                opponent: $('#addBuyOpponent').val(),
-                memo: $('#addBuyMemo').val()
-            };
-            $('#buyAdditionalInfoModal').modal('show');
-        } else { // 판매
-            transferData = {
-                transferType: transferType,
-                personIdx: $('#addSellPlayer').val(),
-                transferDate: $('#addSellTransferDate').val(),
-                price: removeCommas($('#addSellPrice').val()),
-                opponent: $('#addSellOpponent').val(),
-                memo: $('#addSellMemo').val()
-            };
-            saveTransfer(transferData);
-        }
+        nextInfoButton.hide();
+        backInfoButton.show();
+
+        var addForm1 = $('#addForm1');
+        var addForm2 = $('#addForm2');
+
+        addForm1.hide();
+        addForm2.show();
+    });
+
+    /**
+     * 이전 버튼 이벤트
+     * - 선수 기본 정보 폼 활성화
+     * - 선수 추가 정보 폼 비활성화
+     */
+    $('#backInfoButton').on('click', function() {
+        console.log('선수 추가 정보 버튼 클릭 (이전 버튼)');
+        var nextInfoButton = $('#nextInfoButton');
+        var backInfoButton = $('#backInfoButton');
+
+        nextInfoButton.show();
+        backInfoButton.hide();
+
+        var addForm1 = $('#addForm1');
+        var addForm2 = $('#addForm2');
+
+        addForm1.show();
+        addForm2.hide();
     });
 
     // 이적 정보 업데이트 이벤트
@@ -295,7 +329,7 @@ $(document).ready(function() {
             url: '/teams',
             method: 'GET',
             success: function(teams) {
-                let buyTeamSelect = $('#addBuyOpponent');
+                let buyTeamSelect = $('#addOpponent');
                 let sellTeamSelect = $('#addSellOpponent');
                 buyTeamSelect.empty().append('<option value="">상대팀 선택</option>');
                 sellTeamSelect.empty().append('<option value="">상대팀 선택</option>');
@@ -314,16 +348,15 @@ $(document).ready(function() {
 
     // 이적 추가 폼 초기화
     function resetAddTransferForm() {
-        $('#addBuyPlayerName, #addSellPlayer').val('');
-        $('#addBuyTransferDate, #addSellTransferDate').val('');
-        $('input[name="transferType"]').prop('checked', false);
-        $('#addBuyOpponent, #addSellOpponent').val('');
-        $('#addBuyPrice, #addSellPrice').val('');
-        $('#addBuyMemo, #addSellMemo').val('');
+        $('#addPlayerName').val('');
+        $('#addTransferDate').val('');
+        $('#addOpponent').val('');
+        $('#addPrice').val('');
+        $('#addMemo').val('');
     }
 
     // 추가 정보 저장 버튼 클릭 이벤트
-    $('#saveAdditionalInfoButton').on('click', function() {
+    $('#saveButton').on('click', function() {
         let additionalData = {
             birthdate: $('#addPlayerBirthdate').val(),
             nationality: $('#addPlayerNationality').val(),
@@ -338,11 +371,11 @@ $(document).ready(function() {
         let formData = new FormData();
         formData.append('transferData', JSON.stringify({
             transferType: "1",
-            playerName: $('#addBuyPlayerName').val(),
-            transferDate: $('#addBuyTransferDate').val(),
-            price: removeCommas($('#addBuyPrice').val()),
-            opponent: $('#addBuyOpponent').val(),
-            memo: $('#addBuyMemo').val()
+            playerName: $('#addPlayerName').val(),
+            transferDate: $('#addTransferDate').val(),
+            price: removeCommas($('#addPrice').val()),
+            opponent: $('#addOpponent').val(),
+            memo: $('#addMemo').val()
         }));
         formData.append('additionalData', JSON.stringify(additionalData));
 
