@@ -94,81 +94,65 @@
 			</li>
 		</ul>
 	</nav>
-
+	<!-- modal.html의 모달을 포함 -->
+    <th:block th:replace="fragments/modal :: modalFragment"></th:block>
 	<!-- 모달 구조 -->
 	<div id="financeModal" class="modal fade" tabindex="-1">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 id="modalTitle" class="modal-title">수입 항목 추가</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close"></button>
-				</div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modalTitle" class="modal-title">수입 항목 추가</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="financeForm"> <!-- form 태그 추가 -->
+                <div class="modal-body">
+                    <!-- 공통 입력 필드 -->
+                    <div id="commonFields" class="mb-3">
+                        <label for="financeDate" id="dateLabel" class="form-label">수입 날짜:</label>
+                        <input type="date" id="financeDate" class="form-control" required>
 
-				<div class="modal-body">
-					<!-- 공통 입력 필드 -->
-					<div id="commonFields" class="mb-3">
-						<label for="financeDate" id="dateLabel" class="form-label">수입
-							날짜:</label> <input type="date" id="financeDate" class="form-control">
+                        <label for="amount" class="form-label">금액:</label>
+                        <input type="text" id="amount" class="form-control" required pattern="\d*">
 
-						<label for="amount" class="form-label">금액:</label> <input
-							type="text" id="amount" class="form-control" pattern="\d*">
+                        <label for="trader" class="form-label">거래 대상:</label>
+                        <input type="text" id="trader" class="form-control" required>
 
-						<label for="trader" class="form-label">거래 대상:</label> <input
-							type="text" id="trader" class="form-control"> <label
-							for="purpose" class="form-label">적요:</label> <input type="text"
-							id="purpose" class="form-control"> <label
-							for="financeMemo" class="form-label">메모:</label>
-						<textarea id="financeMemo" class="form-control"></textarea>
-					</div>
+                        <label for="purpose" class="form-label">적요:</label>
+                        <input type="text" id="purpose" class="form-control" required>
 
-					<!-- 수입/지출 구분 라디오 버튼 -->
-					<div class="mb-3">
-						<div class="form-check form-check-inline">
-							<input type="radio" name="modalFinanceType" id="modalIncomeRadio"
-								value="수입" class="form-check-input" checked> <label
-								for="modalIncomeRadio" class="form-check-label">수입</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input type="radio" name="modalFinanceType"
-								id="modalExpenseRadio" value="지출" class="form-check-input">
-							<label for="modalExpenseRadio" class="form-check-label">지출</label>
-						</div>
-					</div>
+                        <label for="financeMemo" class="form-label">메모:</label>
+                        <textarea id="financeMemo" class="form-control" required></textarea>
+                    </div>
 
-				</div>
+                    <!-- 수입/지출 구분 라디오 버튼 -->
+                    <div class="mb-3">
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="modalFinanceType" id="modalIncomeRadio" value="수입" class="form-check-input" checked>
+                            <label for="modalIncomeRadio" class="form-check-label">수입</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="modalFinanceType" id="modalExpenseRadio" value="지출" class="form-check-input">
+                            <label for="modalExpenseRadio" class="form-check-label">지출</label>
+                        </div>
+                    </div>
+                </div>
 
-				<div class="modal-footer">
-					<button id="submitFinance" class="btn btn-primary">추가</button>
-					<button type="button" class="btn btn-secondary"
-						data-bs-dismiss="modal">취소</button>
-				</div>
-			</div>
-		</div>
-	</div>
+                <div class="modal-footer">
+                    <button type="submit" id="submitFinance" class="btn btn-primary">추가</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-	<!-- 경고 모달 -->
-	<div class="modal fade" id="alertModal" tabindex="-1"
-		aria-labelledby="alertModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="alertModalLabel">알림</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close"></button>
-				</div>
-				<div class="modal-body">금액은 숫자만 입력 가능합니다.</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary"
-						data-bs-dismiss="modal">확인</button>
-				</div>
-			</div>
-		</div>
-	</div>
+
+
 </th:block>
 
 <th:block layout:fragment="customJs">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="/js/modal.js"></script>
 	<script src="/js/finance.js"></script>
 </th:block>
 </html>
