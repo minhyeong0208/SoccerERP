@@ -31,6 +31,13 @@ public class InjuryController {
         this.injuryService = injuryService;
         this.personService = personService;
     }
+
+    // 부상 부위별 저번달과 이번달 부상자 수 비교
+    @GetMapping("/compare")
+    public ResponseEntity<Map<String, Map<String, Integer>>> compareInjuriesByMonth() {
+        Map<String, Map<String, Integer>> injuryComparison = injuryService.compareInjuriesByMonth();
+        return ResponseEntity.ok(injuryComparison);
+    }
     
     // 월별 부상 발생 빈도 조회
     @GetMapping("/monthly-injury-counts")
@@ -43,7 +50,6 @@ public class InjuryController {
     public List<Injury> getAllInjuriesWithPerson() {
         return injuryService.findAllInjuriesWithPerson();
     }
-
 
     // 모든 부상 조회 (페이징 처리)
     @GetMapping
@@ -79,11 +85,22 @@ public class InjuryController {
     }
 
     // 부상 삭제
+    /*
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInjury(@PathVariable(value = "id") int injuryIdx) {
         injuryService.deleteInjury(injuryIdx);
         return ResponseEntity.ok().build();
     }
+     */
+    
+ // 부상 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInjury(@PathVariable(value = "id") int injuryIdx) {
+        System.out.println("Deleting injury with ID: " + injuryIdx);
+        injuryService.deleteInjury(injuryIdx);
+        return ResponseEntity.ok().build();
+    }
+
 
     // 모든 선수 조회 (부상 추가 시 선택할 수 있도록)
     @GetMapping("/players")

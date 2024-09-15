@@ -40,4 +40,7 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     // 포지션별 선수 수 집계
     @Query("SELECT p.position, COUNT(p) FROM Person p WHERE p.typeCode = 'player' GROUP BY p.position")
     List<Object[]> countPlayersByPosition();
+    
+ 	// id 칼럼을 기준으로 검색하는 메서드
+    Person findById(String id);  // 이 경우 id는 Person 테이블의 id 칼럼입니다.
 }

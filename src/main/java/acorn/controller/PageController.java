@@ -97,6 +97,7 @@ public class PageController {
     @GetMapping("/user/transfer")
     public String userTransfer(){ return "layout/transfer"; }
     
-    @GetMapping("/admin/test")
-    public String test(){ return "layout/default2"; }
+    @GetMapping("/user/personal")
+    public String userPersonal() { return "layout/personal"; }
+    
 }

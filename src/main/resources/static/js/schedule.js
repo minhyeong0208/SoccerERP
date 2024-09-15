@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     match.title = game.gameName;
                     match.start = game.gameDate;
                     match.type = game.gameType;
-                    match.isHome = game.isHome === 1 ? 'HOME' : 'AWAY'; // home:1, away:0
+                    match.isHome = game.isHome === 1 ? '홈 경기' : '원정 경기'; // home:1, away:0
                     match.stadium = game.stadium;
                     match.className = 'match';
                     matches.push(match);
@@ -58,11 +58,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function initializeCalendar() {
         const calendar = new FullCalendar.Calendar(calendarEl, {
             aspectRatio: 2,
-            //locale: 'ko',
+           	locale: 'ko',
             initialView: 'dayGridMonth',
             events: schedules,
             eventClick: function (info) {
                 handleEventClick(info);
+            },
+            customButtons: {
+                today: {
+                  text: '오늘',
+                },
             },
             headerToolbar: {
                 right: 'prev,next today',
@@ -78,10 +83,10 @@ document.addEventListener('DOMContentLoaded', function () {
         modalStart.textContent = info.event.start.toISOString().split('T', 1);
         if (info.event.classNames.includes('match')) {
             modalDescription.textContent = `${info.event.extendedProps.isHome}, ${info.event.extendedProps.stadium}`;
-            modalClass.textContent = 'game schedule';
+            modalClass.textContent = '경기';
         } else if (info.event.classNames.includes('training')) {
             modalDescription.textContent = `${info.event.extendedProps.memo}`;
-            modalClass.textContent = 'training schedule';
+            modalClass.textContent = '훈련';
         }
 
         showModal(modalBackground);
@@ -90,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
     modalClose.addEventListener('click', function () {
         hideModal(modalBackground);
     });
-
+	
     fetchData();
-
+	
 });

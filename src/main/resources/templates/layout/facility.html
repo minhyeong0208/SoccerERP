@@ -26,6 +26,11 @@
 					data-bs-toggle="modal" data-bs-target="#addFacilityModal">
 					<i class="fas fa-plus"></i> 시설 추가
 				</button>
+				<!-- 수정 버튼에서 data-bs-toggle과 data-bs-target 제거 -->
+				<button id="openUpdateFacilityModalButton"
+					class="btn btn-warning me-2">
+					<i class="fas fa-edit"></i> 시설 수정
+				</button>
 				<button id="openDeleteButton" class="btn btn-danger">
 					<i class="fas fa-trash"></i> 선택 삭제
 				</button>
@@ -149,6 +154,61 @@
 			</div>
 		</div>
 
+		<!-- 시설 수정 모달 -->
+		<div id="updateFacilityModal" class="modal fade" tabindex="-1"
+			aria-labelledby="editFacilityModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="editFacilityModalLabel">시설 수정</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form id="facilityEditForm">
+							<!-- 시설명 입력 -->
+							<div class="form-group mb-3">
+								<label for="editFacilityName" class="form-label">시설명</label> <input
+									type="text" class="form-control" id="editFacilityName"
+									placeholder="시설명 입력">
+							</div>
+							<!-- 시설 위치 -->
+							<div class="form-group mb-3">
+								<label for="editFacilityLocation" class="form-label">시설
+									위치</label>
+								<div class="input-group">
+									<input type="text" class="form-control"
+										id="editFacilityLocation" placeholder="시설 위치 입력" readonly>
+									<button class="btn btn-secondary" id="searchEditLocationButton"
+										type="button">검색</button>
+								</div>
+							</div>
+							<!-- 검색 결과를 표시할 공간 -->
+							<div id="editLocationResults" class="mt-3"></div>
+							<!-- 수용 인원 -->
+							<div class="form-group mb-3">
+								<label for="editFacilityCapacity" class="form-label">수용
+									인원</label> <input type="number" class="form-control"
+									id="editFacilityCapacity" placeholder="수용 인원 입력">
+							</div>
+							<!-- 준공일시 -->
+							<div class="form-group mb-3">
+								<label for="editFacilityFoundDate" class="form-label">준공
+									일시</label> <input type="date" class="form-control"
+									id="editFacilityFoundDate">
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">취소</button>
+						<button type="button" class="btn btn-primary"
+							id="editFacilityButton">수정</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- 삭제 확인 모달 -->
 		<div class="modal fade" id="deleteConfirmModal" tabindex="-1"
 			aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
@@ -169,6 +229,82 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- 오류 알림 모달 -->
+		<div class="modal fade" id="errorModal" tabindex="-1"
+			aria-labelledby="errorModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="errorModalLabel">오류 발생</h5>
+					</div>
+					<div class="modal-body">
+						<p id="errorMessage">시설 정보를 불러오는 중 오류가 발생했습니다.</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 위치 선택 필요 모달 -->
+		<div class="modal fade" id="locationRequiredModal" tabindex="-1"
+			aria-labelledby="locationRequiredModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="locationRequiredModalLabel">알림</h5>
+					</div>
+					<div class="modal-body">시설 위치를 검색하고 선택해야 합니다.</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary"
+							data-bs-dismiss="modal">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 성공 알림 모달 -->
+		<div class="modal fade" id="successModal" tabindex="-1"
+			aria-labelledby="successModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="successModalLabel">성공</h5>
+					</div>
+					<div class="modal-body">
+						<p id="successMessage">작업이 성공적으로 완료되었습니다.</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary"
+							data-bs-dismiss="modal">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 오류 알림 모달 -->
+		<div class="modal fade" id="errorModal" tabindex="-1"
+			aria-labelledby="errorModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="errorModalLabel">오류 발생</h5>
+					</div>
+					<div class="modal-body">
+						<p id="errorMessage">오류 메시지가 여기에 표시됩니다.</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
 	</th:block>
 
 	<!-- Kakao Maps API를 여기에 직접 추가 -->

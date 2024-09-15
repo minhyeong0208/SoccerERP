@@ -28,7 +28,7 @@ public class RankController {
             for (Element team : footballTeams) {
                 Element rank = team.selectFirst("th");
                 Element title = team.selectFirst("span:nth-child(2)");  // 팀명
-                Element matchCount = team.selectFirst("td:nth-child(3)");   // 경기 수
+                Element matchCount = team.selectFirst("td:nth-child(3)");   // 경기 수 
                 Element victoryPoint = team.selectFirst("td:nth-child(4)"); // 승점
                 Element victory = team.selectFirst("td:nth-child(5)");  // 승수
                 Element draw = team.selectFirst("td:nth-child(6)");     // 무승무수

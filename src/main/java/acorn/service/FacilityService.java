@@ -31,10 +31,9 @@ public class FacilityService {
     }
     
     // 시설명으로 검색
-    public List<Facility> searchFacilitiesByName(String facilityName) {
-        return facilityRepository.findByFacilityNameContaining(facilityName);
+    public Page<Facility> searchFacilitiesByName(String facilityName, Pageable pageable) {
+        return facilityRepository.findByFacilityNameContaining(facilityName, pageable);
     }
-
     // 새로운 시설 추가
     public Facility addFacility(Facility facility) {
         return facilityRepository.save(facility);
