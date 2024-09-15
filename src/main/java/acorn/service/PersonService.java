@@ -184,4 +184,8 @@ public class PersonService {
     public void deletePersons(List<Integer> personIds) {
         personRepository.deleteAllByIdInBatch(personIds);
     }
+    
+    public Person getPersonByLoginId(String loginId) {
+        return personRepository.findById(loginId);
+    }
 }

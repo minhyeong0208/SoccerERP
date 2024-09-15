@@ -10,11 +10,21 @@
 
 <th:block layout:fragment="customContents">
 	<h3>마이 페이지</h3>
-	집가서 할게요
+	<div class="coach-info">
+        <p><strong>코치명:</strong> <span id="coach-name"></span></p>
+        <p><strong>생년월일:</strong> <span id="coach-birth"></span></p>
+        <p><strong>전화번호:</strong> <span id="coach-phone"></span></p>
+        <p><strong>이메일:</strong> <span id="coach-email"></span></p>
+        <p><strong>계약 시작일:</strong> <span id="contract-start"></span></p>
+        <p><strong>계약 종료일:</strong> <span id="contract-end"></span></p>
+    </div>
 </th:block>
 
 <th:block layout:fragment="customJs">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-	
+<script th:inline="javascript">
+    var loggedInCoachId = /*[[${session.loggedInId}]]*/ 'default_id';
+</script>
+<script src="/js/personal.js"></script>
 </th:block>
 </html>

@@ -83,6 +83,17 @@ public class PersonController {
 		}
 		return ResponseEntity.ok().body(person);
 	}
+	
+	// 특정 사람 조회 (id 칼럼 기준)
+	@GetMapping("/coaches/{login-id}")
+	public ResponseEntity<Person> getPersonByLoginId(@PathVariable(value = "login-id") String loginId) {
+	    Person person = personService.getPersonByLoginId(loginId);
+	    if (person == null) {
+	        return ResponseEntity.notFound().build();
+	    }
+	    return ResponseEntity.ok().body(person);
+	}
+	
 
 	// 새로운 사람 추가
 	@PostMapping
