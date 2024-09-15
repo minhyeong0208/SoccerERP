@@ -232,14 +232,14 @@
                   </div>
                   <div class="col">
                     <label for="gameDate" class="form-label">경기 일자</label>
-                    <input type="date" class="form-control" id="gameDate" required autocomplete="false">
+                    <input type="date" class="form-control" id="gameDate" required autocomplete="off">
                   </div>
                 </div>
 
-                <!-- 새로 추가된 game_name 입력 필드 -->
+                <!-- game_name 필드 -->
                 <div class="mb-3">
                   <label for="game_name" class="form-label">경기명</label>
-                  <input type="text" class="form-control" id="game_name" required>
+                  <input type="text" class="form-control" id="game_name" required autocomplete="off">
                 </div>
 
                 <div class="mb-3">
@@ -261,7 +261,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="stadium" class="form-label">경기장소</label>
-                  <input type="text" class="form-control" id="stadium" required autocomplete="false">
+                  <input type="text" class="form-control" id="stadium" required autocomplete="off">
                 </div>
                 <div class="row mb-3">
                   <div class="col">
@@ -310,7 +310,7 @@
                 </div>
                 <div class="col">
                   <label for="editGameDate" class="form-label">경기 일자</label>
-                  <input type="date" class="form-control" id="editGameDate" required autocomplete="false">
+                  <input type="date" class="form-control" id="editGameDate" required autocomplete="off">
                 </div>
               </div>
 
@@ -339,7 +339,7 @@
               </div>
               <div class="mb-3">
                 <label for="editStadium" class="form-label">경기장소</label>
-                <input type="text" class="form-control" id="editStadium" required autocomplete="false">
+                <input type="text" class="form-control" id="editStadium" required autocomplete="off">
               </div>
               <div class="row mb-3">
                 <div class="col">
@@ -362,23 +362,40 @@
     </div>
 
   <!-- 경기 삭제 모달 -->
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteConfirmModalLabel">삭제 확인</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            정말 선택한 경기를 삭제하시겠습니까?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-            <button type="button" class="btn btn-danger" id="confirmDelete">삭제</button>
-          </div>
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConfirmModalLabel">삭제 확인</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          정말 선택한 경기를 삭제하시겠습니까?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">삭제</button>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="modal fade" id="customModal" tabindex="-1" aria-labelledby="customModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="customModalLabel">알림</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Modal message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </th:block>
 
 <th:block layout:fragment="customJs">

@@ -14,6 +14,7 @@ import acorn.service.GameService;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public class GameController {
 
         return "layout/games";
     }
-    
+
     // 특정 경기 결과 조회
     @GetMapping("/{id}/result")
     public ResponseEntity<String> getGameResult(@PathVariable(value = "id") int gameIdx) {

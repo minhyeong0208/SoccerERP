@@ -7,6 +7,45 @@ let gameData = null;
 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
+/**
+ * 2개의 인자를 사용하는 경우
+ * showModal('알림', '간단한 메시지입니다.');
+ *
+ * 3개의 인자를 사용하는 경우
+ * showModal('성공', '선택한 경기가 삭제되었습니다.', (event) => {
+ *     console.log('Modal hidden event:', event);
+ *     location.reload();
+ * });
+ * @param title
+ * @param message
+ * @param callback
+ */
+function showModal(title, message, callback) {
+    const modalElement = document.getElementById('customModal');
+    const modalTitle = modalElement.querySelector('.modal-title');
+    const modalBody = modalElement.querySelector('.modal-body');
+
+    modalTitle.textContent = title;
+    modalBody.textContent = message;
+    modalBody.style.whiteSpace = 'pre-line';
+    modalBody.style.wordWrap = 'break-word';
+
+    const modal = new bootstrap.Modal(modalElement);
+
+    // 이전 이벤트 리스너 제거
+    modalElement.removeEventListener('hidden.bs.modal', modalElement.hiddenHandler);
+
+    if (typeof callback === 'function') {
+        // 모달이 완전히 닫힌 후 콜백 실행
+        modalElement.hiddenHandler = (event) => {
+            callback(event);
+        };
+        modalElement.addEventListener('hidden.bs.modal', modalElement.hiddenHandler, { once: true });
+    }
+
+    modal.show();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // 초기 데이터 설정 및 게임 목록 로드
     initializeGameData();
@@ -14,8 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 전체 선택 체크박스 이벤트 리스너
     document.getElementById('selectAll').addEventListener('change', function() {
-            const checkboxes = document.getElementsByName('selectedMatches');
-            for(let checkbox of checkboxes) {
+        const checkboxes = document.getElementsByName('selectedMatches');
+        for(let checkbox of checkboxes) {
             checkbox.checked = this.checked;
         }
     });
@@ -235,7 +274,9 @@ function createPageLink(pageNumber, text, disabled = false, active = false) {
     return li;
 }
 
-// 경기 추가 function
+/**
+ * 경기 추가
+ */
 function addGame() {
     const gameType = document.querySelector('input[name="gameType"]:checked').value;
     const gameName = document.getElementById('game_name').value;
@@ -265,20 +306,28 @@ function addGame() {
         body: JSON.stringify(newGame)
     })
         .then(response => {
+            console.log('# response status', response.status);
+            console.log('# response status code', response.statusText);
             if (!response.ok) {
                 return response.json().then(err => { throw err; });
             }
             return response.json();
         })
         .then(data => {
-            loadGames(currentPage); // 경기 목록 갱신
+            loadGames(currentPage);
             const modal = bootstrap.Modal.getInstance(document.getElementById('addGameModal'));
-            modal.hide(); // 모달 닫기
-            alert('경기가 성공적으로 추가되었습니다.');
+            modal.hide();
+            showModal('성공', '경기가 성공적으로 추가되었습니다.', (event) => {
+                location.reload();
+            });
         })
         .catch((error) => {
-            console.error('Error:', error);
-            alert('경기 추가 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'));
+            let errMsg = '경기 추가 중 오류가 발생했습니다.\n';
+            Object.values(error).forEach(value => {
+                const item = '\n• ' + value;
+                errMsg += item;
+            });
+            showModal('오류', errMsg);
         });
 }
 
@@ -295,12 +344,6 @@ function editGame() {
 
     // 오늘 날짜와 비교
     const today = new Date().toISOString().split('T')[0];
-
-    // 미래 경기의 경우 득점과 실점이 0인지 확인
-    if (gameDate > today && (goal !== "0" || concede !== "0")) {
-        alert('미래 경기의 득점과 실점은 0이어야 합니다.');
-        return;  // 유효성 검사를 통과하지 못하면 함수 실행 중지
-    }
 
     const newGame = {
         gameIdx: gameIdx,
@@ -330,72 +373,20 @@ function editGame() {
         })
         .then(data => {
             console.log('Success:', data);
-            loadGames(currentPage);  // 테이블 업데이트
+            loadGames(currentPage);
             const modal = bootstrap.Modal.getInstance(document.getElementById('editGameModal'));
-            modal.hide();  // 모달 닫기
-            alert('경기가 성공적으로 수정되었습니다.');
-            updateMostRecentGame(); // 최근 경기 갱신
+            modal.hide();
+            showModal('성공', '경기가 성공적으로 수정되었습니다.', (event) => {
+                location.reload();
+            });
         })
         .catch((error) => {
-            console.error('Error:', error);
-            // 오류 메시지와 함께 오류 처리
-            alert('경기 수정 중 오류가 발생했습니다: ' + (error.message || '미래 경기의 득점과 실점은 0이어야 합니다.'));
-        });
-}
-
-// 최근 경기 정보를 업데이트하는 함수
-function updateMostRecentGame() {
-    fetch('/games/mostRecent')
-        .then(response => response.json())
-        .then(data => {
-            if (data) {
-                const recentGameElement = document.querySelector('#recent-game');
-                const today = new Date().setHours(0,0,0,0);
-                const gameDate = new Date(data.gameDate).setHours(0,0,0,0);
-
-                // HTML 템플릿 생성
-                const html = `
-                    <div class="text-center">
-                        <div class="mb-3">
-                            <h5>${formatDate(data.gameDate)}</h5>
-                        </div>
-                        <div class="row align-items-center mb-3">
-                            <div class="col-4">
-                                <div class="team-logo-container">
-                                    <img src="/img/team/강원FC.png" alt="강원 FC 로고" class="team-logo">
-                                </div>
-                                <br>
-                                <h2 class="text">강원 FC</h2>
-                            </div>
-                            <div class="col-4">
-                                <img src="/img/team/versus.png" alt="versus" class="versus-logo">
-                            </div>
-                            <div class="col-4">
-                                <div class="team-logo-container">
-                                    <img src="/img/team/${getTeamImageFileName(data.opponent)}" alt="${data.opponent} 로고" class="team-logo">
-                                </div>
-                                <br>
-                                <h2 class="text">${data.opponent}</h2>
-                            </div>
-                        </div>
-                        <div>
-                            <h2>${gameDate > today ? '경기 예정' : `${data.goal} : ${data.concede}`}</h2>
-                        </div>
-                        <div class="mt-3">
-                            <p>${data.stadium}</p>
-                        </div>
-                    </div>
-                `;
-
-                // HTML 업데이트
-                recentGameElement.innerHTML = html;
-            } else {
-                const recentGameElement = document.querySelector('#recent-game');
-                recentGameElement.innerHTML = '<p class="text-center">최근 경기 정보가 없습니다.</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error updating most recent game:', error);
+            let errMsg = '경기 수정 중 오류가 발생했습니다.\n';
+            Object.values(error).forEach(value => {
+                const item = '\n• ' + value;
+                errMsg += item;
+            });
+            showModal('오류', errMsg);
         });
 }
 
@@ -405,7 +396,7 @@ function showDeleteConfirmModal() {
         const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
         modal.show();
     } else {
-        alert('삭제할 경기를 선택해주세요.');
+        showModal('알림', '삭제할 경기를 선택해주세요.');
     }
 }
 
@@ -415,7 +406,7 @@ function deleteGame() {
     const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
 
     if (selectedIds.length === 0) {
-        alert('삭제할 항목을 선택하세요.');
+        showModal('알림', '삭제할 항목을 선택하세요.');
         return;
     }
 
@@ -423,47 +414,49 @@ function deleteGame() {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-			[csrfHeader]: csrfToken
+            [csrfHeader]: csrfToken
         },
         body: JSON.stringify(selectedIds)
     })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(text || '서버 응답이 올바르지 않습니다.');
+            });
+        }
+        return response.text().then(text => {
+            return text ? JSON.parse(text) : {};
+        });
+    })
+    .then(data => {
+        showModal('성공', '선택한 경기가 삭제되었습니다.', (event) => {
+            location.reload();
+        });
+    })
+    .catch((error) => {
+        let errMsg = '경기 삭제 중 오류가 발생했습니다.\n';
+        Object.values(error).forEach(value => {
+            const item = '\n• ' + value;
+            errMsg += item;
+        });
+        showModal('오류', '경기 삭제 중 오류가 발생했습니다: ' + errMsg);
+    });
+}
+
+function reload() {
+    fetch(`/games/reload`)
         .then(response => {
             if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(text || '서버 응답이 올바르지 않습니다.');
-                });
+                throw new Error('서버 응답이 올바르지 않습니다.');
             }
-            return response.text().then(text => {
-                return text ? JSON.parse(text) : {};
-            });
+            return response.json();
         })
         .then(data => {
-            console.log('삭제 성공:', data);
-            // 페이지 새로고침 또는 테이블 업데이트
-            location.reload();
-            // 또는 특정 함수를 호출하여 테이블만 업데이트할 수 있습니다.
-            // updateTable();
+            console.log(data);
         })
-        .catch((error) => {
-            console.error('삭제 중 오류 발생:', error);
-            alert('경기 삭제 중 오류가 발생했습니다: ' + error.message);
+        .catch(error => {
+            console.error('Error:', error);
+            const tableBody = document.getElementById('gameTableBody');
+            tableBody.innerHTML = '<tr><td colspan="8">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>';
         });
-
-function getTeamImageFileName(teamName) {
-    const nameMap = {
-        '울산HD': '울산',
-        '수원FC': '수원',
-        '김천상무FC': '김천',
-        '서울FC': '서울',
-        '포항 스틸러스': '포항',
-        '광주FC': '광주',
-        '제주 유나이티드FC': '제주',
-        '대전 하나시티즈': '대전',
-        '인천 유나이티드FC': '인천',
-        '전북 현대': '전북',
-        '대구FC': '대구',
-        '강원FC': '강원'
-    };
-    return (nameMap[teamName] || teamName) + '.png';
-    }
 }
