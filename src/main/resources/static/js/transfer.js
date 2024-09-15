@@ -200,12 +200,13 @@ $(document).ready(function() {
         loadTeamOptions();
         // loadPlayerOptions();
         // resetAddTransferForm();
-        switchFormMode('buy');
-        var addForm2 = $('#addForm2');
-        addForm2.hide();
+        const selectedValue = $('input[name="transferType"]:checked').val();
+        switchFormMode(selectedValue);
     });
 
     function switchFormMode(selectedValue) {
+        var addForm1 = $('#addForm1');
+        var addForm2 = $('#addForm2');
         var nextInfoButton = $('#nextInfoButton');
         var backInfoButton = $('#backInfoButton');
         var saveButton = $('#saveButton');
@@ -213,25 +214,45 @@ $(document).ready(function() {
         switch(selectedValue) {
             case 'buy':
                 console.log('구매가 선택되었습니다.');
+                addForm1.show();
+                addForm2.hide();
                 nextInfoButton.show();
+                backInfoButton.hide();
                 saveButton.hide();
                 break;
             case 'sell':
                 console.log('판매가 선택되었습니다.');
+                addForm1.show();
+                addForm2.hide();
                 nextInfoButton.hide();
+                backInfoButton.hide();
                 saveButton.show();
+                break;
+            case 'next':
+                console.log('선수 추가 정보 버튼 클릭 (다음 버튼)');
+                addForm1.hide();
+                addForm2.show();
+                nextInfoButton.hide();
+                backInfoButton.show();
+                saveButton.show();
+                break;
+            case 'back':
+                console.log('선수 추가 정보 버튼 클릭 (이전 버튼)');
+                addForm1.show();
+                addForm2.hide();
+                nextInfoButton.show();
+                backInfoButton.hide();
+                saveButton.hide();
                 break;
             default:
                 console.log('알 수 없는 값입니다.');
         }
-        backInfoButton.hide();
     }
 
     // 이적 타입 변경 이벤트
     $('input[name="transferType"]').on('change', function() {
         var selectedValue = $(this).val();
         console.log('Selected transfer type:', selectedValue);
-
         switchFormMode(selectedValue);
     });
 
@@ -241,18 +262,39 @@ $(document).ready(function() {
      * - 선수 추가 정보 폼 활성화
      */
     $('#nextInfoButton').on('click', function() {
-        console.log('선수 추가 정보 버튼 클릭 (다음 버튼)');
-        var nextInfoButton = $('#nextInfoButton');
-        var backInfoButton = $('#backInfoButton');
+        // 모든 값이 구성되었는지 확인
+        const requiredFields = ['addPlayerName', 'addTransferDate', 'addPrice', 'addOpponent'];
+        let isValid = true;
+        let firstInvalidField = null;
 
-        nextInfoButton.hide();
-        backInfoButton.show();
+        // 각 필수 필드 검사
+        requiredFields.forEach(fieldId => {
+            const field = $(`#${fieldId}`);
+            const value = field.val().trim();
 
-        var addForm1 = $('#addForm1');
-        var addForm2 = $('#addForm2');
+            if (value === '') {
+                isValid = false;
+                field.addClass('is-invalid');
+                if (!firstInvalidField) firstInvalidField = field;
+            } else {
+                field.removeClass('is-invalid');
+            }
+        });
 
-        addForm1.hide();
-        addForm2.show();
+        // 메모 필드는 선택사항이므로 별도 처리
+        const memoField = $('#addMemo');
+        memoField.removeClass('is-invalid');
+
+        if (!isValid) {
+            // 유효성 검사 실패 시 처리
+            showModal('입력 오류', '모든 필수 항목을 입력해주세요.');
+            if (firstInvalidField) firstInvalidField.focus();
+            return;
+        }
+
+        // 유효성 검사 통과 시 처리
+        console.log('모든 필드가 유효합니다. 다음 단계로 진행합니다.');
+        switchFormMode('next');
     });
 
     /**
@@ -261,18 +303,7 @@ $(document).ready(function() {
      * - 선수 추가 정보 폼 비활성화
      */
     $('#backInfoButton').on('click', function() {
-        console.log('선수 추가 정보 버튼 클릭 (이전 버튼)');
-        var nextInfoButton = $('#nextInfoButton');
-        var backInfoButton = $('#backInfoButton');
-
-        nextInfoButton.show();
-        backInfoButton.hide();
-
-        var addForm1 = $('#addForm1');
-        var addForm2 = $('#addForm2');
-
-        addForm1.show();
-        addForm2.hide();
+        switchFormMode('back');
     });
 
     // 이적 정보 업데이트 이벤트
@@ -344,15 +375,6 @@ $(document).ready(function() {
                 console.error('팀 목록 로드 중 오류 발생:', error);
             }
         });
-    }
-
-    // 이적 추가 폼 초기화
-    function resetAddTransferForm() {
-        $('#addPlayerName').val('');
-        $('#addTransferDate').val('');
-        $('#addOpponent').val('');
-        $('#addPrice').val('');
-        $('#addMemo').val('');
     }
 
     // 추가 정보 저장 버튼 클릭 이벤트
