@@ -12,7 +12,7 @@ import acorn.entity.Transfer;
 @Repository
 public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
-    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p")
+    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p order by t.tradingDate desc")
     Page<Transfer> findAllWithPerson(Pageable pageable);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE p.personName LIKE %:name%")
