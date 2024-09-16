@@ -9,13 +9,13 @@
 			grid-template-columns: repeat(3, 1fr);
 			grid-template-rows: repeat(4, auto);
 			gap: 2rem;
-			padding: 2rem;
-			background-color: #f4f4f4;
-			height: 100vh;
+			padding: 1rem;
+			/*background-color: #f4f4f4;*/
+			/*height: 100vh;*/
 		}
 
 		.layout-item {
-			border: 1px solid #9f9f9f;   /* 확인용 border */
+			border: 1px solid #F4F5FC;
 			border-radius: 1rem;
 			padding: 1rem;
 		}
@@ -35,6 +35,132 @@
 		.span-4-rows {
 			grid-row: span 4;
 		}
+
+		/*
+		.regular-table {
+			height: 90vh;
+		}
+
+		 */
+
+		.layout-item-col {
+			padding-top: 1.5rem;
+			border-radius: 1.5rem;
+			box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+			max-width: 100%; /* 최대 너비를 화면에 맞게 설정 */
+		}
+
+		.card {
+			border-radius: 1.5rem;
+			box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+			max-width: 100%; /* 최대 너비를 화면에 맞게 설정 */
+			max-height: calc(100vh - 120px); /* 최대 높이를 화면에 맞게 설정 (헤더와 여백을 고려) */
+		}
+
+		.card-top-section {
+			border-radius: 1.5rem;
+			box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+			max-width: 100%; /* 최대 너비를 화면에 맞게 설정 */
+			max-height: 6rem;
+		}
+
+		.card-left-border {
+			border-left: 0.25rem solid;
+		}
+		.border-left-primary { border-left-color: #94cbf6; }
+		.border-left-success { border-left-color: #1cc88a; }
+		.border-left-info { border-left-color: #36b9cc; }
+		.border-left-warning { border-left-color: #fb917e; }
+		.text-warning { color: #fb917e !important; }
+
+		.table-wrapper {
+			display: flex;
+			justify-content: center;
+		}
+
+		.rank-table-widget table {
+			border-collapse: collapse;
+			table-layout: fixed;
+			height: 99vh;
+		}
+
+		.rank-table-widget thead {
+			position: sticky;
+		}
+
+		.rank-table-widget th {
+			padding: 1.25rem 1rem 1rem 1rem;
+			font-size: 1rem;
+			color: #A0A7B1;
+			width: fit-content;
+			white-space: nowrap;
+			background-color: #F4F5FC;
+		}
+
+		.rank-table-widget td {
+			padding: 1rem 1rem 1rem 1rem;
+			vertical-align: middle;
+			white-space: nowrap;
+			border-bottom: 2px solid #EDEEF1;
+		}
+
+		.font-bold {
+			font-weight: bold;
+		}
+
+		#upcoming-games {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1rem;
+			padding: 1rem 0;
+			width: 100%;
+			flex-direction: row;
+			overflow: auto;
+		}
+
+		.upcoming-game {
+			appearance: none;
+			text-decoration: none;
+			background: linear-gradient(#f9f9f9, #e1f8e1);
+			margin-top: 1.25rem;
+			padding: 1rem;
+			border-radius: 1rem;
+			height: 10rem;
+			/*width: 13rem;*/
+			display: flex;
+			/*flex: 0 0 13rem;*/
+			flex-direction: row;
+			justify-content: space-between;
+		}
+
+		.date-flag {
+			border-radius: 0.5rem;
+			height: 5rem;
+			min-width: 3rem;
+			width: 3rem;
+			border: 1px solid white;
+			background-color: white;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.upcoming-game-details {
+			width: 13rem;
+		}
+
+		.game-date {
+			top: 0.5rem;
+			left: 0.5rem;
+			font-size: 1.35rem;
+		}
+
+		.game-date-month {
+			font-size: 0.6rem;
+			text-transform: uppercase;
+			font-weight: bold;
+		}
     </style>
 </th:block>
 
@@ -42,27 +168,46 @@
 	<div class="grid-container">
 		<div class="layout-container">
 			<!-- 첫 번째 줄 (전체 선수 수, 부상자 수) -->
-			<div class="layout-item">
-				<div>
-					<p>
-						전체 선수 수 : <span id="player-count"></span>
-					</p>
+			<div class="layout-item card-top-section card-left-border border-left-primary">
+				<div class="row">
+						<div class="h-100 py-2">
+							<div class="card-body">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="h6 font-weight-bold text-primary text-uppercase mb-1">전체 선수 수</div>
+									</div>
+									<div class="col-auto">
+										<b id="player-count"></b>
+									</div>
+								</div>
+							</div>
+						</div>
 				</div>
 			</div>
-			<div class="layout-item">
-				<!-- 부상자 수 -->
-				<div>
-					<p>
-						전체 부상자 수 : <span id="injury-count"></span>
-					</p>
+			<div class="layout-item card-top-section card-left-border border-left-warning">
+				<div class="row">
+					<div class="h-100 py-2">
+						<div class="card-body">
+							<div class="row no-gutters align-items-center">
+								<div class="col mr-2">
+									<div class="h6 font-weight-bold text-warning text-uppercase mb-1">부상자 수</div>
+									<div class="h5 mb-0 font-weight-bold text-gray-800" ></div>
+								</div>
+								<div class="col-auto">
+									<b id="injury-count"></b>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
+
 			</div>
 			<!-- 두 번째 줄 (커다란 영역 하나) -->
-			<div class="layout-item span-4-rows">
+			<div class="layout-item span-4-rows layout-item-col">
 				<!-- 순위표 -->
-				<div id="rank-table-widget">
+				<div id="rank-table-widget" class="rank-table-widget table-wrapper">
 					<!-- 확인용 스타일 하드코딩 -->
-					<table>
+					<table class="regular-table">
 						<thead>
 							<tr>
 								<th>순위</th>
@@ -80,52 +225,69 @@
 			</div>
 
 			<!-- 세 번째 줄 (3개의 영역) -->
-			<div class="layout-item span-2-columns">
-				<div>
-					<p>upcoming games</p>
+			<div class="layout-item span-2-columns card card-left-border border-left-primary">
+				<div class="card-body">
+					<div class="row no-gutters align-items-center">
+						<div class="col mr-2">
+							<div class="h6 font-weight-bold text-primary text-uppercase mb-1">예정 경기</div>
+						</div>
+					</div>
+					<div id="upcoming-games">
+
+					</div>
+				</div>
+
+
 					<table>
 						<tbody id="upcoming-3-games"></tbody>
 					</table>
-				</div>
 			</div>
-			<div class="layout-item">
+			<div class="layout-item card">
 				<!-- 작은 영역 2 -->
-				<div style="width: 500px;">
-					<span>월별 부상자 추이</span>
+				<div class="card-body">
+					<div class="h6 font-weight-bold text-primary text-uppercase mb-1">월별 부상자 추이</div>
 					<!-- 차트 크기는 확인용 하드코딩 -->
-					<canvas id="monthly-injury-counts"></canvas>
+					<div class="chart-wrapper" style="width: 30rem; padding-right: 2rem; margin-top: 1rem;">
+						<canvas id="monthly-injury-counts"></canvas>
+					</div>
+
 				</div>
 			</div>
-			<div class="layout-item">
-				<p>
-					<span>오늘의 일정</span>
-					<span id="today-schedule-overview"></span>
-				</p>
-				<div>
-					<p id="today-schedule-count"></p>
-					<p>
-						<span id="today-schedule-games"></span>
-					</p>
-					<p>
-						<span id="today-schedule-trainings"></span>
-					</p>
-					<p>
-						<span id="today-schedule-injuries"></span>
-					</p>
+			<div class="layout-item card">
+				<div class="card-body">
+					<div class="h6 font-weight-bold text-primary text-uppercase mb-1">
+						오늘의 일정
+						<span id="today-schedule-overview" class="today-schedule-overview" style="color: #2B2B2F;"></span>
+					</div>
+					<div>
+						<p id="today-schedule-count"></p>
+						<p>
+							<span id="today-schedule-games"></span>
+						</p>
+						<p>
+							<span id="today-schedule-trainings"></span>
+						</p>
+						<p>
+							<span id="today-schedule-injuries"></span>
+						</p>
+					</div>
+				</div>
+
+			</div>
+			<div class="layout-item card">
+				<div class="card-body">
+					<div class="h6 font-weight-bold text-primary text-uppercase mb-1">포지션별 선수 수</div>
+					<div class="chart-wrapper" style="width: 30rem; height: 15rem; padding-right: 2rem; margin-top: 1rem;">
+						<canvas id="position-count"></canvas>
+					</div>
 				</div>
 			</div>
-			<div class="layout-item">
-				<div style="width: 300px;">
-					<span>포지션별 선수 수</span>
-					<!-- 차트 크기는 확인용 하드코딩 -->
-					<canvas id="position-count"></canvas>
-				</div>
-			</div>
-			<div class="layout-item">
-				<div style="width: 300px;">
-					<span>부위별 부상자 수 비교(전월)</span>
-					<!-- 차트 크기는 확인용 하드코딩 -->
-					<canvas id="injuries-count-compare"></canvas>
+			<div class="layout-item card">
+				<div class="card-body">
+					<div class="h6 font-weight-bold text-primary text-uppercase mb-1">부위별 부상자 수 (전월 비교)</div>
+					<div class="chart-wrapper" style="width: 30rem; height: 15rem; padding-right: 2rem; margin-top: 1rem;">
+						<canvas id="injuries-count-compare"></canvas>
+					</div>
 				</div>
 			</div>
 		</div>
