@@ -28,7 +28,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/css/**").permitAll()
+                .requestMatchers("/", "/css/**", "/persons/verify-password").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 접근 가능
                 .requestMatchers("/user/**").hasRole("USER") // 사용자만 접근 가능
                 .anyRequest().authenticated() // 모든 요청에 대해 인증을 요구
@@ -61,6 +61,10 @@ public class SecurityConfig {
             if (login == null) {
                 throw new UsernameNotFoundException("User not found");
             }
+            
+            System.out.println("로그인한 사용자: " + username);
+            System.out.println("DB에서 가져온 비밀번호: " + login.getPw());
+            
             // 암호화된 비밀번호를 사용할 수 있도록 설정
             UserBuilder builder = User.withUsername(username)
                 .password(login.getPw()) // 암호화된 비밀번호 그대로 사용

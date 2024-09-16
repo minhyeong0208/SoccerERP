@@ -5,12 +5,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +30,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import acorn.entity.Login;
 import acorn.entity.Person;
+import acorn.repository.LoginRepository;
 import acorn.service.PersonService;
 
 @RestController
@@ -36,6 +45,12 @@ public class PersonController {
 		this.personService = personService;
 	}
 
+	@Autowired
+    private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private LoginRepository loginRepository;
+	
 	// 포지션별 선수 수 조회
 	@GetMapping("/positions/count")
 	public ResponseEntity<List<Map<String, Object>>> getPlayersCountByPosition() {
@@ -149,7 +164,7 @@ public class PersonController {
 		// 파일이 있는 경우에만 이미지 업데이트
 		if (file != null && !file.isEmpty()) {
 			String fileName = file.getOriginalFilename();
-			String uploadDir = "C:/spring/sprsou/SoccerERP/src/main/resources/static/img/persons/";
+			String uploadDir = "C:/Project/SoccerERP/src/main/resources/static/img/persons/";
 			Path filePath = Paths.get(uploadDir + fileName);
 			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 			personDetails.setPersonImage(fileName); // 새로운 이미지 경로 설정
@@ -177,5 +192,44 @@ public class PersonController {
 		personService.deletePersons(personIds);
 		return ResponseEntity.ok("Persons with IDs " + personIds + " have been successfully deleted.");
 	}
+
+	@PostMapping("/verify-password")
+	public ResponseEntity<?> verifyPassword(@RequestBody Map<String, String> request, Authentication authentication) {
+	    String currentPassword = request.get("password");
+	    String loginId = authentication.getName(); // 인증된 사용자의 로그인 ID를 가져옴
+
+	    // 로그인 ID로 DB에서 비밀번호 조회
+	    Login login = loginRepository.findByLoginId(loginId);
+
+	    if (login == null || login.getPw() == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자를 찾을 수 없거나 비밀번호가 없습니다.");
+	    }
+
+	    // 로그 추가: 입력된 비밀번호와 DB에서 가져온 암호화된 비밀번호 확인
+	    System.out.println("입력된 비밀번호: " + currentPassword);
+	    System.out.println("DB에서 가져온 비밀번호: " + login.getPw());
+
+	    // 비밀번호가 일치하는지 확인
+	    if (passwordEncoder.matches(currentPassword, login.getPw())) {
+	        return ResponseEntity.ok(Collections.singletonMap("verified", true));
+	    } else {
+	        return ResponseEntity.ok(Collections.singletonMap("verified", false));
+	    }
+	}
+	
+	@PutMapping("/{personIdx}/change-password")
+    public ResponseEntity<?> changePassword(@PathVariable("personIdx") int personIdx, @RequestBody Map<String, String> request) {
+        String newPassword = request.get("newPassword");
+
+        if (newPassword == null || newPassword.isEmpty()) {
+            return ResponseEntity.badRequest().body("새 비밀번호를 입력해주세요.");
+        }
+
+        // 서비스에서 비밀번호 변경 처리
+        personService.changePassword(personIdx, newPassword);
+
+        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+    }
+
 
 }
