@@ -16,7 +16,7 @@
       <li>
         <a th:href="@{/dashboard}" title="Dashboard" class="custom_tooltip">
           <i class="fas fa-tachometer-alt"></i>
-          <span class="link">대시보드</span>
+          <b class="link">&nbsp;대시보드</b>
         </a>
       </li>
 
@@ -24,7 +24,7 @@
       <li th:if="${gubun == 'ADMIN'}">
         <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#financeSubmenu" aria-expanded="true">
           <i class="fas fa-wallet"></i>
-          <span class="link">재정 관리</span>
+          <b class="link">&nbsp;재정 관리</b>
         </a>
         <ul class="collapse show" id="financeSubmenu">
           <li><a th:href="@{/admin/finance}">재정</a></li>
@@ -36,7 +36,7 @@
       <li>
         <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#personnelSubmenu" aria-expanded="true">
           <i class="fas fa-users"></i>
-          <span class="link">인적 관리</span>
+          <b class="link">&nbsp;인적 관리</b>
         </a>
         <ul class="collapse show" id="personnelSubmenu">
           <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/player}">선수</a></li>
@@ -53,7 +53,7 @@
       <li>
         <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#scheduleSubmenu" aria-expanded="true">
           <i class="fas fa-calendar-alt"></i>
-          <span class="link">일정 관리</span>
+          <b class="link">&nbsp;일정 관리</b>
         </a>
         <ul class="collapse show" id="scheduleSubmenu">
           <li><a th:href="@{/schedule}">일정</a></li>
@@ -66,7 +66,7 @@
       <li>
         <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#facilitySubmenu" aria-expanded="true">
           <i class="fas fa-building"></i>
-          <span class="link">시설 관리</span>
+          <b class="link">&nbsp;시설 관리</b>
         </a>
         <ul class="collapse show" id="facilitySubmenu">
           <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a th:href="@{/admin/facility}">시설</a></li>
