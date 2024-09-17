@@ -112,8 +112,11 @@ $(document).ready(function() {
         let searchField = $('#searchField').val();
         let searchTerm = $('#searchInput').val().toLowerCase();
 
+        const url = `/transfers/search?${searchField}=${searchTerm}&page=0&size=${pageSize}&filterType=${filterType}`
+            + (transferType !== '' ? `&transferType=` + transferType : '');
+
         $.ajax({
-            url: `/transfers/search?${searchField}=${searchTerm}&page=0&size=${pageSize}&filterType=${filterType}`,
+            url: url,
             method: 'GET',
             success: function(data) {
                 transferData = data.content;

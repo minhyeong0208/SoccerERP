@@ -99,9 +99,10 @@ public class TransferController {
     public Page<Transfer> searchTransfersByPersonName(@RequestParam(required = true) String filterType,
                                                       @RequestParam(required = false) String team,
                                                       @RequestParam(required = false) String person,
+                                                      @RequestParam(required = false) String transferType,
                                                       Pageable pageable) {
         String name = (team != null) ? team : person;
-        return transferService.searchTransfersByName(filterType, name, pageable);
+        return transferService.searchTransfersByName(filterType, name, transferType, pageable);
     }
 
     @GetMapping("/detail/{id}")

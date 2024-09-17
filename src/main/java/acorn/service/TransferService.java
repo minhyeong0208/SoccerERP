@@ -120,10 +120,19 @@ public class TransferService {
 
     // 선수, 팀 이름으로 이적 정보 검색 (페이징 처리 지원)
     @Transactional(readOnly = true)
-    public Page<Transfer> searchTransfersByName(String filterType, String name, Pageable pageable) {
-        if ("".equals(name) || null == name) return transferRepository.findAllWithPerson(pageable);
+    public Page<Transfer> searchTransfersByName(String filterType, String name, String transferTypeStr, Pageable pageable) {
+        int transferType = (("".equals(transferTypeStr) || null == transferTypeStr) ? -1 : ("구매".equals(transferTypeStr)) ? 1 : 0);
+        if ("".equals(name) || null == name) {
+            if ( -1 == transferType ) return transferRepository.findAllWithPerson(pageable); // 전체
+            return transferRepository.findAllWithPersonFilterTransferType(transferType, pageable); // 조건
+        }
 
-        if ("team".equals(filterType)) return transferRepository.findByTeamNameContaining(name, pageable);
-        return transferRepository.findByPersonNameContaining(name, pageable);
+        if ("team".equals(filterType)) {
+            if ( -1 == transferType ) return transferRepository.findByTeamNameContaining(name, pageable); // 전체, 팀 검색
+            else transferRepository.findByTeamNameContainingFilterTransferType(name, transferType, pageable); // 조건, 팀 검색
+        }
+
+        if ( -1 == transferType ) return transferRepository.findByPersonNameContaining(name, pageable); // 전체, 선수 검색
+        return transferRepository.findByPersonNameContainingFilterTransferType(name, transferType, pageable); // 조건, 선수 검색
     }
 }
