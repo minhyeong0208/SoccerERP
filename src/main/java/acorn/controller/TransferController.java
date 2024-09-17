@@ -9,9 +9,7 @@ import acorn.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -89,20 +87,13 @@ public class TransferController {
 
     // 모든 이적 정보 조회 (페이징 처리)
     @GetMapping
-    public Page<Transfer> getAllTransfers(@RequestParam(required = false) String transferType, Pageable pageable) {
-        if (transferType != null) return transferService.getAllTransfersFilterType(transferType, pageable);
-        return transferService.getAllTransfers(pageable);
-    }
-
-    // 선수 이름으로 검색 (페이징 처리 지원)
-    @GetMapping("/search")
-    public Page<Transfer> searchTransfersByPersonName(@RequestParam(required = true) String filterType,
-                                                      @RequestParam(required = false) String team,
-                                                      @RequestParam(required = false) String person,
-                                                      @RequestParam(required = false) String transferType,
-                                                      Pageable pageable) {
-        String name = (team != null) ? team : person;
-        return transferService.searchTransfersByName(filterType, name, transferType, pageable);
+    public Page<Transfer> search(@RequestParam(required = false) String team,
+                                 @RequestParam(required = false) String person,
+                                 @RequestParam(required = false) String transferType,
+                                 Pageable pageable) {
+        String filterType = (team != null) ? "team" : "person";
+        String name = ("team".equals(filterType)) ? team : person;
+        return transferService.searchTransfers(filterType, name, transferType, pageable);
     }
 
     @GetMapping("/detail/{id}")
@@ -128,19 +119,5 @@ public class TransferController {
             persons.put(item.getPersonIdx(), item.getPersonName());
         }
         return ResponseEntity.ok(persons);
-    }
-
-    // 이적 리스트 이적 날짜 내림차순 정렬
-    public String listTransfers(Model model,
-                                @RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("tradingDate").descending());
-        Page<Transfer> transferPage = transferService.getAllTransfers(pageable);
-
-        model.addAttribute("transfers", transferPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", transferPage.getTotalPages());
-
-        return "transfers";
     }
 }

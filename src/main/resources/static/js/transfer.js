@@ -4,8 +4,7 @@ $(document).ready(function() {
 
     let transferData = [];
     let currentPage = 0;
-    let transferType = '';
-    let filterType = 'person'; // enum [person, team] || default person
+    let transferType = '전체'; // string | enum['구매', '판매']
     const pageSize = 20;
     let totalPages = 0;
     let selectedIds = [];
@@ -35,8 +34,8 @@ $(document).ready(function() {
     document.querySelectorAll('input[name="transferTypeFilter"]').forEach(radio => {
         radio.addEventListener('change', function() {
             transferType = this.value === '전체' ? '' : this.value;
-            currentPage = 0;
-            loadTransfer(currentPage);
+            console.log('# transferTypeFilter > click')
+            search();
         });
     });
 
@@ -87,8 +86,7 @@ $(document).ready(function() {
 
     // searchField 변경 이벤트 리스너
     $('#searchField').on('change', function() {
-        filterType = $(this).val();
-
+        let filterType = $(this).val();
         // 검색 입력 필드의 placeholder 갱신
         $('#searchInput').attr('placeholder', filterType === 'person' ? '선수명 입력' : '팀명 입력');
     });
@@ -108,11 +106,17 @@ $(document).ready(function() {
         search();
     });
 
-    function search() {
+    function search(caller) {
         let searchField = $('#searchField').val();
         let searchTerm = $('#searchInput').val().toLowerCase();
 
-        const url = `/transfers/search?${searchField}=${searchTerm}&page=0&size=${pageSize}&filterType=${filterType}`
+        let state = 0;
+
+        if ('.page-link' === caller) {
+            state = currentPage;
+        }
+
+        const url = `/transfers?${searchField}=${searchTerm}&page=` + state + `&size=${pageSize}`
             + (transferType !== '' ? `&transferType=` + transferType : '');
 
         $.ajax({
@@ -121,7 +125,7 @@ $(document).ready(function() {
             success: function(data) {
                 transferData = data.content;
                 totalPages = data.totalPages;
-                currentPage = 0;
+                currentPage = state;
                 renderTable(transferData);
                 renderPaginationButtons();
             },
@@ -135,7 +139,8 @@ $(document).ready(function() {
     // 페이지네이션 이벤트
     $(document).on('click', '.page-link', function() {
         currentPage = $(this).data('page');
-        loadTransfer(currentPage);
+        console.log('# page-link > click')
+        search('.page-link');
     });
 
     // 이적 데이터 로드 함수

@@ -72,19 +72,6 @@ public class TransferService {
         return transferRepository.findById(transferIdx).orElse(null);
     }
 
-    // 이적 구분 정보 조회 (페이징 처리)
-    @Transactional(readOnly = true)
-    public Page<Transfer> getAllTransfersFilterType(String transferTypeStr, Pageable pageable) {
-        int transferType = ("구매".equals(transferTypeStr) ? 1 : 0);
-        return transferRepository.findAllWithPersonFilterTransferType(transferType, pageable);
-    }
-
-    // 모든 이적 정보 조회 (페이징 처리)
-    @Transactional(readOnly = true)
-    public Page<Transfer> getAllTransfers(Pageable pageable) {
-        return transferRepository.findAllWithPerson(pageable);
-    }
-
     // 이적 정보 업데이트
     @Transactional
     public Transfer updateTransfer(int transferIdx, Transfer transferDetails) {
@@ -120,8 +107,8 @@ public class TransferService {
 
     // 선수, 팀 이름으로 이적 정보 검색 (페이징 처리 지원)
     @Transactional(readOnly = true)
-    public Page<Transfer> searchTransfersByName(String filterType, String name, String transferTypeStr, Pageable pageable) {
-        int transferType = (("".equals(transferTypeStr) || null == transferTypeStr) ? -1 : ("구매".equals(transferTypeStr)) ? 1 : 0);
+    public Page<Transfer> searchTransfers(String filterType, String name, String transferTypeStr, Pageable pageable) {
+        int transferType = (("전체".equals(transferTypeStr) || null == transferTypeStr) ? -1 : ("구매".equals(transferTypeStr)) ? 1 : 0);
         if ("".equals(name) || null == name) {
             if ( -1 == transferType ) return transferRepository.findAllWithPerson(pageable); // 전체
             return transferRepository.findAllWithPersonFilterTransferType(transferType, pageable); // 조건
