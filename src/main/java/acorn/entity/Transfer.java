@@ -7,15 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Table(name = "transfer")
 public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +25,14 @@ public class Transfer {
     private Person person;
 
     private int transferType;
-
-    @Column(name = "trading_date")
     private Date tradingDate;
-
     private String opponent;
     private String transferMemo;
     private int price;
+
+    @Transient
+    private int personIdx;
+
+    @Transient // DB에 저장하지 않고 임시로 사용
+    private String playerName;  // 경기 결과(승, 무, 패)
 }
