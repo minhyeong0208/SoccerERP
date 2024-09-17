@@ -1,22 +1,22 @@
 package acorn.controller;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import acorn.service.PersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import acorn.dto.TransferWithPersonDto;
 import acorn.entity.Transfer;
 import acorn.entity.Person;
 import acorn.service.TransferService;
@@ -25,50 +25,36 @@ import acorn.service.TransferService;
 @RequestMapping("/transfers")
 public class TransferController {
 
-    private final TransferService transferService;
+    @Autowired
+    private TransferService transferService;
+
+    @Autowired
+    private PersonService personService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public TransferController(TransferService transferService) {
-        this.transferService = transferService;
-    }
-
     // 선수 판매
-    @PostMapping("/sale")
-    public ResponseEntity<String> createSaleTransfer(@RequestBody Transfer transfer) {
+    @PostMapping("/sell")
+    public ResponseEntity<String> sell(@RequestBody Transfer transfer) {
         // 이적 타입이 0인지 확인
         if (transfer.getTransferType() != 0) {
             return ResponseEntity.badRequest().body("Invalid transfer type. Sale transfers must have transferType set to 0.");
         }
         transfer.setTransferType(0);  // 판매 타입을 0으로 설정
+        Person person = personService.getPersonById(transfer.getPersonIdx());
+        transfer.setPerson(person);
         transferService.addSaleTransfer(transfer);
         return ResponseEntity.ok("Sale transfer created successfully.");
     }
 
     // 선수 구매 (파일 업로드 기능 추가)
-    @PostMapping("/purchase")
+    @PostMapping("/buy")
     public ResponseEntity<String> createPurchaseTransfer(
-            @RequestPart("transfer") Transfer transfer,
-            @RequestPart("person") Person person,
+            @RequestBody Transfer transfer,
+            @RequestBody Person person,
             @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
 
-        // 이적 타입이 1인지 확인
-        if (transfer.getTransferType() != 1) {
-            return ResponseEntity.badRequest().body("Invalid transfer type. Purchase transfers must have transferType set to 1.");
-        }
-        transfer.setTransferType(1);  // 구매 타입을 1로 설정
-
-        TransferWithPersonDto dto = new TransferWithPersonDto(transfer, person, null);
-
-        if (file != null && !file.isEmpty()) {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            Path path = Paths.get(uploadDir + java.io.File.separator + fileName);
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            person.setPersonImage(fileName);
-        }
-
-        transferService.addPurchaseTransfer(dto);
         return ResponseEntity.ok("Purchase transfer created successfully.");
     }
 
@@ -77,12 +63,6 @@ public class TransferController {
     public ResponseEntity<Transfer> getTransferById(@PathVariable("id") int id) {
         Transfer transfer = transferService.getTransferById(id);
         return transfer != null ? ResponseEntity.ok(transfer) : ResponseEntity.notFound().build();
-    }
-
-    // 모든 이적 정보 조회 (페이징 처리)
-    @GetMapping
-    public Page<Transfer> getAllTransfers(Pageable pageable) {
-        return transferService.getAllTransfers(pageable);
     }
 
     // 이적 정보 업데이트
@@ -107,10 +87,21 @@ public class TransferController {
         return ResponseEntity.ok().build();
     }
 
+    // 모든 이적 정보 조회 (페이징 처리)
+    @GetMapping
+    public Page<Transfer> getAllTransfers(@RequestParam(required = false) String transferType, Pageable pageable) {
+        if (transferType != null) return transferService.getAllTransfersFilterType(transferType, pageable);
+        return transferService.getAllTransfers(pageable);
+    }
+
     // 선수 이름으로 검색 (페이징 처리 지원)
     @GetMapping("/search")
-    public Page<Transfer> searchTransfersByPersonName(@RequestParam String name, Pageable pageable) {
-        return transferService.searchTransfersByPersonName(name, pageable);
+    public Page<Transfer> searchTransfersByPersonName(@RequestParam(required = true) String filterType,
+                                                      @RequestParam(required = false) String team,
+                                                      @RequestParam(required = false) String person,
+                                                      Pageable pageable) {
+        String name = (team != null) ? team : person;
+        return transferService.searchTransfersByName(filterType, name, pageable);
     }
 
     @GetMapping("/detail/{id}")
@@ -118,5 +109,37 @@ public class TransferController {
         Transfer selectedTransfer = transferService.getTransferById(id);
         model.addAttribute("selectedTransfer", selectedTransfer);
         return "transfer"; // transfer.html 뷰 이름
+    }
+
+    /**
+     * 판매 대상 선수 목록 조회
+     * @return
+     */
+    @GetMapping("/person/list")
+    public ResponseEntity<?> getPersonList() {
+        Map<Integer, String> persons = new HashMap<>();
+        /**
+         * TODO
+         * teamIdx Session 내 처리
+         */
+        String teamIdx = "GFC";
+        for (Person item : personService.findAllWithTeamIdx(teamIdx)) {
+            persons.put(item.getPersonIdx(), item.getPersonName());
+        }
+        return ResponseEntity.ok(persons);
+    }
+
+    // 이적 리스트 이적 날짜 내림차순 정렬
+    public String listTransfers(Model model,
+                                @RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("tradingDate").descending());
+        Page<Transfer> transferPage = transferService.getAllTransfers(pageable);
+
+        model.addAttribute("transfers", transferPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", transferPage.getTotalPages());
+
+        return "transfers";
     }
 }

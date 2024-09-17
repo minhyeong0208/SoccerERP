@@ -14,14 +14,29 @@
         </div>
 
         <!-- 추가/삭제 버튼을 오른쪽에 배치 -->
-        <div class="d-flex justify-content-end mb-3">
-            <button id="openAddTransferModalButton" class="btn btn-primary me-2"
-                    data-bs-toggle="modal" data-bs-target="#addTransferModal">
-                <i class="fas fa-plus"></i> 이적 추가
-            </button>
-            <button id="openDeleteButton" class="btn btn-danger">
-                <i class="fas fa-trash"></i> 선택 삭제
-            </button>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- 라디오 버튼 필터 -->
+            <div class="btn-group" role="group" aria-label="Transfer Type Filter">
+                <th:block th:each="type, iterStat : ${transferType}">
+                    <input type="radio" class="btn-check" name="transferTypeFilter"
+                           th:id="${'transferType' + iterStat.index}"
+                           th:value="${type}"
+                           autocomplete="off"
+                           th:checked="${iterStat.first}">
+                    <label class="btn btn-outline-primary"
+                           th:for="${'transferType' + iterStat.index}"
+                           th:text="${type}"></label>
+                </th:block>
+            </div>
+            <div>
+                <button id="openAddTransferModalButton" class="btn btn-primary me-2"
+                        data-bs-toggle="modal" data-bs-target="#addTransferModal">
+                    <i class="fas fa-plus"></i> 이적 추가
+                </button>
+                <button id="openDeleteButton" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> 선택 삭제
+                </button>
+            </div>
         </div>
 
         <!-- 이적 리스트 테이블 -->
@@ -53,10 +68,10 @@
             <div class="d-flex justify-content-center mb-3">
                 <div class="input-group">
                     <select class="form-select" id="searchField" style="max-width: 150px;">
-                        <option value="name">선수명</option>
+                        <option value="person">선수명</option>
                         <option value="team">팀명</option>
                     </select>
-                    <input type="text" class="form-control" id="searchInput" placeholder="검색어 입력">
+                    <input type="text" class="form-control" id="searchInput" placeholder="선수명 입력">
                     <button class="btn btn-dark" id="searchButton">
                         <i class="fas fa-search"></i> 검색
                     </button>
@@ -187,8 +202,8 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="addPlayerName" class="form-label">선수명</label>
-                            <input type="text" class="form-control" id="addPlayerName" autocomplete="off">
+                            <label class="form-label">선수명</label>
+                            <div id="playerNameContainer"></div>
                         </div>
                         <div class="form-group mb-3">
                             <label for="addTransferDate" class="form-label">이적 일자</label>
@@ -323,6 +338,23 @@
                 <div class="modal-body">이적 정보가 성공적으로 수정되었습니다.</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="customModal" tabindex="-1" aria-labelledby="customModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customModalLabel">알림</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Modal message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
                 </div>
             </div>
         </div>

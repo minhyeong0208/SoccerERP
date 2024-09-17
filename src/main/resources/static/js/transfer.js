@@ -4,6 +4,8 @@ $(document).ready(function() {
 
     let transferData = [];
     let currentPage = 0;
+    let transferType = '';
+    let filterType = 'person'; // enum [person, team] || default person
     const pageSize = 20;
     let totalPages = 0;
     let selectedIds = [];
@@ -27,6 +29,15 @@ $(document).ready(function() {
                 $(this).val(addCommas(value));
             }
         }
+    });
+
+    // 이적 유형 필터 이벤트 리스너
+    document.querySelectorAll('input[name="transferTypeFilter"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            transferType = this.value === '전체' ? '' : this.value;
+            currentPage = 0;
+            loadTransfer(currentPage);
+        });
     });
 
     // 전체 선택 체크박스 이벤트
@@ -65,7 +76,7 @@ $(document).ready(function() {
             data: JSON.stringify(selectedIds),
             success: function() {
                 $('#deleteConfirmModal').modal('hide');
-                loadTransferData(currentPage);
+                loadTransfer(currentPage);
             },
             error: function(error) {
                 console.error('이적 정보 삭제 중 오류 발생:', error);
@@ -74,13 +85,35 @@ $(document).ready(function() {
         });
     });
 
+    // searchField 변경 이벤트 리스너
+    $('#searchField').on('change', function() {
+        filterType = $(this).val();
+
+        // 검색 입력 필드의 placeholder 갱신
+        $('#searchInput').attr('placeholder', filterType === 'person' ? '선수명 입력' : '팀명 입력');
+    });
+
+    // searchInput에서 엔터 키 입력 이벤트 리스너
+    $('#searchInput').on('keypress', function(e) {
+        if (e.which === 13) { // 13은 엔터 키의 keyCode
+            console.log('# searchInput > enter key pressed');
+            search();
+            e.preventDefault(); // 폼 제출 방지
+        }
+    });
+
     // 검색 기능
     $('#searchButton').on('click', function() {
+        console.log('# searchButton > click')
+        search();
+    });
+
+    function search() {
         let searchField = $('#searchField').val();
         let searchTerm = $('#searchInput').val().toLowerCase();
 
         $.ajax({
-            url: `/transfers/search?${searchField}=${searchTerm}&page=0&size=${pageSize}`,
+            url: `/transfers/search?${searchField}=${searchTerm}&page=0&size=${pageSize}&filterType=${filterType}`,
             method: 'GET',
             success: function(data) {
                 transferData = data.content;
@@ -94,18 +127,20 @@ $(document).ready(function() {
                 alert('검색 중 오류가 발생했습니다.');
             }
         });
-    });
+    }
 
     // 페이지네이션 이벤트
     $(document).on('click', '.page-link', function() {
         currentPage = $(this).data('page');
-        loadTransferData(currentPage);
+        loadTransfer(currentPage);
     });
 
     // 이적 데이터 로드 함수
-    function loadTransferData(page = 0) {
+    function loadTransfer(page = 0) {
+        const url = `/transfers?page=${page}&size=${pageSize}`
+            + (transferType !== '' ? `&transferType=` + transferType : '');
         $.ajax({
-            url: `/transfers?page=${page}&size=${pageSize}`,
+            url: url,
             method: "GET",
             success: function(response) {
                 transferData = response.content;
@@ -202,6 +237,7 @@ $(document).ready(function() {
         // resetAddTransferForm();
         const selectedValue = $('input[name="transferType"]:checked').val();
         switchFormMode(selectedValue);
+        updatePlayerNameField(selectedValue);
     });
 
     function switchFormMode(selectedValue) {
@@ -249,20 +285,49 @@ $(document).ready(function() {
         }
     }
 
+    function fetchAndPopulatePlayerList(selectElement) {
+        $.ajax({
+            url: '/transfers/person/list',
+            method: 'GET',
+            success: function(response) {
+                selectElement.html('<option value="">선수를 선택하세요</option>');
+                $.each(response, function(personIdx, personName) {
+                    selectElement.append($('<option>', {
+                        value: personIdx,
+                        text: personName
+                    }));
+                });
+            },
+            error: function(error) {
+                console.error('Error fetching player list:', error);
+            }
+        });
+    }
+
+    function updatePlayerNameField(transferType) {
+        var container = $('#playerNameContainer');
+        container.empty(); // 기존 내용을 비웁니다
+
+        if (transferType === 'buy') {
+            // 구매의 경우: text input 생성
+            container.html('<input type="text" class="form-control" id="addPlayerName" autocomplete="off">');
+        } else if (transferType === 'sell') {
+            // 판매의 경우: select (콤보박스) 생성 및 데이터 로드
+            var select = $('<select class="form-control" id="addPlayerName"></select>');
+            container.append(select);
+            fetchAndPopulatePlayerList(select);
+        }
+    }
+
     // 이적 타입 변경 이벤트
     $('input[name="transferType"]').on('change', function() {
         var selectedValue = $(this).val();
         console.log('Selected transfer type:', selectedValue);
         switchFormMode(selectedValue);
+        updatePlayerNameField(selectedValue);
     });
 
-    /**
-     * 다음 버튼 이벤트
-     * - 선수 기본 정보 폼 비활성화
-     * - 선수 추가 정보 폼 활성화
-     */
-    $('#nextInfoButton').on('click', function() {
-        // 모든 값이 구성되었는지 확인
+    function validationForm1() {
         const requiredFields = ['addPlayerName', 'addTransferDate', 'addPrice', 'addOpponent'];
         let isValid = true;
         let firstInvalidField = null;
@@ -286,15 +351,23 @@ $(document).ready(function() {
         memoField.removeClass('is-invalid');
 
         if (!isValid) {
-            // 유효성 검사 실패 시 처리
+            // // 유효성 검사 실패 시 처리
             showModal('입력 오류', '모든 필수 항목을 입력해주세요.');
             if (firstInvalidField) firstInvalidField.focus();
-            return;
+            return false;
         }
 
-        // 유효성 검사 통과 시 처리
-        console.log('모든 필드가 유효합니다. 다음 단계로 진행합니다.');
-        switchFormMode('next');
+        console.log('모든 필드가 유효합니다.');
+        return true;
+    }
+
+    /**
+     * 다음 버튼 이벤트
+     * - 선수 기본 정보 폼 비활성화
+     * - 선수 추가 정보 폼 활성화
+     */
+    $('#nextInfoButton').on('click', function() {
+        if (validationForm1()) switchFormMode('next');
     });
 
     /**
@@ -327,7 +400,7 @@ $(document).ready(function() {
             data: JSON.stringify(updatedTransfer),
             success: function() {
                 $('#updateSuccessModal').modal('show');
-                loadTransferData(currentPage);
+                loadTransfer(currentPage);
             },
             error: function(error) {
                 console.error("이적 정보 수정 중 오류 발생:", error);
@@ -377,9 +450,25 @@ $(document).ready(function() {
         });
     }
 
-    // 추가 정보 저장 버튼 클릭 이벤트
+    // 이적 선수 저장 버튼
     $('#saveButton').on('click', function() {
-        let additionalData = {
+        const selectedValue = $('input[name="transferType"]:checked').val();
+
+        if (!validationForm1()) return;
+
+        let price = $('#addPrice').val();
+
+        var transferData = {
+            personIdx: $('#addPlayerName').val(),
+            transferDate: $('#addTransferDate').val(),
+            price: price.replace(/,/g, ''),
+            opponent: $('#addOpponent').val(),
+            memo: $('#addMemo').val()
+        };
+
+        console.log('# transferData > ', transferData);
+
+        var personData = {
             birthdate: $('#addPlayerBirthdate').val(),
             nationality: $('#addPlayerNationality').val(),
             backNumber: $('#addPlayerBackNumber').val(),
@@ -390,6 +479,10 @@ $(document).ready(function() {
             weight: $('#addPlayerWeight').val()
         };
 
+        console.log('# personData > ', personData);
+
+        // TODO: please implement below sutff, image upload
+        /*
         let formData = new FormData();
         formData.append('transferData', JSON.stringify({
             transferType: "1",
@@ -399,32 +492,70 @@ $(document).ready(function() {
             opponent: $('#addOpponent').val(),
             memo: $('#addMemo').val()
         }));
-        formData.append('additionalData', JSON.stringify(additionalData));
+        formData.append('additionalData', JSON.stringify(fieldVal));
 
         let imageFile = $('#addPlayerImage')[0].files[0];
         if (imageFile) {
             formData.append('image', imageFile);
         }
+        */
 
-        $.ajax({
-            url: '/transfers/buy',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                [csrfHeader]: csrfToken
-            },
-            success: function(response) {
-                $('#buyAdditionalInfoModal').modal('hide');
-                $('#addTransferModal').modal('hide');
-                loadTransferData();
-            },
-            error: function(error) {
-                console.error('이적 정보 저장 중 오류 발생:', error);
-                alert('이적 정보 저장 중 오류가 발생했습니다.');
-            }
-        });
+        if (selectedValue === 'buy') {
+            transferData.person = personData;
+            const formData = transferData;
+            // if (!validationForm2()) return;
+            $.ajax({
+                url: '/transfers/buy',
+                method: 'POST',
+                data: JSON.stringify(formData),
+                processData: false,
+                contentType: false,
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
+                success: function (response) {
+
+                },
+                error: function (error) {
+
+                }
+            });
+        } else if (selectedValue === 'sell') {
+            const formData = transferData;
+            $.ajax({
+                url: '/transfers/sell',
+                method: 'POST',
+                data: JSON.stringify(formData),
+                processData: false,
+                contentType: 'application/json',
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
+                success: function (response) {
+
+                },
+                error: function (error) {
+
+                }
+            });
+            // $.ajax({
+            //     url: '/transfers/sell',
+            //     method: 'POST',
+            //     data: Object.assign(baseInfoData, detailInfoData),
+            //     processData: false,
+            //     contentType: false,
+            //     headers: {
+            //         [csrfHeader]: csrfToken
+            //     },
+            //     success: function (response) {
+            //         $('#sellConfirmModalLabel').modal('hide');
+            //         loadTransfer();
+            //     },
+            //     error: function (error) {
+            //         console.error('이적 정보 저장 중 오류 발생:', error);
+            //         alert('이적 정보 저장 중 오류가 발생했습니다.');
+            //     }
+        }
     });
 
     function saveTransfer(transferData) {
@@ -438,7 +569,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#addTransferModal').modal('hide');
-                loadTransferData();
+                loadTransfer();
             },
             error: function(error) {
                 console.error('이적 정보 저장 중 오류 발생:', error);
@@ -460,5 +591,22 @@ $(document).ready(function() {
     });
 
     // 초기 데이터 로드 호출
-    loadTransferData(currentPage);
+    loadTransfer(currentPage);
+
+    function showModal(title, message, callback) {
+        const modalElement = document.getElementById('customModal');
+        const modalTitle = modalElement.querySelector('.modal-title');
+        const modalBody = modalElement.querySelector('.modal-body');
+
+        modalTitle.textContent = title;
+        modalBody.textContent = message;
+        modalBody.style.whiteSpace = 'pre-line';
+        modalBody.style.wordWrap = 'break-word';
+
+        const modal = new bootstrap.Modal(modalElement);
+        // 이전 이벤트 리스너 제거
+        $('#customModal').off('hidden.bs.modal');
+        $('#customModal').on('hidden.bs.modal', callback);
+        modal.show();
+    }
 });

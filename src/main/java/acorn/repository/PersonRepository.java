@@ -33,7 +33,7 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     	Page<Person> searchByPersonNameOrPosition(@Param("personName") String personName, 
     	                                          @Param("position") String position, 
     	                                          Pageable pageable);  // 페이징 지원
-   
+
     // 여러 ID에 해당하는 사람들을 한 번에 삭제
     void deleteAllByIdInBatch(Iterable<Integer> ids);
     
@@ -43,4 +43,7 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     
  	// id 칼럼을 기준으로 검색하는 메서드
     Person findById(String id);  // 이 경우 id는 Person 테이블의 id 칼럼입니다.
+
+    @Query("SELECT p FROM Person p WHERE p.teamIdx = :teamIdx")
+    List<Person> findAllWithTeamIdx(@Param("teamIdx") String teamIdx);
 }

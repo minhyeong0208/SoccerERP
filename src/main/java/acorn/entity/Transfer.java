@@ -19,7 +19,6 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int transferIdx;
 
-    // 추가: Person 엔티티와의 관계 설정
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_idx")
     private Person person;

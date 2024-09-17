@@ -15,6 +15,9 @@ public class PageController {
 	@Autowired
     private GameService gameService;
 
+    private final static String gameTypeStr = "전체,리그,토너먼트";
+    private final static String transferTypeStr = "전체,구매,판매";
+
     @GetMapping("/login")
     public String login() { return "layout/login"; } // 로그인 페이지 (login.html)
     
@@ -33,9 +36,6 @@ public class PageController {
     // 사용자 : 경기 관리
     @GetMapping("/user/game")
     public String gameList(Model model) {
-        // 게임 구분 문자열을 메소드 내부에 정의
-        String gameTypeStr = "전체,리그,토너먼트";
-
         /* 경기 수 */
         model.addAttribute("matchCount", gameService.getTotalGames());
         /* 승패 마진 */
@@ -93,9 +93,19 @@ public class PageController {
 
     // 관리자, 사용자 : 이적 관리
     @GetMapping("/admin/transfer")
-    public String adminTransfer(){ return "layout/transfer"; }
+    public String adminTransfer(Model model){
+        /* 이적 구분 */
+        List<String> transferType = Arrays.asList(transferTypeStr.split(","));
+        model.addAttribute("transferType", transferType);
+        return "layout/transfer";
+    }
     @GetMapping("/user/transfer")
-    public String userTransfer(){ return "layout/transfer"; }
+    public String userTransfer(Model model){
+        /* 이적 구분 */
+        List<String> transferType = Arrays.asList(transferTypeStr.split(","));
+        model.addAttribute("transferType", transferType);
+        return "layout/transfer";
+    }
     
     @GetMapping("/user/personal")
     public String userPersonal() { return "layout/personal"; }

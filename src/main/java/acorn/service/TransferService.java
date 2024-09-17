@@ -32,7 +32,7 @@ public class TransferService {
     @Transactional
     public Transfer addSaleTransfer(Transfer transfer) {
         Transfer savedTransfer = transferRepository.save(transfer);
-        personRepository.deleteById(transfer.getPerson().getPersonIdx());
+        personRepository.deleteById(transfer.getPersonIdx());
 
         Finance income = Finance.builder()
                 .financeType("수입")
@@ -51,7 +51,6 @@ public class TransferService {
     @Transactional
     public Transfer addPurchaseTransfer(TransferWithPersonDto dto) {
         Person newPerson = personRepository.save(dto.getPerson());
-        dto.getTransfer().setPerson(newPerson);
         Transfer savedTransfer = transferRepository.save(dto.getTransfer());
 
         Finance expense = Finance.builder()
@@ -73,6 +72,13 @@ public class TransferService {
         return transferRepository.findById(transferIdx).orElse(null);
     }
 
+    // 이적 구분 정보 조회 (페이징 처리)
+    @Transactional(readOnly = true)
+    public Page<Transfer> getAllTransfersFilterType(String transferTypeStr, Pageable pageable) {
+        int transferType = ("구매".equals(transferTypeStr) ? 1 : 0);
+        return transferRepository.findAllWithPersonFilterTransferType(transferType, pageable);
+    }
+
     // 모든 이적 정보 조회 (페이징 처리)
     @Transactional(readOnly = true)
     public Page<Transfer> getAllTransfers(Pageable pageable) {
@@ -84,7 +90,6 @@ public class TransferService {
     public Transfer updateTransfer(int transferIdx, Transfer transferDetails) {
         Transfer transfer = getTransferById(transferIdx);
         if (transfer != null) {
-            transfer.setPerson(transferDetails.getPerson());
             transfer.setTransferType(transferDetails.getTransferType());
             transfer.setTradingDate(transferDetails.getTradingDate());
             transfer.setOpponent(transferDetails.getOpponent());
@@ -113,15 +118,12 @@ public class TransferService {
         transferRepository.deleteAllById(transferIds);
     }
 
-    // 선수 이름으로 이적 정보 검색 (페이징 처리 지원)
+    // 선수, 팀 이름으로 이적 정보 검색 (페이징 처리 지원)
     @Transactional(readOnly = true)
-    public Page<Transfer> searchTransfersByPersonName(String name, Pageable pageable) {
-        return transferRepository.findByPersonNameContaining(name, pageable);
-    }
+    public Page<Transfer> searchTransfersByName(String filterType, String name, Pageable pageable) {
+        if ("".equals(name) || null == name) return transferRepository.findAllWithPerson(pageable);
 
-    // 추가된 메소드: 통합 검색 (선수 이름 또는 상대팀)
-    @Transactional(readOnly = true)
-    public Page<Transfer> searchTransfers(String term, Pageable pageable) {
-        return transferRepository.searchTransfers(term, pageable);
+        if ("team".equals(filterType)) return transferRepository.findByTeamNameContaining(name, pageable);
+        return transferRepository.findByPersonNameContaining(name, pageable);
     }
 }

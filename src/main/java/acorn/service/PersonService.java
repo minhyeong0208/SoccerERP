@@ -75,14 +75,6 @@ public class PersonService {
     }
 
     // 새로운 사람 추가
-    /*public Person addPerson(Person person) {
-        // 양방향 관계 설정
-        if (person.getAbility() != null) {
-            person.getAbility().setPerson(person);
-        }
-        return personRepository.save(person);
-        
-    }*/
 
     public Person addPerson(Person person) {
         Person savedPerson = personRepository.save(person);  // person 테이블 저장
@@ -188,4 +180,11 @@ public class PersonService {
     public Person getPersonByLoginId(String loginId) {
         return personRepository.findById(loginId);
     }
+
+    /**
+     * 팀에 소속된 선수 목록 조회
+     * @param teamIdx
+     * @return
+     */
+    public List<Person> findAllWithTeamIdx(String teamIdx) { return personRepository.findAllWithTeamIdx(teamIdx); }
 }
