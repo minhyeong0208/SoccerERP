@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +32,8 @@ import acorn.service.PersonService;
 @RequestMapping("/persons")
 public class PersonController {
 
-	private final PersonService personService;
-
-	public PersonController(PersonService personService) {
-		this.personService = personService;
-	}
+	@Autowired
+	private PersonService personService;
 
 	// 포지션별 선수 수 조회
 	@GetMapping("/positions/count")
@@ -102,11 +100,16 @@ public class PersonController {
 		return personService.addPerson(person);
 	}
 
-	// JSON + 이미지 파일 업로드를 받는 새로운 방식
+	@GetMapping("/image")
+	public ResponseEntity<?> getPersonImage(@RequestParam int backNumber, @RequestParam String personName) {
+		return ResponseEntity.ok(personService.getPersonImagePath(backNumber, personName));
+	}
+
 	@PostMapping("/add-only-image")
 	public ResponseEntity<?> uploadImage(@RequestPart("file") MultipartFile file) throws IOException {
 		// 이미지 파일 저장 경로 설정
-		String uploadDir = "C:/Project/SoccerERP/src/main/resources/static/img/persons/";
+		// TODO : Properties 경로 사용
+		String uploadDir = "src/main/resources/static/img/persons/";
 
 		try {
 		// 디렉토리가 존재하지 않으면 생성
@@ -125,7 +128,7 @@ public class PersonController {
 
 			// 저장된 파일 경로 반환
 			Map<String, String> response = new HashMap<>();
-			response.put("imageLocation", "/img/persons/" + uniqueFilename);
+			response.put("imageLocation", uniqueFilename);
 
 			return ResponseEntity.ok(response);
 		} catch (IOException e) {

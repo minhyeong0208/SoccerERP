@@ -1,6 +1,7 @@
 package acorn.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,10 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     	Page<Person> searchByPersonNameOrPosition(@Param("personName") String personName, 
     	                                          @Param("position") String position, 
     	                                          Pageable pageable);  // 페이징 지원
+
+    // personIdx로 personImage를 직접 조회하는 메서드
+    @Query("SELECT p.personImage FROM Person p WHERE p.backNumber = :backNumber AND p.personName = :personName")
+    Optional<String> findPersonImageByPersonIdx(@Param("backNumber") int backNumber, @Param("personName") String personName);
 
     @Query("SELECT COUNT(p) > 0 FROM Person p WHERE p.teamIdx = :teamIdx AND p.backNumber = :backNumber")
     boolean existsByBackNumber(String teamIdx, int backNumber);

@@ -1,20 +1,17 @@
 package acorn.controller;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import acorn.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import acorn.entity.Transfer;
 import acorn.entity.Person;
@@ -94,9 +91,15 @@ public class TransferController {
 
     // 이적 정보 업데이트
     @PutMapping("/{id}")
-    public ResponseEntity<Transfer> updateTransfer(
-            @PathVariable int id, @RequestBody Transfer transferDetails) {
-        Transfer updatedTransfer = transferService.updateTransfer(id, transferDetails);
+    public ResponseEntity<Transfer> updateTransfer(@PathVariable int transferIdx, @RequestBody Transfer transferDetails) {
+        // 기존 Transfer 조회
+        Transfer transfer = transferService.getTransferById(transferIdx);
+        transfer.setTradingDate(transferDetails.getTradingDate());
+        transfer.setOpponent(transferDetails.getOpponent());
+        transfer.setPrice(transferDetails.getPrice());
+        transfer.setTransferMemo(transferDetails.getTransferMemo());
+
+        Transfer updatedTransfer = transferService.updateTransfer(transferIdx, transfer);
         return updatedTransfer != null ? ResponseEntity.ok(updatedTransfer) : ResponseEntity.notFound().build();
     }
 

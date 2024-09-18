@@ -240,14 +240,30 @@ $(document).ready(function() {
     /**
      * 선수 이미지 로드
      */
-    function loadPlayerImage(playerName) {
-        let imagePath = `/img/persons/${playerName}.png`;
-        let playerImage = document.getElementById('playerImage');
-        playerImage.src = imagePath;
-        playerImage.onerror = function() {
-            this.onerror = null;
-            this.src = '/img/persons/default.png';
-        };
+    function loadPlayerImage(backNumber, personName) {
+        const url = `/persons/image?backNumber=${backNumber}&personName=${personName}`;
+
+        fetch(url, {
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('이미지 정보를 가져오는데 실패했습니다.');
+                return response.text();
+            })
+            .then(imagePath => {
+                let playerImage = document.getElementById('playerImage');
+                playerImage.src = '/img/persons/' + imagePath;
+                playerImage.onerror = function() {
+                    this.onerror = null;
+                    this.src = '/img/persons/default.png';
+                };
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('이미지 정보를 불러오는 중 오류가 발생했습니다.');
+            });
     }
 
     /**
@@ -260,7 +276,8 @@ $(document).ready(function() {
         $('#playerHeight').text(transfer.person ? transfer.person.height + 'cm' : '--');
         $('#playerWeight').text(transfer.person ? transfer.person.weight + 'kg' : '--');
 
-        loadPlayerImage(transfer.person ? transfer.person.personName : 'default');
+        loadPlayerImage(transfer.person ? transfer.person.backNumber : -1,
+            transfer.person ? transfer.person.personName : 'default');
 
         $('#editTransferPlayer').val(transfer.person ? transfer.person.personName : '');
 
@@ -454,7 +471,7 @@ $(document).ready(function() {
     // 이적 정보 업데이트 이벤트
     $('#updateTransferButton').on('click', function() {
         let transferIdx = $('#transferId').val();
-        let updatedTransfer = {
+        let transferData = {
             transferType: $('#editTransferType').val(),
             tradingDate: $('#editTransferDate').val(),
             opponent: $('#editOpponent').val(),
@@ -462,23 +479,34 @@ $(document).ready(function() {
             transferMemo: $('#editTransferMemo').val()
         };
 
-        $.ajax({
-            url: `/transfers/${transferIdx}`,
-            method: "PUT",
-            contentType: "application/json",
+        const url = `/transfer/${transferIdx}`;
+
+        fetch(url, {
+            method: 'PUT',
+            data: JSON.stringify(transferData),
             headers: {
                 [csrfHeader]: csrfToken
-            },
-            data: JSON.stringify(updatedTransfer),
-            success: function() {
-                $('#updateSuccessModal').modal('show');
-                loadTransfer(currentPage);
-            },
-            error: function(error) {
-                console.error("이적 정보 수정 중 오류 발생:", error);
-                alert('이적 정보 수정 중 오류가 발생했습니다.');
             }
-        });
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                showModal('성공', '이적 정보 수정을 완료하였습니다.', (event) => {
+                    location.reload();
+                });
+            })
+            .catch((error) => {
+                let errMsg = '이적 정보 수정 중 오류가 발생했습니다.\n';
+                Object.values(error).forEach(value => {
+                    const item = '\n• ' + value;
+                    errMsg += item;
+                });
+                showModal('오류', errMsg);
+            });
     });
 
     // 팀 옵션 로드 (강원FC 제외)

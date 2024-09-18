@@ -73,8 +73,15 @@ public class PersonService {
         return personRepository.findById(personIdx).orElse(null);
     }
 
+    // TODO : image return
+    public String getPersonImagePath(int backNumber, String personName) {
+        return personRepository.findPersonImageByPersonIdx(backNumber, personName)
+                .orElse("/img/default-person.png");
+    }
+
     // 새로운 사람 추가
     public Person addPerson(Person person) {
+        person.setTypeCode("player");
         Person savedPerson = personRepository.save(person);  // person 테이블 저장
         
         // Debugging log
