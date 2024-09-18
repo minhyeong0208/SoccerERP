@@ -346,7 +346,7 @@ $(document).ready(function() {
      */
     $('#transferTableBody').on('click', 'tr', function() {
         let transferId = $(this).data('id');
-        let transfer = transferData.find(t => t.transferIdx == transferId);
+        let transfer = transferData.find(t => t.transferIdx === transferId);
 
         if (transfer) loadPlayerInfo(transfer);
     });
