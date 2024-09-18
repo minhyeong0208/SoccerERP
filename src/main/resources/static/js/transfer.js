@@ -5,6 +5,7 @@ $(document).ready(function() {
     let transferData = [];
     let currentPage = 0;
     let transferType = '전체'; // string | enum['구매', '판매']
+    let currentFilter = '전체';
     const pageSize = 10;
     let totalPages = 0;
 
@@ -34,7 +35,8 @@ $(document).ready(function() {
      */
     document.querySelectorAll('input[name="transferTypeFilter"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            transferType = this.value === '전체' ? '' : this.value;
+            currentFilter = this.value;
+            currentPage = 0; // 필터 변경 시 첫 페이지로 리셋
             console.log('# transferTypeFilter > click')
             search();
         });
@@ -156,7 +158,7 @@ $(document).ready(function() {
             success: function(data) {
                 transferData = data.content;
                 totalPages = data.totalPages;
-                currentPage = data.number;  // 서버에서 반환한 현재 페이지 번호
+                currentPage = data.number;
                 renderTable(transferData);
                 renderPaginationButtons();
             },
@@ -171,8 +173,12 @@ $(document).ready(function() {
      * 페이지네이션 이벤트
      */
     $(document).on('click', '.page-link', function() {
+        // prevGroup과 nextGroup 버튼에 대해서는 이벤트를 처리하지 않음
+        const thisId = $(this).attr('id');
+        if (thisId === 'prevGroup' || thisId === 'nextGroup') {
+            return;
+        }
         currentPage = $(this).data('page');
-        console.log('# page-link > click')
         search('.page-link');
     });
 
@@ -182,7 +188,7 @@ $(document).ready(function() {
     $('#prevGroup').on('click', function() {
         if (currentPage > 0) {
             currentPage--;
-            search('.page-link');
+            search('#prevGroup');
         }
     });
 
@@ -192,7 +198,7 @@ $(document).ready(function() {
     $('#nextGroup').on('click', function() {
         if (currentPage < totalPages - 1) {
             currentPage++;
-            search('.page-link');
+            search('#nextGroup');
         }
     });
 
@@ -203,8 +209,13 @@ $(document).ready(function() {
         let pageButtons = $('#pageButtons');
         pageButtons.empty();
 
-        $('#prevGroup').prop('disabled', currentPage === 0);
-        $('#nextGroup').prop('disabled', currentPage >= totalPages - 1);
+        console.log('# currentPage, totalPages >', currentPage, totalPages)
+
+        // 이전 버튼 상태 설정
+        $('#prevGroupItem').toggleClass('disabled', currentPage === 0).find('#prevGroup').prop('disabled', currentPage === 0);
+
+        // 다음 버튼 상태 설정
+        $('#nextGroupItem').toggleClass('disabled', currentPage >= totalPages - 1).find('#nextGroup').prop('disabled', currentPage >= totalPages - 1);
 
         let startPage = Math.max(0, currentPage - 2);
         let endPage = Math.min(totalPages - 1, startPage + 4);
@@ -335,7 +346,7 @@ $(document).ready(function() {
      */
     $('#transferTableBody').on('click', 'tr', function() {
         let transferId = $(this).data('id');
-        let transfer = transferData.find(t => t.transferIdx == transferId);
+        let transfer = transferData.find(t => t.transferIdx === transferId);
 
         if (transfer) loadPlayerInfo(transfer);
     });
@@ -665,7 +676,6 @@ $(document).ready(function() {
         console.log('# transferData > ', transferData);
 
         transferData.person = personData;
-        const formData = transferData;
 
         fetch('/transfers/sell', {
             method: 'POST',
@@ -673,7 +683,7 @@ $(document).ready(function() {
                 'Content-Type': 'application/json',
                 [csrfHeader]: csrfToken
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(transferData)
         })
             .then(response => {
                 return response.statusText;
