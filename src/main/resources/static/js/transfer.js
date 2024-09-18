@@ -43,16 +43,43 @@ $(document).ready(function() {
     /**
      * 전체 선택 체크박스 이벤트
      */
-    $('#selectAllCheckbox').on('click', function() {
-        $('.rowCheckbox').prop('checked', $(this).is(':checked'));
+    document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+        const checkboxes = document.getElementsByName('rowCheckbox');
+        for(let checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
     });
 
     /**
      * 개별 체크박스 이벤트
      */
-    $('#transferTableBody').on('change', '.rowCheckbox', function() {
-        $('#selectAllCheckbox').prop('checked', $('.rowCheckbox:checked').length === $('.rowCheckbox').length);
+    document.addEventListener('DOMContentLoaded', function() {
+        const transferTableBody = document.getElementById('transferTableBody');
+
+        transferTableBody.addEventListener('change', function(event) {
+            if (event.target && event.target.name === 'rowCheckbox') {
+                updateSelectAllCheckbox();
+            }
+        });
     });
+
+    /**
+     * 전체 선택 체크박스 상태 업데이트 함수
+     */
+    function updateSelectAllCheckbox() {
+        const checkboxes = document.getElementsByName('rowCheckbox');
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+
+        let allChecked = true;
+        for(let checkbox of checkboxes) {
+            if (!checkbox.checked) {
+                allChecked = false;
+                break;
+            }
+        }
+
+        selectAllCheckbox.checked = allChecked;
+    }
 
     /**
      * 선택 삭제 버튼 이벤트 리스너
