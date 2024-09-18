@@ -154,7 +154,6 @@ public class PersonService {
                 person.setPosition(personDetails.getPosition());
             }
             if (personDetails.getBackNumber() != 0) { // 백넘버가 0이 아니면 업데이트
-                if (!validBackNumber(personDetails.getTeamIdx(), personDetails.getBackNumber())) { return null; }
                 person.setBackNumber(personDetails.getBackNumber());
             }
             if (personDetails.getNationality() != null) {
