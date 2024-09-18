@@ -5,7 +5,7 @@ $(document).ready(function() {
     let transferData = [];
     let currentPage = 0;
     let transferType = '전체'; // string | enum['구매', '판매']
-    const pageSize = 20;
+    const pageSize = 10;
     let totalPages = 0;
 
     // 숫자에 콤마 추가하는 함수
@@ -143,12 +143,12 @@ $(document).ready(function() {
 
         let state = 0;
 
-        if ('.page-link' === caller) {
+        if (caller === '.page-link' || caller === '#prevGroup' || caller === '#nextGroup') {
             state = currentPage;
         }
 
-        const url = `/transfers?${searchField}=${searchTerm}&page=` + state + `&size=${pageSize}`
-            + (transferType !== '' ? `&transferType=` + transferType : '');
+        const url = `/transfers?${searchField}=${searchTerm}&page=${state}&size=${pageSize}`
+            + (transferType !== '' ? `&transferType=${transferType}` : '');
 
         $.ajax({
             url: url,
@@ -156,7 +156,7 @@ $(document).ready(function() {
             success: function(data) {
                 transferData = data.content;
                 totalPages = data.totalPages;
-                currentPage = state;
+                currentPage = data.number;  // 서버에서 반환한 현재 페이지 번호
                 renderTable(transferData);
                 renderPaginationButtons();
             },
@@ -177,6 +177,26 @@ $(document).ready(function() {
     });
 
     /**
+     * 이전 버튼 클릭 이벤트
+     */
+    $('#prevGroup').on('click', function() {
+        if (currentPage > 0) {
+            currentPage--;
+            search('.page-link');
+        }
+    });
+
+    /**
+     * 다음 버튼 클릭 이벤트
+     */
+    $('#nextGroup').on('click', function() {
+        if (currentPage < totalPages - 1) {
+            currentPage++;
+            search('.page-link');
+        }
+    });
+
+    /**
      * 페이지네이션 버튼 렌더링
      */
     function renderPaginationButtons() {
@@ -186,12 +206,29 @@ $(document).ready(function() {
         $('#prevGroup').prop('disabled', currentPage === 0);
         $('#nextGroup').prop('disabled', currentPage >= totalPages - 1);
 
-        for (let i = 0; i < totalPages; i++) {
+        let startPage = Math.max(0, currentPage - 2);
+        let endPage = Math.min(totalPages - 1, startPage + 4);
+
+        if (startPage > 0) {
+            pageButtons.append(`<li class="page-item"><button class="page-link" data-page="0">1</button></li>`);
+            if (startPage > 1) {
+                pageButtons.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
             pageButtons.append(`
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <button class="page-link" data-page="${i}">${i + 1}</button>
-                </li>
-            `);
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <button class="page-link" data-page="${i}">${i + 1}</button>
+            </li>
+        `);
+        }
+
+        if (endPage < totalPages - 1) {
+            if (endPage < totalPages - 2) {
+                pageButtons.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
+            }
+            pageButtons.append(`<li class="page-item"><button class="page-link" data-page="${totalPages - 1}">${totalPages}</button></li>`);
         }
     }
 
