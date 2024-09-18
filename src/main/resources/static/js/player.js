@@ -7,6 +7,8 @@ let totalPages = 1;
 let totalPeople = [];
 let mappedPeople = [];
 
+let selectedPlayer = [];
+
 //
 let url = `http://localhost:80/persons`;
 
@@ -23,12 +25,12 @@ const formToObject = (form) =>
 
 // 전체 사람 정보 가져오기
 function fetchPlayerData(page, url) {
-	currentPage = page;
+    currentPage = page;
 
-	// 수정하기
-	url += `/players?page=${page}&size=${pageSize}`;
+    // 수정하기
+    url += `/players?page=${page}&size=${pageSize}`;
 
-	console.log(url);
+    console.log(url);
     fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -90,7 +92,7 @@ function fetchPlayerData(page, url) {
             document.querySelector("#nextGroup").disabled = currentPage >= totalPages - 1;
 
             // 리스트 첫번째 데이터 상세보기
-            console.log(totalPeople[0]);
+            selectedPlayer = totalPeople[0];
             showPlayerDetail(totalPeople[0]);
 
         })
@@ -100,17 +102,17 @@ function fetchPlayerData(page, url) {
 
 // 검색
 document.getElementById('search-btn').addEventListener('click', function () {
-	const searchOption = document.getElementById('search-option').value;
-	const searchValue = document.getElementById('search-value').value;
-	
-	console.log(searchOption, searchValue);
-	currentPage = 0;
-	
-	// 수정하기
+    const searchOption = document.getElementById('search-option').value;
+    const searchValue = document.getElementById('search-value').value;
+
+    console.log(searchOption, searchValue);
+    currentPage = 0;
+
+    // 수정하기
     url += `/search?`;
 
     if (searchOption && !searchValue) {
-        alert(`검색어를 입력하세요`);
+        showAlertModal('알림', '검색어를 입력하세요');
         return;
     } else {
         url += `${searchOption}=${searchValue}&page=${currentPage}&size=${pageSize}`;
@@ -123,7 +125,7 @@ document.getElementById('search-btn').addEventListener('click', function () {
 })
 
 // 데이트 피커 하루 전으로 나오는 문제
-function convertDate(date){
+function convertDate(date) {
     date = new Date(date);
     let offset = date.getTimezoneOffset() * 60000;
     return new Date(date.getTime() - offset);
@@ -140,7 +142,6 @@ function showPlayerDetail(player) {
     document.getElementById('detail-nationality').value = player.nationality;
     document.getElementById('detail-personIdx').value = player.personIdx;
 
-    document.getElementById('player-name-backnumber').textContent = player.personIdx + ' ' + player.personName;
     document.getElementById('player-detail-image').setAttribute('src', `/img/persons/${player.personImage}`);
     document.getElementById('player-detail-image').setAttribute('onerror', `this.onerror = null; this.src = '/img/persons/default.png';`);
 
@@ -214,18 +215,102 @@ document.getElementById('person-table-widget').addEventListener('click', functio
         const personIdx = row.getAttribute('data-id');
         const player = totalPeople.find(player => player.personIdx === parseInt(personIdx));
         if (player) {
+            selectedPlayer = player;
             showPlayerDetail(player);
             updateChart(player.ability);
+            console.log(selectedPlayer);
         }
     }
 })
+
+const abilityModal = document.getElementById('ability-update-modal');
+
+// 능력치 차트 클릭 시 능력치 수정 모달
+document.getElementById('player-ability-chart').addEventListener('click', function () {
+    //alert(selectedPlayer.ability.abilityIdx);
+    const abilityModal = new bootstrap.Modal(document.getElementById('ability-update-modal'));
+
+    // 모달 내부의 input 요소들에 현재 능력치 값 설정
+    const abilityData = selectedPlayer.ability;  // 선택된 선수의 능력치 데이터
+    document.getElementById('update-pass').value = abilityData.pass;
+    document.getElementById('show-update-pass').textContent = abilityData.pass;
+
+    document.getElementById('update-physical').value = abilityData.physical;
+    document.getElementById('show-update-physical').textContent = abilityData.physical;
+
+    document.getElementById('update-speed').value = abilityData.speed;
+    document.getElementById('show-update-speed').textContent = abilityData.speed;
+
+    document.getElementById('update-dribble').value = abilityData.dribble;
+    document.getElementById('show-update-dribble').textContent = abilityData.dribble;
+
+    document.getElementById('update-shoot').value = abilityData.shoot;
+    document.getElementById('show-update-shoot').textContent = abilityData.shoot;
+
+    document.getElementById('update-defence').value = abilityData.defence;
+    document.getElementById('show-update-defence').textContent = abilityData.defence;
+
+    // 모달을 띄움
+    abilityModal.show();
+})
+
+// 능력치 수정 버튼 클릭 시 업데이트 처리
+document.getElementById('update-player-ability').addEventListener('click', function () {
+    const updatedAbility = {
+        abilityIdx: selectedPlayer.ability.abilityIdx,
+        pass: document.getElementById('update-pass').value,
+        physical: document.getElementById('update-physical').value,
+        speed: document.getElementById('update-speed').value,
+        dribble: document.getElementById('update-dribble').value,
+        shoot: document.getElementById('update-shoot').value,
+        defence: document.getElementById('update-defence').value,
+    };
+
+    // 서버에 업데이트된 능력치 전송 로직 추가
+    console.log('업데이트된 능력치:', updatedAbility);
+    fetch(`http://localhost/abilities/${updatedAbility.abilityIdx}`, {
+        method: "PUT",
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify(updatedAbility),
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error(`http err, status : ${response.status}`);
+            }
+        })
+        .then(data => {
+            if (data !== null) {
+                showAlertModal('알림', '수정되었습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('request failed', error);
+        })
+
+    // 모달 닫기
+    const abilityModal = bootstrap.Modal.getInstance(document.getElementById('ability-update-modal'));
+    abilityModal.hide();
+});
 
 // 선수 추가 모달
 const modal = document.getElementById("player-modal");
 const modalTitle = document.getElementById("modalTitle");
 const dateLabel = document.getElementById("dateLabel");
-const addPlayerButton = document.getElementById("add-player-btn");
 const closeButtons = document.getElementsByClassName("close");
+if (document.getElementById("add-player-btn")) {
+    const addPlayerButton = document.getElementById("add-player-btn");
+    // 선수 추가 입력폼 모달
+    addPlayerButton.onclick = function () {
+        //alert('clicked');
+        modal.style.display = "block";
+    }
+}
+
 
 // 모달 닫기
 for (let i = 0; i < closeButtons.length; i++) {
@@ -239,34 +324,30 @@ function updateAbilityValue(id, val) {
     document.getElementById('show-' + id).textContent = val;
 }
 
-// 선수 추가 입력폼 모달
-addPlayerButton.onclick = function () {
-    //alert('clicked');
-    modal.style.display = "block";
-}
 
 // 선수 추가
 document.getElementById('submit-player').addEventListener('click', function () {
+    // 모달 위치 조정하기
     if (!document.getElementById('add-personName').value) {
-        alert('이름을 입력하세요');
+        showAlertModal('알림', '이름을 입력하세요');
         return;
     } else if (!document.getElementById('add-backNumber').value) {
-        alert('등번호를 입력하세요');
+        showAlertModal('알림', '등번호를 입력하세요');
         return;
     } else if (!document.getElementById('add-height').value) {
-        alert('키를 입력하세요');
+        showAlertModal('알림', '키를 입력하세요');
         return;
     } else if (!document.getElementById('add-weight').value) {
-        alert('몸무게를 입력하세요');
+        showAlertModal('알림', '몸무게를 입력하세요');
         return;
     } else if (!document.getElementById('add-birth').value) {
-        alert('생일을 입력하세요');
+        showAlertModal('알림', '생일을 입력하세요');
         return;
     } else if (!document.getElementById('add-nationality').value) {
-        alert('국적을 입력하세요');
+        showAlertModal('알림', '국적을 입력하세요');
         return;
     } else if (!document.getElementById('add-personImage').value) {
-        alert('사진을 입력하세요');
+        showAlertModal('알림', '사진을 입력하세요');
         return;
     }
 
@@ -294,75 +375,82 @@ function postPlayer(newPerson) {
         .then(response => response.json())
         .then(result => {
             if (result != null) {
-                alert("선수가 추가되었습니다!");
+                showAlertModal("알림", "선수가 추가되었습니다!");
                 modal.style.display = "none";
                 location.reload(); // 페이지 갱신
             } else {
-                alert("관리자에게 문의하세요");
+                showAlertModal("알림", "관리자에게 문의하세요");
             }
         })
         .catch(error => {
             console.error("Error:", error);
-            alert("서버와의 통신 중 오류가 발생했습니다.");
+            showAlertModal("알림", "서버와의 통신 중 오류가 발생했습니다.");
         });
 }
 
 // 선수 수정
-document.getElementById('update-player').addEventListener('click', function () {
-    const playerInfo = formToObject(document.getElementById('detail-player-info'));
-    //console.log(playerInfo);
+if (document.getElementById('update-player')) {
+    document.getElementById('update-player').addEventListener('click', function () {
+        const playerInfo = formToObject(document.getElementById('detail-player-info'));
+        //console.log(playerInfo);
 
-    const formData = new FormData();
+        const formData = new FormData();
 
-    formData.append('person', new Blob([JSON.stringify(playerInfo)], {type: 'application/json'}));
-    const fileInput = document.getElementById('update-personImage');
-    formData.append('file', fileInput.files[0]);
+        formData.append('person', new Blob([JSON.stringify(playerInfo)], {type: 'application/json'}));
+        const fileInput = document.getElementById('update-personImage');
+        formData.append('file', fileInput.files[0]);
 
-    putPlayer(playerInfo.personIdx, formData);
-});
+        showConfirmModal("확인", "정말 수정하시겠습니까?", function () {
+            putPlayer(playerInfo.personIdx, formData);
+        })
+
+    });
+}
+
 
 function putPlayer(id, formData) {
-    if (confirm('수정하시겠습니까?')) {
-        fetch(url + `/${id}/with-image`, {
-            method: "PUT",
-            headers: {
-                [csrfHeader]: csrfToken
-            },
-            body: formData,
+    fetch(url + `/${id}/with-image`, {
+        method: "PUT",
+        headers: {
+            [csrfHeader]: csrfToken
+        },
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (result != null) {
+                showAlertModal("알림", "수정되었습니다!");
+
+                fetchPlayerData(currentPage, url); // 수정 후 데이터 갱신
+                modal.style.display = "none";
+            } else {
+                showAlertModal("알림", "관리자에게 문의하세요");
+            }
         })
-            .then(response => response.json())
-            .then(result => {
-                if (result != null) {
-                    alert("수정되었습니다!");
-
-                    fetchPlayerData(currentPage, url); // 수정 후 데이터 갱신
-                    modal.style.display = "none";
-                } else {
-                    alert("관리자에게 문의하세요");
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("서버와의 통신 중 오류가 발생했습니다.");
-            });
-    }
-
+        .catch(error => {
+            console.error("Error:", error);
+            showAlertModal("알림", "서버와의 통신 중 오류가 발생했습니다.");
+        });
 }
 
 // 삭제
-document.getElementById('delete-player-btn').addEventListener('click', function () {
-    deletePerson();
-})
+if (document.getElementById('delete-player-btn')) {
+    document.getElementById('delete-player-btn').addEventListener('click', function () {
+        deletePerson();
+    })
+}
+
 
 function deletePerson() {
     const selectedCheckboxes = document.querySelectorAll('.delete-checkbox:checked');
     const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute('data-id'));
 
     if (selectedIds.length === 0) {
-        alert('삭제할 항목을 선택하세요.');
+        showAlertModal("알림", "삭제할 항목을 선택하세요!");
         return;
     }
-    if (confirm('삭제하시겠습니까?')) {
+
+    showConfirmModal("확인", "정말 삭제하시겠습니까?", function () {
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
@@ -377,17 +465,17 @@ function deletePerson() {
             .then(response => response.text())
             .then(result => {
                 if (result) {
-                    alert('삭제 되었습니다!');
+                    showAlertModal("알림", "삭제 되었습니다.");
                     fetchPlayerData(currentPage, url);
                 } else {
-                    alert('ㅠㅠ');
+                    showAlertModal("알림", 'ㅠㅠ');
                 }
             })
             .catch(error => {
                 console.error("Error:", error);
-                alert("서버와의 통신 중 오류가 발생했습니다.");
+                showAlertModal("알림", "서버와의 통신 중 오류가 발생했습니다.");
             });
-    }
+    })
 }
 
 // 체크박스 전체 클릭

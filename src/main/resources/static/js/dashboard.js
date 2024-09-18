@@ -1,3 +1,19 @@
+//
+const imageMap = {
+    '강원': '강원FC.png',
+    '광주': '광주FC.png',
+    '김천': '김천상무FC.png',
+    '대구': '대구FC.png',
+    '대전': '대전 하나시티즈.png',
+    '서울': '서울FC.png',
+    '울산': '울산HD.png',
+    '인천': '인천 유나이티드FC.png',
+    '전북': '전북 현대.png',
+    '제주': '제주 유나이티드FC.png',
+    '수원FC': '수원FC.png',
+    '포항': '포항 스틸러스.png'
+};
+
 // 전체 선수 수
 let playerCount = 0;
 
@@ -6,7 +22,7 @@ function getPlayerCount() {
         .then(response => response.json())
         .then(data => {
             playerCount = data.totalElements;
-            console.log(playerCount);
+            //console.log(playerCount);
             document.getElementById('player-count').textContent = `${playerCount}명~`;
         })
 }
@@ -16,14 +32,10 @@ function getInjured() {
     fetch('http://localhost:80/injuries')
         .then(response => response.json())
         .then(data => {
-            console.log(`getInjured : ${data.totalElements}`);
+            //console.log(`getInjured : ${data.totalElements}`);
             document.getElementById('injury-count').textContent = `${data.totalElements}명~`;
         })
 }
-
-// 월별 부상자
-let monthlyInjuryCount = [];
-let injuryByMonth = [];
 
 // 월별 부상자 차트
 let ctx = document.getElementById('monthly-injury-counts').getContext('2d');
@@ -33,20 +45,21 @@ function monthlyInjury() {
     fetch('http://localhost:80/injuries/monthly-injury-counts')
         .then(response => response.json())
         .then(data => {
-                console.log(data);
-                monthlyInjuryCount = data;
+                // 1~12월 데이터를 모두 포함하는 배열 생성
+                const fullYearData = Array.from({length: 12}, (_, index) => {
+                    const month = index + 1;
+                    const monthData = data.find(item => item.month === month);
+                    return {month, count: monthData ? monthData.count : 0};
+                });
 
-                for (let i = 0; i < monthlyInjuryCount.length; i++) {
-                    injuryByMonth.push(monthlyInjuryCount[i].count);
-                }
-                console.log(injuryByMonth);
-                updateChart(monthlyInjuryCount);
+                const injuryByMonth = fullYearData.map((data) => data.count);
+                updateChart(injuryByMonth);
             }
         )
 }
 
 // 월별 부상자 차트 업데이트
-function updateChart(monthlyInjuryCount) {
+function updateChart(injuryByMonth) {
     if (monthlyInjuryChart) {
         //monthlyInjuryChart.data.datasets[0].data = Object.values(abilities);
         //monthlyInjuryChart.update();
@@ -113,14 +126,14 @@ function countPosition() {
     fetch('http://localhost:80/persons/positions/count')
         .then(response => response.json())
         .then(data => {
-                console.log(data);
+                //console.log(data);
                 positionCount = data;
 
                 console.log(positionCount.length);
                 for (let i = 0; i < positionCount.length; i++) {
                     countByposition.push(positionCount[i].count);
                 }
-                console.log(countByposition);
+                //console.log(countByposition);
                 updateChart2(countByposition);
             }
         )
@@ -195,10 +208,22 @@ function getFuturGames() {
                                 </div>
                             </div>
                             <div class="upcoming-game-details">
-                                ${homeTeam}<br>
-                                ${'vs'}<br>
-                                ${awayTeam}<br>
-                                ${game.stadium}<br>
+                                <table style="text-align: center; height: 100%">
+                                    <tr>
+                                        <td style="width: 45%;">
+                                            <img src="/img/team/${homeTeam}.png" style="width: 50px; height: 50px;">
+                                            <div>${homeTeam}</div>
+                                        </td>
+                                        <td style="width: 10%;">VS</td>
+                                        <td>
+                                            <img src="/img/team/${awayTeam}.png" style="width: 50px; height: 50px;">
+                                            <div>${awayTeam}</div>
+                                        </td>
+                                    </tr>
+                                    <tr style="height: 20%;">
+                                        <td colspan="3">${game.stadium}</td>
+                                    </tr>
+                                </table>
                             </div>
                             
                         </div>`;
@@ -226,27 +251,13 @@ function getRankTable() {
 
             // 랭킹, 팀명, 승점, 승무패
             let tableBody = document.getElementById('rank-table-rows');
-            const imageMap = {
-                '강원': '강원FC.png',
-                '광주': '광주FC.png',
-                '김천': '김천상무FC.png',
-                '대구': '대구FC.png',
-                '대전': '대전 하나시티즈.png',
-                '서울': '서울FC.png',
-                '울산': '울산HD.png',
-                '인천': '인천 유나이티드FC.png',
-                '전북': '전북 현대.png',
-                '제주': '제주 유나이티드FC.png',
-                '수원FC': '수원FC.png',
-                '포항': '포항 스틸러스.png'
-            };
 
             let mappedData = data.map((rankData) => {
                 const imageFileName = imageMap[rankData.title] || '';
                 return `<tr>
                 <td class="font-bold">${rankData.rank}</td>
                 <td>
-                    <img src="/img/team/${imageFileName}" style="width: 30px;">
+                    <img src="/img/team/${imageFileName}" style="width: 25px; height: 25px;">
                     ${rankData.title}
                 </td>
                 <td class="font-bold">${rankData.victoryPoint}</td>
@@ -273,7 +284,7 @@ function getTodaySchedule() {
             //document.getElementById('today-schedule-overview').textContent = `경기 : ${data.games.length}, 훈련 : ${data.trainings.length}, 부상 : ${data.injuries.length}`;
 
             if (!data.injuries || data.injuries.length !== 0) {
-                console.log(`today's injuries : ${data.injuries.length}`);
+                //console.log(`today's injuries : ${data.injuries.length}`);
                 let injuriesText = '부상자 : ';
                 data.injuries.map((injury) => {
                     injuriesText += `${injury.injuryIdx}  `;
@@ -283,14 +294,19 @@ function getTodaySchedule() {
                 document.getElementById('today-schedule-injuries').innerHTML = `<span class="no-schedule">오늘 부상자는 존재하지 않습니다.</span>`;
             }
             if (!data.games || data.games.length !== 0) {
-                console.log(`today's games : ${data.games.length}`);
+                //console.log(`today's games : ${data.games.length}`);
                 document.getElementById('today-schedule-games').textContent = `경기 : ${data.games[0].opponent}랑 경기`;
             } else {
                 document.getElementById('today-schedule-games').innerHTML = `<span class="no-schedule">오늘 경기는 존재하지 않습니다.</span>`;
             }
             if (!data.trainings || data.trainings.length !== 0) {
-                console.log(`today's trainings : ${data.trainings}`);
-                //document.getElementById('today-schedule-trainings').textContent = ``;
+                //console.log(`today's trainings : ${data.trainings}`);
+                let trainingsText = '';
+                data.trainings.map((training) => {
+                    const trainDate = new Date(training.startTime);
+                    trainingsText += `<div class="ec-schedule">${trainDate.getHours()} - ${training.trainName}</div>`;
+                })
+                document.getElementById('today-schedule-trainings').innerHTML = trainingsText;
             } else {
                 document.getElementById('today-schedule-trainings').innerHTML = `<span class="no-schedule">오늘 훈련은 존재하지 않습니다.</span>`;
             }
@@ -307,33 +323,47 @@ function getInjuriesCompare() {
     fetch('http://localhost:80/injuries/compare')
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            const injuryPart = Object.keys(data);
+            const lastMonthValues = Object.keys(data).map(key => data[key]["저번달"]);
+            const thisMonthValues = Object.keys(data).map(key => data[key]["이번달"]);
+            updateChart3(injuryPart, lastMonthValues, thisMonthValues);
         })
 }
 
 // 부상자 수 비교 차트 업데이트
-// function updateChart3() {
-//     if () {
-//         //monthlyInjuryChart.data.datasets[0].data = Object.values(abilities);
-//         //monthlyInjuryChart.update();
-//     } else {
-//         positionCountChart = new Chart(ctx2, {
-//             type: 'pie',
-//             data: {
-//                 labels: ['DF', 'FW', 'GK', 'MF'],
-//                 datasets: [{
-//                     data: countByposition,
-//                 }]
-//             },
-//             options: {
-//                 maintainAspectRatio: true,
-//                 responsive: true,
-//             }
-//         });
-//     }
-//
-// }
+function updateChart3(injuryPart, lastMonthValues, thisMonthValues) {
+    if (injuriesCountCompare) {
+        //monthlyInjuryChart.data.datasets[0].data = Object.values(abilities);
+        //monthlyInjuryChart.update();
+    } else {
+        injuriesCountCompare = new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: injuryPart,
+                datasets: [{
+                    label: '저번달',
+                    data: lastMonthValues,
+                    backgroundColor: '#fcd74f',
+                    borderRadius: 5,
+                    borderSkipped: false
+                },
+                    {
+                        label: '이번달',
+                        data: thisMonthValues,
+                        backgroundColor: 'rgb(255,135,85)',
+                        borderRadius: 5,
+                        borderSkipped: false
+                    }]
+            },
+            options: {
+                indexAxis: 'y',
+                maintainAspectRatio: true,
+                responsive: true,
+            }
+        });
+    }
 
+}
 
 
 // 페이지 로드
