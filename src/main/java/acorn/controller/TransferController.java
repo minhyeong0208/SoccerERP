@@ -91,16 +91,16 @@ public class TransferController {
 
     // 이적 정보 업데이트
     @PutMapping("/{id}")
-    public ResponseEntity<Transfer> updateTransfer(@PathVariable int transferIdx, @RequestBody Transfer transferDetails) {
+    public ResponseEntity<?> updateTransfer(@PathVariable int id, @RequestBody Transfer transferDetails) {
         // 기존 Transfer 조회
-        Transfer transfer = transferService.getTransferById(transferIdx);
+        Transfer transfer = transferService.getTransferById(id);
         transfer.setTradingDate(transferDetails.getTradingDate());
         transfer.setOpponent(transferDetails.getOpponent());
         transfer.setPrice(transferDetails.getPrice());
         transfer.setTransferMemo(transferDetails.getTransferMemo());
 
-        Transfer updatedTransfer = transferService.updateTransfer(transferIdx, transfer);
-        return updatedTransfer != null ? ResponseEntity.ok(updatedTransfer) : ResponseEntity.notFound().build();
+        return (transferService.updateTransfer(transfer) != null)
+                ? ResponseEntity.ok("") : ResponseEntity.notFound().build();
     }
 
     // 선택된 경기 삭제 (스크립트에서 deleteGame 호출)

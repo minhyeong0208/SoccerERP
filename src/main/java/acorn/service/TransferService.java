@@ -74,6 +74,11 @@ public class TransferService {
         return transferRepository.findById(transferIdx).orElse(null);
     }
 
+    @Transactional
+    public Transfer updateTransfer(Transfer transfer) {
+        return transferRepository.save(transfer);
+    }
+
     // 이적 정보 업데이트
     @Transactional
     public Transfer updateTransfer(int transferIdx, Transfer transferDetails) {

@@ -479,20 +479,21 @@ $(document).ready(function() {
             transferMemo: $('#editTransferMemo').val()
         };
 
-        const url = `/transfer/${transferIdx}`;
+        const url = `/transfers/${transferIdx}`;
 
         fetch(url, {
             method: 'PUT',
-            data: JSON.stringify(transferData),
             headers: {
+                'Content-Type': 'application/json',
                 [csrfHeader]: csrfToken
-            }
+            },
+            body: JSON.stringify(transferData),
         })
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(err => { throw err; });
                 }
-                return response.json();
+                return response.text();
             })
             .then(data => {
                 showModal('성공', '이적 정보 수정을 완료하였습니다.', (event) => {
