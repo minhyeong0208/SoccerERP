@@ -1,6 +1,7 @@
 package acorn.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +34,14 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     	Page<Person> searchByPersonNameOrPosition(@Param("personName") String personName, 
     	                                          @Param("position") String position, 
     	                                          Pageable pageable);  // 페이징 지원
-   
+
+    // personIdx로 personImage를 직접 조회하는 메서드
+    @Query("SELECT p.personImage FROM Person p WHERE p.backNumber = :backNumber AND p.personName = :personName")
+    Optional<String> findPersonImageByPersonIdx(@Param("backNumber") int backNumber, @Param("personName") String personName);
+
+    @Query("SELECT COUNT(p) > 0 FROM Person p WHERE p.teamIdx = :teamIdx AND p.backNumber = :backNumber")
+    boolean existsByBackNumber(String teamIdx, int backNumber);
+
     // 여러 ID에 해당하는 사람들을 한 번에 삭제
     void deleteAllByIdInBatch(Iterable<Integer> ids);
     
@@ -43,8 +51,10 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     
  	// id 칼럼을 기준으로 검색하는 메서드
     Person findById(String id);  // 이 경우 id는 Person 테이블의 id 칼럼입니다.
-    
+
     // personIdx 칼럼을 기준으로 검색하는 메서드
     Person findByPersonIdx(int personIdx);
 
+    @Query("SELECT p FROM Person p WHERE p.teamIdx = :teamIdx")
+    List<Person> findAllWithTeamIdx(@Param("teamIdx") String teamIdx);
 }

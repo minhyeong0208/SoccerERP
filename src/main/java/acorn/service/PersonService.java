@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import acorn.repository.LoginRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,27 +15,23 @@ import org.springframework.stereotype.Service;
 
 import acorn.entity.Login;
 import acorn.entity.Person;
-import acorn.repository.LoginRepository;
 import acorn.repository.PersonRepository;
-import jakarta.transaction.Transactional;
 
 @Service
 public class PersonService {
 
-    private final PersonRepository personRepository;
-    private final LoginService loginService;
+    @Autowired
+    private PersonRepository personRepository;
 
-    public PersonService(PersonRepository personRepository, LoginService loginService) {
-        this.personRepository = personRepository;
-        this.loginService = loginService;
-    }
-    
+    @Autowired
+    private LoginService loginService;
+
     @Autowired
     private PasswordEncoder passwordEncoder; // PasswordEncoder 주입
-    
+
     @Autowired
     private LoginRepository loginRepository;
-    
+
     // 포지션별 선수 수 반환
     public List<Map<String, Object>> getPlayersCountByPosition() {
         List<Object[]> results = personRepository.countPlayersByPosition();
@@ -84,6 +82,12 @@ public class PersonService {
         return personRepository.findById(personIdx).orElse(null);
     }
 
+    // TODO : image return
+    public String getPersonImagePath(int backNumber, String personName) {
+        return personRepository.findPersonImageByPersonIdx(backNumber, personName)
+                .orElse("/img/default-person.png");
+    }
+
     // 새로운 사람 추가
     /*public Person addPerson(Person person) {
         // 양방향 관계 설정
@@ -94,12 +98,12 @@ public class PersonService {
         
     }*/
 
-    
     public Person addPerson(Person person) {
     	// 양방향 관계 설정
         if (person.getAbility() != null) {
             person.getAbility().setPerson(person);
         }
+        person.setTypeCode("player");
         Person savedPerson = personRepository.save(person);  // person 테이블 저장
         System.out.println("Person saved successfully: " + savedPerson.getPersonIdx());
         // 기본 비밀번호 "123"을 암호화
@@ -150,6 +154,7 @@ public class PersonService {
                 person.setPosition(personDetails.getPosition());
             }
             if (personDetails.getBackNumber() != 0) { // 백넘버가 0이 아니면 업데이트
+                if (!validBackNumber(personDetails.getTeamIdx(), personDetails.getBackNumber())) { return null; }
                 person.setBackNumber(personDetails.getBackNumber());
             }
             if (personDetails.getNationality() != null) {
@@ -189,6 +194,9 @@ public class PersonService {
         return null;
     }
 
+    // 유효한 등번호인지 확인
+    private boolean validBackNumber(String teamIdx, int backNumber) { return !personRepository.existsByBackNumber(teamIdx, backNumber); }
+
     // 사람 삭제
     public void deletePerson(int personIdx) {
         personRepository.deleteById(personIdx);
@@ -212,7 +220,14 @@ public class PersonService {
     public Person getPersonByLoginId(String loginId) {
         return personRepository.findById(loginId);
     }
-    
+
+    /**
+     * 팀에 소속된 선수 목록 조회
+     * @param teamIdx
+     * @return
+     */
+    public List<Person> findAllWithTeamIdx(String teamIdx) { return personRepository.findAllWithTeamIdx(teamIdx); }
+
  // 비밀번호 변경 로직
     public void changePassword(int personIdx, String newPassword) {
         Person person = personRepository.findByPersonIdx(personIdx);

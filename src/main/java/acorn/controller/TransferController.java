@@ -1,22 +1,18 @@
 package acorn.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
+import acorn.service.PersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import acorn.dto.TransferWithPersonDto;
 import acorn.entity.Transfer;
 import acorn.entity.Person;
 import acorn.service.TransferService;
@@ -25,51 +21,29 @@ import acorn.service.TransferService;
 @RequestMapping("/transfers")
 public class TransferController {
 
-    private final TransferService transferService;
+    @Autowired
+    private TransferService transferService;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    @Autowired
+    private PersonService personService;
 
-    public TransferController(TransferService transferService) {
-        this.transferService = transferService;
-    }
+    private static final String teamIdx = "GFC";
 
-    // 선수 판매
-    @PostMapping("/sale")
-    public ResponseEntity<String> createSaleTransfer(@RequestBody Transfer transfer) {
-        // 이적 타입이 0인지 확인
-        if (transfer.getTransferType() != 0) {
-            return ResponseEntity.badRequest().body("Invalid transfer type. Sale transfers must have transferType set to 0.");
-        }
-        transfer.setTransferType(0);  // 판매 타입을 0으로 설정
-        transferService.addSaleTransfer(transfer);
-        return ResponseEntity.ok("Sale transfer created successfully.");
-    }
+    private static final int TRANSFER_TYPE_BUY = 1;
+    private static final int TRANSFER_TYPE_SELL = 0;
 
-    // 선수 구매 (파일 업로드 기능 추가)
-    @PostMapping("/purchase")
-    public ResponseEntity<String> createPurchaseTransfer(
-            @RequestPart("transfer") Transfer transfer,
-            @RequestPart("person") Person person,
-            @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+    private static final String TRANSFER_FILTER_TEAM = "team";
+    private static final String TRANSFER_FILTER_PERSON = "person";
 
-        // 이적 타입이 1인지 확인
-        if (transfer.getTransferType() != 1) {
-            return ResponseEntity.badRequest().body("Invalid transfer type. Purchase transfers must have transferType set to 1.");
-        }
-        transfer.setTransferType(1);  // 구매 타입을 1로 설정
-
-        TransferWithPersonDto dto = new TransferWithPersonDto(transfer, person, null);
-
-        if (file != null && !file.isEmpty()) {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            Path path = Paths.get(uploadDir + java.io.File.separator + fileName);
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            person.setPersonImage(fileName);
-        }
-
-        transferService.addPurchaseTransfer(dto);
-        return ResponseEntity.ok("Purchase transfer created successfully.");
+    // 모든 이적 정보 조회 (페이징 처리)
+    @GetMapping
+    public Page<Transfer> search(@RequestParam(required = false) String team,
+                                 @RequestParam(required = false) String person,
+                                 @RequestParam(required = false) String transferType,
+                                 Pageable pageable) {
+        String filterType = (team != null) ? TRANSFER_FILTER_TEAM :TRANSFER_FILTER_PERSON;
+        String name = (TRANSFER_FILTER_TEAM.equals(filterType)) ? team : person;
+        return transferService.searchTransfers(filterType, name, transferType, pageable);
     }
 
     // 특정 이적 정보 조회
@@ -79,38 +53,66 @@ public class TransferController {
         return transfer != null ? ResponseEntity.ok(transfer) : ResponseEntity.notFound().build();
     }
 
-    // 모든 이적 정보 조회 (페이징 처리)
-    @GetMapping
-    public Page<Transfer> getAllTransfers(Pageable pageable) {
-        return transferService.getAllTransfers(pageable);
+    // 선수 구매
+    @PostMapping("/buy")
+    public ResponseEntity<?> buy(@RequestBody Transfer transfer) {
+        transfer.setTransferType(TRANSFER_TYPE_BUY);
+
+        Person tempPerson = transfer.getPerson();
+        tempPerson.setPersonName(transfer.getPlayerName());
+        tempPerson.setTeamIdx(teamIdx);
+
+        Person person = personService.addPerson(tempPerson);
+
+        transfer.setPerson(person);
+
+        try {
+            transferService.addPurchaseTransfer(transfer);
+            return ResponseEntity.ok("");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("이적 구매 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    // 선수 판매
+    @PostMapping("/sell")
+    public ResponseEntity<?> sell(@RequestBody Transfer transfer) {
+        transfer.setTransferType(TRANSFER_TYPE_SELL);
+
+        transfer.setPerson(personService.getPersonById(transfer.getPersonIdx()));
+
+        try {
+            transferService.addSaleTransfer(transfer);
+            return ResponseEntity.ok("");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("이적 판매 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     // 이적 정보 업데이트
     @PutMapping("/{id}")
-    public ResponseEntity<Transfer> updateTransfer(
-            @PathVariable int id, @RequestBody Transfer transferDetails) {
-        Transfer updatedTransfer = transferService.updateTransfer(id, transferDetails);
-        return updatedTransfer != null ? ResponseEntity.ok(updatedTransfer) : ResponseEntity.notFound().build();
+    public ResponseEntity<?> updateTransfer(@PathVariable int id, @RequestBody Transfer transferDetails) {
+        // 기존 Transfer 조회
+        Transfer transfer = transferService.getTransferById(id);
+        transfer.setTradingDate(transferDetails.getTradingDate());
+        transfer.setOpponent(transferDetails.getOpponent());
+        transfer.setPrice(transferDetails.getPrice());
+        transfer.setTransferMemo(transferDetails.getTransferMemo());
+
+        return (transferService.updateTransfer(transfer) != null)
+                ? ResponseEntity.ok("") : ResponseEntity.notFound().build();
     }
 
-    // 이적 정보 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTransfer(@PathVariable int id) {
-        transferService.deleteTransfer(id);
-        return ResponseEntity.ok().build();
-    }
-
-    // 선택된 이적 기록 삭제
-    @DeleteMapping("/delete-multiple")
-    public ResponseEntity<Void> deleteTransfers(@RequestBody List<Integer> transferIds) {
-        transferService.deleteTransfers(transferIds);
-        return ResponseEntity.ok().build();
-    }
-
-    // 선수 이름으로 검색 (페이징 처리 지원)
-    @GetMapping("/search")
-    public Page<Transfer> searchTransfersByPersonName(@RequestParam String name, Pageable pageable) {
-        return transferService.searchTransfersByPersonName(name, pageable);
+    // 선택된 경기 삭제 (스크립트에서 deleteGame 호출)
+    @DeleteMapping
+    public ResponseEntity<?> deleteTransfer(@RequestBody List<Integer> ids) {
+        try {
+            transferService.deleteTransfers(ids); // 서비스 호출로 이적 기록 삭제
+            return ResponseEntity.ok(""); // 성공 시 빈 응답 반환
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     @GetMapping("/detail/{id}")
@@ -118,5 +120,22 @@ public class TransferController {
         Transfer selectedTransfer = transferService.getTransferById(id);
         model.addAttribute("selectedTransfer", selectedTransfer);
         return "transfer"; // transfer.html 뷰 이름
+    }
+
+    /**
+     * 판매 대상 선수 목록 조회
+     * @return
+     */
+    @GetMapping("/person/list")
+    public ResponseEntity<?> getPersonList() {
+        Map<Integer, String> persons = new HashMap<>();
+        /**
+         * TODO
+         * teamIdx Session 내 처리
+         */
+        for (Person item : personService.findAllWithTeamIdx(teamIdx)) {
+            persons.put(item.getPersonIdx(), item.getPersonName());
+        }
+        return ResponseEntity.ok(persons);
     }
 }

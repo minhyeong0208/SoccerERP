@@ -27,7 +27,7 @@ public class Ability {
     private int defence;
 
     // Person과의 연관 관계 설정
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_idx")
     @JsonBackReference
     @ToString.Exclude  // Lombok toString에서 순환 참조 방지

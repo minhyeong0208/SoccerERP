@@ -25,31 +25,6 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
-    private final static String gameTypeStr = "전체,리그,토너먼트";
-
-    @GetMapping("/dashboard")
-    public String gameList(Model model) {
-        /* 경기 수 */
-        model.addAttribute("matchCount", gameService.getTotalGames());
-        /* 승패 마진 */
-        model.addAttribute("winLossMargin", gameService.getWinLossMargin());
-        /* 팀 득점 */
-        model.addAttribute("teamScore", gameService.getTotalGoals());
-        /* 팀 실점 */
-        model.addAttribute("teamConcede", gameService.getTotalConcede());
-
-        /* 게임 구분 */
-        List<String> gameType = Arrays.asList(gameTypeStr.split(","));
-        model.addAttribute("gameType", gameType);
-        /* 최근 1경기 */
-        model.addAttribute("mostRecentGame", gameService.getMostRecentGame());
-
-        /* 현재 시간 추가 */
-        model.addAttribute("currentDateTime", LocalDateTime.now());
-
-        return "layout/games";
-    }
-
     // 특정 경기 결과 조회
     @GetMapping("/{id}/result")
     public ResponseEntity<String> getGameResult(@PathVariable(value = "id") int gameIdx) {

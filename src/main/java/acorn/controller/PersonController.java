@@ -6,17 +6,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import acorn.entity.Login;
+import acorn.repository.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,27 +31,22 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import acorn.entity.Login;
 import acorn.entity.Person;
-import acorn.repository.LoginRepository;
 import acorn.service.PersonService;
 
 @RestController
 @RequestMapping("/persons")
 public class PersonController {
 
-	private final PersonService personService;
-
-	public PersonController(PersonService personService) {
-		this.personService = personService;
-	}
+	@Autowired
+	private PersonService personService;
 
 	@Autowired
     private PasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	private LoginRepository loginRepository;
-	
+
 	// 포지션별 선수 수 조회
 	@GetMapping("/positions/count")
 	public ResponseEntity<List<Map<String, Object>>> getPlayersCountByPosition() {
@@ -114,6 +110,42 @@ public class PersonController {
 	@PostMapping
 	public Person createPerson(@RequestBody Person person) {
 		return personService.addPerson(person);
+	}
+
+	@GetMapping("/image")
+	public ResponseEntity<?> getPersonImage(@RequestParam int backNumber, @RequestParam String personName) {
+		return ResponseEntity.ok(personService.getPersonImagePath(backNumber, personName));
+	}
+
+	@PostMapping("/add-only-image")
+	public ResponseEntity<?> uploadImage(@RequestPart("file") MultipartFile file) throws IOException {
+		// 이미지 파일 저장 경로 설정
+		// TODO : Properties 경로 사용
+		String uploadDir = "src/main/resources/static/img/persons/";
+
+		try {
+		// 디렉토리가 존재하지 않으면 생성
+			Path uploadPath = Paths.get(uploadDir);
+			if (!Files.exists(uploadPath)) {
+				Files.createDirectories(uploadPath);
+			}
+
+			// 파일명에서 공백 제거 및 현재 시간 추가하여 유니크한 파일명 생성
+			String originalFilename = file.getOriginalFilename();
+			String filename = originalFilename.replaceAll("\\s+", "_");
+			String uniqueFilename = System.currentTimeMillis() + "_" + filename;
+
+			Path filePath = uploadPath.resolve(uniqueFilename);
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+			// 저장된 파일 경로 반환
+			Map<String, String> response = new HashMap<>();
+			response.put("imageLocation", uniqueFilename);
+
+			return ResponseEntity.ok(response);
+		} catch (IOException e) {
+			return ResponseEntity.internalServerError().body("파일 업로드 중 오류가 발생했습니다: " + e.getMessage());
+		}
 	}
 
 	// JSON + 이미지 파일 업로드를 받는 새로운 방식
@@ -216,7 +248,7 @@ public class PersonController {
 	        return ResponseEntity.ok(Collections.singletonMap("verified", false));
 	    }
 	}
-	
+
 	@PutMapping("/{personIdx}/change-password")
     public ResponseEntity<?> changePassword(@PathVariable("personIdx") int personIdx, @RequestBody Map<String, String> request) {
         String newPassword = request.get("newPassword");
