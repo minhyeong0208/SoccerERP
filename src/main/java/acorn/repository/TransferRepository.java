@@ -20,7 +20,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
     Page<Transfer> findAllWithPerson(Pageable pageable);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.transferType = :transferType ORDER BY t.tradingDate DESC")
-    Page<Transfer> findAllWithPersonFilterTransferType(int transferType, Pageable pageable);
+    Page<Transfer> findAllWithPersonFilterTransferType(@Param("transferType") int transferType, Pageable pageable);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE p.personName LIKE %:name% order by t.tradingDate desc")
     Page<Transfer> findByPersonNameContaining(@Param("name") String name, Pageable pageable);
@@ -29,10 +29,10 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
     Page<Transfer> findByTeamNameContaining(@Param("name") String name, Pageable pageable);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.transferType = :transferType AND p.personName LIKE %:name% order by t.tradingDate desc")
-    Page<Transfer> findByPersonNameContainingFilterTransferType(@Param("name") String name, int transferType, Pageable pageable);
+    Page<Transfer> findByPersonNameContainingFilterTransferType(@Param("name") String name, @Param("transferType") int transferType, Pageable pageable);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.transferType = :transferType AND t.opponent LIKE %:name% order by t.tradingDate desc")
-    Page<Transfer> findByTeamNameContainingFilterTransferType(@Param("name") String name, int transferType, Pageable pageable);
+    Page<Transfer> findByTeamNameContainingFilterTransferType(@Param("name") String name, @Param("transferType") int transferType, Pageable pageable);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE p.personName LIKE %:term% OR t.opponent LIKE %:term%")
     Page<Transfer> searchTransfers(@Param("term") String term, Pageable pageable);

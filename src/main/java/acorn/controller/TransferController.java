@@ -37,9 +37,9 @@ public class TransferController {
 
     // 모든 이적 정보 조회 (페이징 처리)
     @GetMapping
-    public Page<Transfer> search(@RequestParam(required = false) String team,
-                                 @RequestParam(required = false) String person,
-                                 @RequestParam(required = false) String transferType,
+    public Page<Transfer> search(@RequestParam(value = "team", required = false) String team,
+            @RequestParam(value = "person", required = false) String person,
+            @RequestParam(value = "transferType", required = false) String transferType,
                                  Pageable pageable) {
         String filterType = (team != null) ? TRANSFER_FILTER_TEAM :TRANSFER_FILTER_PERSON;
         String name = (TRANSFER_FILTER_TEAM.equals(filterType)) ? team : person;
@@ -91,7 +91,7 @@ public class TransferController {
 
     // 이적 정보 업데이트
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTransfer(@PathVariable int id, @RequestBody Transfer transferDetails) {
+    public ResponseEntity<?> updateTransfer(@PathVariable("id") int id, @RequestBody Transfer transferDetails) {
         // 기존 Transfer 조회
         Transfer transfer = transferService.getTransferById(id);
         transfer.setTradingDate(transferDetails.getTradingDate());
@@ -116,7 +116,7 @@ public class TransferController {
     }
 
     @GetMapping("/detail/{id}")
-    public String getTransferDetail(@PathVariable int id, Model model) {
+    public String getTransferDetail(@PathVariable("id") int id, Model model) {
         Transfer selectedTransfer = transferService.getTransferById(id);
         model.addAttribute("selectedTransfer", selectedTransfer);
         return "transfer"; // transfer.html 뷰 이름
