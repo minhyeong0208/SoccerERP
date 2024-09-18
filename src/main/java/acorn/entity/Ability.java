@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
@@ -29,5 +30,6 @@ public class Ability {
     @OneToOne
     @JoinColumn(name = "person_idx")
     @JsonBackReference
+    @ToString.Exclude  // Lombok toString에서 순환 참조 방지
     private Person person;
 }
