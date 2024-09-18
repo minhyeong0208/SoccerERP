@@ -7,7 +7,6 @@ $(document).ready(function() {
     let transferType = '전체'; // string | enum['구매', '판매']
     const pageSize = 20;
     let totalPages = 0;
-    let selectedIds = [];
 
     // 숫자에 콤마 추가하는 함수
     function addCommas(num) {
@@ -30,7 +29,9 @@ $(document).ready(function() {
         }
     });
 
-    // 이적 유형 필터 이벤트 리스너
+    /**
+     * 이적 유형 필터 이벤트 리스너
+     */
     document.querySelectorAll('input[name="transferTypeFilter"]').forEach(radio => {
         radio.addEventListener('change', function() {
             transferType = this.value === '전체' ? '' : this.value;
@@ -39,59 +40,57 @@ $(document).ready(function() {
         });
     });
 
-    // 전체 선택 체크박스 이벤트
+    /**
+     * 전체 선택 체크박스 이벤트
+     */
     $('#selectAllCheckbox').on('click', function() {
         $('.rowCheckbox').prop('checked', $(this).is(':checked'));
     });
 
-    // 개별 체크박스 이벤트
+    /**
+     * 개별 체크박스 이벤트
+     */
     $('#transferTableBody').on('change', '.rowCheckbox', function() {
         $('#selectAllCheckbox').prop('checked', $('.rowCheckbox:checked').length === $('.rowCheckbox').length);
     });
 
-    // 삭제 버튼 클릭 이벤트
-    $('#openDeleteButton').on('click', function() {
-        selectedIds = $('.rowCheckbox:checked').map(function() {
-            return $(this).val();
-        }).get();
+    /**
+     * 선택 삭제 버튼 이벤트 리스너
+     */
+    document.getElementById('deleteSelectedBtn').addEventListener('click', showDeleteConfirmModal);
 
-        if (selectedIds.length === 0) {
-            alert("삭제할 항목을 선택하세요.");
-            return;
+    /**
+     * 삭제 모달 Open 및 Validation
+     */
+    function showDeleteConfirmModal() {
+        const selectedTransfers = document.querySelectorAll('input[name="rowCheckbox"]:checked');
+        if (selectedTransfers.length > 0) {
+            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        } else {
+            showModal('알림', '삭제할 이적 항목을 선택해주세요.');
         }
+    }
 
-        $('#deleteConfirmModal').modal('show');
-    });
-
-    // 삭제 확인 이벤트
+    /**
+     * 삭제 확인 이벤트
+     */
     $('#confirmDeleteButton').on('click', function() {
-        $.ajax({
-            url: '/transfers/delete-multiple',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            data: JSON.stringify(selectedIds),
-            success: function() {
-                $('#deleteConfirmModal').modal('hide');
-                loadTransfer(currentPage);
-            },
-            error: function(error) {
-                console.error('이적 정보 삭제 중 오류 발생:', error);
-                alert('이적 정보 삭제 중 오류가 발생했습니다.');
-            }
-        });
+        remove();
     });
 
-    // searchField 변경 이벤트 리스너
+    /**
+     * searchField 변경 이벤트 리스너
+     */
     $('#searchField').on('change', function() {
         let filterType = $(this).val();
         // 검색 입력 필드의 placeholder 갱신
         $('#searchInput').attr('placeholder', filterType === 'person' ? '선수명 입력' : '팀명 입력');
     });
 
-    // searchInput에서 엔터 키 입력 이벤트 리스너
+    /**
+     * searchInput에서 엔터 키 입력 이벤트 리스너
+     */
     $('#searchInput').on('keypress', function(e) {
         if (e.which === 13) { // 13은 엔터 키의 keyCode
             console.log('# searchInput > enter key pressed');
@@ -100,12 +99,17 @@ $(document).ready(function() {
         }
     });
 
-    // 검색 기능
+    /**
+     * 검색 버튼
+     */
     $('#searchButton').on('click', function() {
         console.log('# searchButton > click')
         search();
     });
 
+    /**
+     * 검색
+     */
     function search(caller) {
         let searchField = $('#searchField').val();
         let searchTerm = $('#searchInput').val().toLowerCase();
@@ -136,14 +140,37 @@ $(document).ready(function() {
         });
     }
 
-    // 페이지네이션 이벤트
+    /**
+     * 페이지네이션 이벤트
+     */
     $(document).on('click', '.page-link', function() {
         currentPage = $(this).data('page');
         console.log('# page-link > click')
         search('.page-link');
     });
 
-    // 이적 데이터 로드 함수
+    /**
+     * 페이지네이션 버튼 렌더링
+     */
+    function renderPaginationButtons() {
+        let pageButtons = $('#pageButtons');
+        pageButtons.empty();
+
+        $('#prevGroup').prop('disabled', currentPage === 0);
+        $('#nextGroup').prop('disabled', currentPage >= totalPages - 1);
+
+        for (let i = 0; i < totalPages; i++) {
+            pageButtons.append(`
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <button class="page-link" data-page="${i}">${i + 1}</button>
+                </li>
+            `);
+        }
+    }
+
+    /**
+     * 이적 데이터 로드
+     */
     function loadTransfer(page = 0) {
         const url = `/transfers?page=${page}&size=${pageSize}`
             + (transferType !== '' ? `&transferType=` + transferType : '');
@@ -162,24 +189,9 @@ $(document).ready(function() {
         });
     }
 
-    // 페이지네이션 버튼 렌더링
-    function renderPaginationButtons() {
-        let pageButtons = $('#pageButtons');
-        pageButtons.empty();
-
-        $('#prevGroup').prop('disabled', currentPage === 0);
-        $('#nextGroup').prop('disabled', currentPage >= totalPages - 1);
-
-        for (let i = 0; i < totalPages; i++) {
-            pageButtons.append(`
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <button class="page-link" data-page="${i}">${i + 1}</button>
-                </li>
-            `);
-        }
-    }
-
-    // 테이블 렌더링
+    /**
+     * 테이블 렌더링
+     */
     function renderTable(data) {
         let transferTableBody = $("#transferTableBody");
         transferTableBody.empty();
@@ -187,7 +199,7 @@ $(document).ready(function() {
         $.each(data, function(index, transfer) {
             transferTableBody.append(`
             <tr style="cursor: pointer;" data-id="${transfer.transferIdx}">
-                <td><input type="checkbox" class="rowCheckbox" value="${transfer.transferIdx}"></td>
+                <td><input type="checkbox" name="rowCheckbox" value="${transfer.transferIdx}"></td>
                 <td>${transfer.transferType === 1 ? '구매' : '판매'}</td>
                 <td>${transfer.person ? transfer.person.personName : '--'}</td>
                 <td>${transfer.opponent || '--'}</td>
@@ -198,7 +210,9 @@ $(document).ready(function() {
         });
     }
 
-    // 선수 이미지 로드
+    /**
+     * 선수 이미지 로드
+     */
     function loadPlayerImage(playerName) {
         let imagePath = `/img/persons/${playerName}.png`;
         let playerImage = document.getElementById('playerImage');
@@ -209,36 +223,45 @@ $(document).ready(function() {
         };
     }
 
-// 테이블 행 클릭 이벤트
+    /**
+     * 선수 프로필 조회
+     */
+    function loadPlayerInfo(transfer) {
+        $('#playerNumber').text(transfer.person ? transfer.person.backNumber : '--');
+        $('#playerName').text(transfer.person ? transfer.person.personName : '--');
+        $('#playerPosition').text(transfer.person ? transfer.person.position : '--');
+        $('#playerHeight').text(transfer.person ? transfer.person.height + 'cm' : '--');
+        $('#playerWeight').text(transfer.person ? transfer.person.weight + 'kg' : '--');
+
+        loadPlayerImage(transfer.person ? transfer.person.personName : 'default');
+
+        $('#editTransferPlayer').val(transfer.person ? transfer.person.personName : '');
+
+        // 날짜 처리 수정
+        let date = new Date(transfer.tradingDate);
+        date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+        $('#editTransferDate').val(date.toISOString().split('T')[0]);
+
+        $('#editTransferType').val(transfer.transferType);
+        $('#editOpponent').val(transfer.opponent);
+        $('#editPrice').val(addCommas(transfer.price));
+        $('#editTransferMemo').val(transfer.transferMemo);
+        $('#transferId').val(transfer.transferIdx);
+    }
+
+    /**
+     * 테이블 행 클릭 이벤트 (선수 프로필 조회)
+     */
     $('#transferTableBody').on('click', 'tr', function() {
         let transferId = $(this).data('id');
         let transfer = transferData.find(t => t.transferIdx == transferId);
 
-        if (transfer) {
-            $('#playerNumber').text(transfer.person ? transfer.person.backNumber : '--');
-            $('#playerName').text(transfer.person ? transfer.person.personName : '--');
-            $('#playerPosition').text(transfer.person ? transfer.person.position : '--');
-            $('#playerHeight').text(transfer.person ? transfer.person.height + 'cm' : '--');
-            $('#playerWeight').text(transfer.person ? transfer.person.weight + 'kg' : '--');
-
-            loadPlayerImage(transfer.person ? transfer.person.personName : 'default');
-
-            $('#editTransferPlayer').val(transfer.person ? transfer.person.personName : '');
-
-            // 날짜 처리 수정
-            let date = new Date(transfer.tradingDate);
-            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-            $('#editTransferDate').val(date.toISOString().split('T')[0]);
-
-            $('#editTransferType').val(transfer.transferType);
-            $('#editOpponent').val(transfer.opponent);
-            $('#editPrice').val(addCommas(transfer.price));
-            $('#editTransferMemo').val(transfer.transferMemo);
-            $('#transferId').val(transfer.transferIdx);
-        }
+        if (transfer) loadPlayerInfo(transfer);
     });
 
-    // 이적 추가 모달 오픈 이벤트
+    /**
+     * 이적 추가 모달 오픈 이벤트
+     */
     $('#openAddTransferModalButton').on('click', function() {
         loadTeamOptions();
         // loadPlayerOptions();
@@ -248,6 +271,9 @@ $(document).ready(function() {
         updatePlayerNameField(selectedValue);
     });
 
+    /**
+     * 이적 추가 Form Mode 구성
+     */
     function switchFormMode(selectedValue) {
         var addForm1 = $('#addForm1');
         var addForm2 = $('#addForm2');
@@ -293,6 +319,9 @@ $(document).ready(function() {
         }
     }
 
+    /**
+     * TODO : 내용 검토 필요
+     */
     function fetchAndPopulatePlayerList(selectElement) {
         $.ajax({
             url: '/transfers/person/list',
@@ -312,6 +341,9 @@ $(document).ready(function() {
         });
     }
 
+    /**
+     * TODO : 내용 검토 필요
+     */
     function updatePlayerNameField(transferType) {
         var container = $('#playerNameContainer');
         container.empty(); // 기존 내용을 비웁니다
@@ -327,7 +359,9 @@ $(document).ready(function() {
         }
     }
 
-    // 이적 타입 변경 이벤트
+    /**
+     * 이적 타입 변경 이벤트
+     */
     $('input[name="transferType"]').on('change', function() {
         var selectedValue = $(this).val();
         console.log('Selected transfer type:', selectedValue);
@@ -335,8 +369,11 @@ $(document).ready(function() {
         updatePlayerNameField(selectedValue);
     });
 
+    /**
+     * 이적 추가 form validation
+     */
     function validationForm1() {
-        const requiredFields = ['addPlayerName', 'addTransferDate', 'addPrice', 'addOpponent'];
+        const requiredFields = ['addPlayerName', 'addTradingDate', 'addPrice', 'addOpponent'];
         let isValid = true;
         let firstInvalidField = null;
 
@@ -417,38 +454,17 @@ $(document).ready(function() {
         });
     });
 
-    // 선수 옵션 로드
-    function loadPlayerOptions() {
-        $.ajax({
-            url: '/persons',
-            method: 'GET',
-            success: function(persons) {
-                let playerSelect = $('#addSellPlayer');
-                playerSelect.empty().append('<option value="">선수명 선택</option>');
-                persons.forEach(person => {
-                    playerSelect.append(`<option value="${person.personIdx}">${person.personName}</option>`);
-                });
-            },
-            error: function(error) {
-                console.error('선수 목록 로드 중 오류 발생:', error);
-            }
-        });
-    }
-
     // 팀 옵션 로드 (강원FC 제외)
     function loadTeamOptions() {
         $.ajax({
             url: '/teams',
             method: 'GET',
             success: function(teams) {
-                let buyTeamSelect = $('#addOpponent');
-                let sellTeamSelect = $('#addSellOpponent');
-                buyTeamSelect.empty().append('<option value="">상대팀 선택</option>');
-                sellTeamSelect.empty().append('<option value="">상대팀 선택</option>');
+                let teamItems = $('#addOpponent');
+                teamItems.empty().append('<option value="">상대팀 선택</option>');
                 teams.forEach(team => {
                     if (team.teamName !== '강원FC') {
-                        buyTeamSelect.append(`<option value="${team.teamName}">${team.teamName}</option>`);
-                        sellTeamSelect.append(`<option value="${team.teamName}">${team.teamName}</option>`);
+                        teamItems.append(`<option value="${team.teamName}">${team.teamName}</option>`);
                     }
                 });
             },
@@ -458,135 +474,209 @@ $(document).ready(function() {
         });
     }
 
-    // 이적 선수 저장 버튼
+    /**
+     * 저장 버튼
+     */
     $('#saveButton').on('click', function() {
-        const selectedValue = $('input[name="transferType"]:checked').val();
-
         if (!validationForm1()) return;
 
+        const selectedValue = $('input[name="transferType"]:checked').val();
+        (selectedValue === 'buy') ? buy() : sell()
+    });
+
+    /**
+     * 구매
+     */
+    function buy() {
         let price = $('#addPrice').val();
 
         var transferData = {
-            personIdx: $('#addPlayerName').val(),
-            transferDate: $('#addTransferDate').val(),
-            price: price.replace(/,/g, ''),
+            playerName: $('#addPlayerName').val(),
+            tradingDate: $('#addTradingDate').val(),
+            price: removeCommas(price),
             opponent: $('#addOpponent').val(),
             memo: $('#addMemo').val()
         };
 
         console.log('# transferData > ', transferData);
 
+        /**
+         * 파일 업로드 후 URL 구성
+         */
+        const addPlayerImage = $('#addPlayerImage')[0].files[0];
+        const uploadedImageLocation = uploadImage(addPlayerImage);
+
+        let backNumber = $('#addPlayerBackNumber').val();
+        let height = $('#addPlayerHeight').val();
+        let weight = $('#addPlayerWeight').val();
+
         var personData = {
-            birthdate: $('#addPlayerBirthdate').val(),
+            birth: $('#addPlayerBirthdate').val(),
             nationality: $('#addPlayerNationality').val(),
-            backNumber: $('#addPlayerBackNumber').val(),
+            backNumber: removeCommas(backNumber),
             position: $('input[name="playerPosition"]:checked').val(),
             contractStart: $('#addPlayerContractStart').val(),
             contractEnd: $('#addPlayerContractEnd').val(),
-            height: $('#addPlayerHeight').val(),
-            weight: $('#addPlayerWeight').val()
+            height: removeCommas(height),
+            weight: removeCommas(weight),
+            personImage: uploadedImageLocation // 미리 업로드된 선수 이미지
         };
 
         console.log('# personData > ', personData);
 
-        // TODO: please implement below sutff, image upload
-        /*
-        let formData = new FormData();
-        formData.append('transferData', JSON.stringify({
-            transferType: "1",
-            playerName: $('#addPlayerName').val(),
-            transferDate: $('#addTransferDate').val(),
-            price: removeCommas($('#addPrice').val()),
+        transferData.person = personData;
+        // if (!validationForm2()) return;
+
+        fetch('/transfers/buy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(transferData)
+        })
+            .then(response => {
+                return response.statusText;
+            })
+            .then(data => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addTransferModal'));
+                modal.hide();
+                showModal('성공', '정상적으로 영입을 완료하였습니다.', (event) => {
+                    location.reload();
+                });
+            })
+            .catch((error) => {
+                let errMsg = '구매 중 오류가 발생하였습니다.\n';
+                Object.values(error).forEach(value => {
+                    const item = '\n• ' + value;
+                    errMsg += item;
+                });
+                showModal('오류', errMsg);
+            });
+    }
+
+    /**
+     * 판매
+     */
+    function sell() {
+        let price = $('#addPrice').val();
+
+        var transferData = {
+            personIdx: $('#addPlayerName').val(),
+            tradingDate: $('#addTradingDate').val(),
+            price: removeCommas(price),
             opponent: $('#addOpponent').val(),
             memo: $('#addMemo').val()
-        }));
-        formData.append('additionalData', JSON.stringify(fieldVal));
+        };
 
-        let imageFile = $('#addPlayerImage')[0].files[0];
-        if (imageFile) {
-            formData.append('image', imageFile);
-        }
-        */
+        console.log('# transferData > ', transferData);
 
-        if (selectedValue === 'buy') {
-            transferData.person = personData;
-            const formData = transferData;
-            // if (!validationForm2()) return;
-            $.ajax({
-                url: '/transfers/buy',
-                method: 'POST',
-                data: JSON.stringify(formData),
-                processData: false,
-                contentType: false,
-                headers: {
-                    [csrfHeader]: csrfToken
-                },
-                success: function (response) {
+        transferData.person = personData;
+        const formData = transferData;
 
-                },
-                error: function (error) {
-
-                }
-            });
-        } else if (selectedValue === 'sell') {
-            const formData = transferData;
-            $.ajax({
-                url: '/transfers/sell',
-                method: 'POST',
-                data: JSON.stringify(formData),
-                processData: false,
-                contentType: 'application/json',
-                headers: {
-                    [csrfHeader]: csrfToken
-                },
-                success: function (response) {
-
-                },
-                error: function (error) {
-
-                }
-            });
-            // $.ajax({
-            //     url: '/transfers/sell',
-            //     method: 'POST',
-            //     data: Object.assign(baseInfoData, detailInfoData),
-            //     processData: false,
-            //     contentType: false,
-            //     headers: {
-            //         [csrfHeader]: csrfToken
-            //     },
-            //     success: function (response) {
-            //         $('#sellConfirmModalLabel').modal('hide');
-            //         loadTransfer();
-            //     },
-            //     error: function (error) {
-            //         console.error('이적 정보 저장 중 오류 발생:', error);
-            //         alert('이적 정보 저장 중 오류가 발생했습니다.');
-            //     }
-        }
-    });
-
-    function saveTransfer(transferData) {
-        $.ajax({
-            url: '/transfers/sell',
+        fetch('/transfers/sell', {
             method: 'POST',
-            data: JSON.stringify(transferData),
-            contentType: 'application/json',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                return response.statusText;
+            })
+            .then(data => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addTransferModal'));
+                modal.hide();
+                showModal('성공', '정상적으로 방출을 완료하였습니다.', (event) => {
+                    location.reload();
+                });
+            })
+            .catch((error) => {
+                let errMsg = '판매 중 오류가 발생하였습니다.\n';
+                Object.values(error).forEach(value => {
+                    const item = '\n• ' + value;
+                    errMsg += item;
+                });
+                showModal('오류', errMsg);
+            });
+    }
+
+    /**
+     * 삭제
+     */
+    function remove() {
+        const selectedCheckboxes = document.querySelectorAll('input[name="rowCheckbox"]:checked');
+        const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+        
+        // validation은 이전에 처리하였음
+
+        fetch('/transfers', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(selectedIds)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text || '서버 응답이 올바르지 않습니다.');
+                    });
+                }
+                return response.text().then(text => {
+                    return text ? JSON.parse(text) : {};
+                });
+            })
+            .then(data => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+                modal.hide();
+                showModal('성공', '선택한 이적 기록을 성공적으로 삭제했습니다.', (event) => {
+                    location.reload();
+                });
+            })
+            .catch((error) => {
+                let errMsg = '이적 기록 삭제 중 오류가 발생했습니다.\n';
+                Object.values(error).forEach(value => {
+                    const item = '\n• ' + value;
+                    errMsg += item;
+                });
+                showModal('오류', errMsg);
+            });
+    }
+
+    /**
+     * 이미지 업로드
+     */
+    function uploadImage(file) {
+        var formData = new FormData();
+        formData.append('file', file);
+
+        let uploadedImageLocation = '';
+
+        fetch('/persons/add-only-image', {
+            method: 'POST',
             headers: {
                 [csrfHeader]: csrfToken
             },
-            success: function(response) {
-                $('#addTransferModal').modal('hide');
-                loadTransfer();
-            },
-            error: function(error) {
-                console.error('이적 정보 저장 중 오류 발생:', error);
-                alert('이적 정보 저장 중 오류가 발생했습니다.');
-            }
-        });
+            body: formData
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                uploadedImageLocation = data.imageLocation;
+                console.log('Image uploaded successfully. Location:', uploadedImageLocation);
+                return uploadedImageLocation;
+            })
+            .catch(error => {
+                console.error('Error uploading image:', error);
+                showModal('오류', '이미지 업로드 중 오류가 발생했습니다.');
+            });
+        return uploadedImageLocation;
     }
 
-    // 파일 업로드 처리
     $('#addPlayerImage').on('change', function(event) {
         var file = event.target.files[0];
         if (file) {

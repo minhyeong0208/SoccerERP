@@ -9,8 +9,12 @@ import org.springframework.stereotype.Repository;
 
 import acorn.entity.Transfer;
 
+import java.util.List;
+
 @Repository
 public interface TransferRepository extends JpaRepository<Transfer, Integer> {
+
+    List<Transfer> findByTransferIdxIn(List<Integer> transferIdxs);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p ORDER BY t.tradingDate DESC")
     Page<Transfer> findAllWithPerson(Pageable pageable);

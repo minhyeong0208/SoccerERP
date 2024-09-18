@@ -34,6 +34,9 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     	                                          @Param("position") String position, 
     	                                          Pageable pageable);  // 페이징 지원
 
+    @Query("SELECT COUNT(p) > 0 FROM Person p WHERE p.teamIdx = :teamIdx AND p.backNumber = :backNumber")
+    boolean existsByBackNumber(String teamIdx, int backNumber);
+
     // 여러 ID에 해당하는 사람들을 한 번에 삭제
     void deleteAllByIdInBatch(Iterable<Integer> ids);
     

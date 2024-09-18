@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -99,6 +100,37 @@ public class PersonController {
 	@PostMapping
 	public Person createPerson(@RequestBody Person person) {
 		return personService.addPerson(person);
+	}
+
+	// JSON + 이미지 파일 업로드를 받는 새로운 방식
+	@PostMapping("/add-only-image")
+	public ResponseEntity<?> uploadImage(@RequestPart("file") MultipartFile file) throws IOException {
+		// 이미지 파일 저장 경로 설정
+		String uploadDir = "C:/Project/SoccerERP/src/main/resources/static/img/persons/";
+
+		try {
+		// 디렉토리가 존재하지 않으면 생성
+			Path uploadPath = Paths.get(uploadDir);
+			if (!Files.exists(uploadPath)) {
+				Files.createDirectories(uploadPath);
+			}
+
+			// 파일명에서 공백 제거 및 현재 시간 추가하여 유니크한 파일명 생성
+			String originalFilename = file.getOriginalFilename();
+			String filename = originalFilename.replaceAll("\\s+", "_");
+			String uniqueFilename = System.currentTimeMillis() + "_" + filename;
+
+			Path filePath = uploadPath.resolve(uniqueFilename);
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+			// 저장된 파일 경로 반환
+			Map<String, String> response = new HashMap<>();
+			response.put("imageLocation", "/img/persons/" + uniqueFilename);
+
+			return ResponseEntity.ok(response);
+		} catch (IOException e) {
+			return ResponseEntity.internalServerError().body("파일 업로드 중 오류가 발생했습니다: " + e.getMessage());
+		}
 	}
 
 	// JSON + 이미지 파일 업로드를 받는 새로운 방식

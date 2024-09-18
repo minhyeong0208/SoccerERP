@@ -33,7 +33,7 @@
                         data-bs-toggle="modal" data-bs-target="#addTransferModal">
                     <i class="fas fa-plus"></i> 이적 추가
                 </button>
-                <button id="openDeleteButton" class="btn btn-danger">
+                <button id="deleteSelectedBtn" class="btn btn-danger">
                     <i class="fas fa-trash"></i> 선택 삭제
                 </button>
             </div>
@@ -52,14 +52,14 @@
             </tr>
             </thead>
             <tbody id="transferTableBody">
-            <tr th:each="transfer : ${transfers}" style="cursor: pointer;" th:data-id="${transfer.transferIdx}">
-                <td><input type="checkbox" class="rowCheckbox" th:value="${transfer.transferIdx}"></td>
-                <td th:text="${transfer.transferType == 1 ? '구매' : '판매'}">이적 타입</td>
-                <td th:text="${transfer.person != null ? transfer.person.personName : '--'}">선수명</td>
-                <td th:text="${transfer.opponent}">상대팀</td>
-                <td th:text="${#temporals.format(transfer.tradingDate, 'yyyy-MM-dd')}">이적일자</td>
-                <td th:text="${#numbers.formatInteger(transfer.price, 3, 'COMMA')}">이적료</td>
-            </tr>
+                <tr th:each="transfer : ${transfers}">
+                    <td><input type="checkbox" name="rowCheckbox" th:value="${transfer.transferIdx}"></td>
+                    <td th:text="${transfer.transferType == 1 ? '구매' : '판매'}">이적 타입</td>
+                    <td th:text="${transfer.person != null ? transfer.person.personName : '--'}">선수명</td>
+                    <td th:text="${transfer.opponent}">상대팀</td>
+                    <td th:text="${#temporals.format(transfer.tradingDate, 'yyyy-MM-dd')}">이적일자</td>
+                    <td th:text="${#numbers.formatInteger(transfer.price, 3, 'COMMA')}">이적료</td>
+                </tr>
             </tbody>
         </table>
 
@@ -206,8 +206,8 @@
                             <div id="playerNameContainer"></div>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="addTransferDate" class="form-label">이적 일자</label>
-                            <input type="date" class="form-control" id="addTransferDate">
+                            <label for="addTradingDate" class="form-label">이적 일자</label>
+                            <input type="date" class="form-control" id="addTradingDate">
                         </div>
                         <div class="form-group mb-3">
                             <label for="addPrice" class="form-label">이적료</label>
@@ -292,21 +292,6 @@
         </div>
     </div>
 
-    <!-- 이적 추가 성공 모달 -->
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">이적 추가 완료</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">이적 정보가 성공적으로 추가되었습니다.</div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- 판매 확인 모달 -->
     <div class="modal fade" id="sellConfirmModal" tabindex="-1" aria-labelledby="sellConfirmModalLabel" aria-hidden="true">
@@ -338,6 +323,25 @@
                 <div class="modal-body">이적 정보가 성공적으로 수정되었습니다.</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이적 삭제 모달 -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">삭제 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    정말 선택한 경기를 삭제하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">삭제</button>
                 </div>
             </div>
         </div>

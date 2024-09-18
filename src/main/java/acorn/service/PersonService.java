@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,14 +17,12 @@ import acorn.repository.PersonRepository;
 @Service
 public class PersonService {
 
-    private final PersonRepository personRepository;
-    private final LoginService loginService;
+    @Autowired
+    private PersonRepository personRepository;
 
-    public PersonService(PersonRepository personRepository, LoginService loginService) {
-        this.personRepository = personRepository;
-        this.loginService = loginService;
-    }
-    
+    @Autowired
+    private LoginService loginService;
+
     // 포지션별 선수 수 반환
     public List<Map<String, Object>> getPlayersCountByPosition() {
         List<Object[]> results = personRepository.countPlayersByPosition();
@@ -75,7 +74,6 @@ public class PersonService {
     }
 
     // 새로운 사람 추가
-
     public Person addPerson(Person person) {
         Person savedPerson = personRepository.save(person);  // person 테이블 저장
         
@@ -127,6 +125,7 @@ public class PersonService {
                 person.setPosition(personDetails.getPosition());
             }
             if (personDetails.getBackNumber() != 0) { // 백넘버가 0이 아니면 업데이트
+                if (!validBackNumber(personDetails.getTeamIdx(), personDetails.getBackNumber())) { return null; }
                 person.setBackNumber(personDetails.getBackNumber());
             }
             if (personDetails.getNationality() != null) {
@@ -166,6 +165,8 @@ public class PersonService {
         return null;
     }
 
+    // 유효한 등번호인지 확인
+    private boolean validBackNumber(String teamIdx, int backNumber) { return !personRepository.existsByBackNumber(teamIdx, backNumber); }
 
     // 사람 삭제
     public void deletePerson(int personIdx) {
