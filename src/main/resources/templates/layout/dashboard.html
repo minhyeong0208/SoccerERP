@@ -67,11 +67,10 @@
 		.card-left-border {
 			border-left: 0.25rem solid;
 		}
-		.border-left-primary { border-left-color: #94cbf6; }
-		.border-left-success { border-left-color: #1cc88a; }
-		.border-left-info { border-left-color: #36b9cc; }
-		.border-left-warning { border-left-color: #fb917e; }
-		.text-warning { color: #fb917e !important; }
+		.border-left-primary { border-left-color: #328b85; }
+		.border-left-warning { border-left-color: #f57a4c; }
+		.text-primary { color: #328b85 !important; }
+		.text-warning { color: #f57a4c !important; }
 
 		.table-wrapper {
 			display: flex;
@@ -121,7 +120,7 @@
 		.upcoming-game {
 			appearance: none;
 			text-decoration: none;
-			background: linear-gradient(#f9f9f9, #e1f8e1);
+			background: linear-gradient(#f9f9f9 30%, rgba(50, 139, 133, 0.38));
 			margin-top: 1.25rem;
 			padding: 1rem;
 			border-radius: 1rem;
@@ -161,6 +160,54 @@
 			text-transform: uppercase;
 			font-weight: bold;
 		}
+
+		#today-schedules {
+			display: grid;
+			grid-template-rows: repeat(3, 1fr);
+			gap: 0.5rem;
+			padding: 1rem 0;
+			margin-top: 1rem;
+			height: 5rem;
+			width: 100%;
+			flex-direction: column;
+		}
+
+		.today-schedule {
+			height: 4.5rem;
+			padding: 0.5rem;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+		}
+
+		.today-schedule-m {
+			border-bottom: 0.025rem solid #EDEEF1;
+		}
+
+		.today-schedule-gubun-flag {
+			border-radius: 0.5rem;
+			height: 1.5rem;
+			min-width: 3rem;
+			width: 3rem;
+			background-color: #ecddff;
+			color: #5f5967;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			font-weight: bold;
+		}
+
+		.today-schedule-details {
+			padding: 0.5rem;
+			width: 24rem;
+			text-align: center;
+			vertical-align: baseline;
+		}
+
+		.no-schedule {
+			color: #9fa0a1;
+		}
+
     </style>
 </th:block>
 
@@ -257,19 +304,32 @@
 				<div class="card-body">
 					<div class="h6 font-weight-bold text-primary text-uppercase mb-1">
 						오늘의 일정
-						<span id="today-schedule-overview" class="today-schedule-overview" style="color: #2B2B2F;"></span>
 					</div>
-					<div>
-						<p id="today-schedule-count"></p>
-						<p>
-							<span id="today-schedule-games"></span>
-						</p>
-						<p>
-							<span id="today-schedule-trainings"></span>
-						</p>
-						<p>
-							<span id="today-schedule-injuries"></span>
-						</p>
+					<div id="today-schedules">
+						<div class="today-schedule today-schedule-m">
+							<div class="today-schedule-gubun-flag">
+								경기
+							</div>
+							<div class="today-schedule-details" id="today-schedule-games">
+
+							</div>
+						</div>
+						<div class="today-schedule today-schedule-m">
+							<div class="today-schedule-gubun-flag">
+								훈련
+							</div>
+							<div class="today-schedule-details" id="today-schedule-trainings">
+
+							</div>
+						</div>
+						<div class="today-schedule today-schedule-l">
+							<div class="today-schedule-gubun-flag">
+								부상
+							</div>
+							<div class="today-schedule-details" id="today-schedule-injuries">
+
+							</div>
+						</div>
 					</div>
 				</div>
 

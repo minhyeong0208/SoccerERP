@@ -58,10 +58,10 @@ function updateChart(monthlyInjuryCount) {
                 datasets: [{
                     data: injuryByMonth,
                     backgroundColor: [
-                        'rgba(140, 200, 255, 1)'
+                        'rgba(50, 137, 131, 1)'
                     ],
                     borderColor: [
-                        'rgba(140, 200, 255, 1)'
+                        'rgba(50, 137, 131, 1)'
                     ],
                     borderWidth: 1,
                     borderRadius: 5,
@@ -142,10 +142,10 @@ function updateChart2(countByposition) {
                 datasets: [{
                     data: countByposition,
                     backgroundColor: [
-                        '#8cc8ff',
+                        '#f57a4c',
                         '#ecddff',
-                        '#bdbdbd',
-                        '#dafdda',
+                        '#fcd74f',
+                        '#328b85',
                     ],
                     borderRadius: 10,
                 }]
@@ -270,7 +270,7 @@ function getTodaySchedule() {
         .then(data => {
             console.group(data);
 
-            document.getElementById('today-schedule-overview').textContent = `경기 : ${data.games.length}, 훈련 : ${data.trainings.length}, 부상 : ${data.injuries.length}`;
+            //document.getElementById('today-schedule-overview').textContent = `경기 : ${data.games.length}, 훈련 : ${data.trainings.length}, 부상 : ${data.injuries.length}`;
 
             if (!data.injuries || data.injuries.length !== 0) {
                 console.log(`today's injuries : ${data.injuries.length}`);
@@ -279,14 +279,20 @@ function getTodaySchedule() {
                     injuriesText += `${injury.injuryIdx}  `;
                 })
                 document.getElementById('today-schedule-injuries').textContent = injuriesText;
+            } else {
+                document.getElementById('today-schedule-injuries').innerHTML = `<span class="no-schedule">오늘 부상자는 존재하지 않습니다.</span>`;
             }
             if (!data.games || data.games.length !== 0) {
                 console.log(`today's games : ${data.games.length}`);
                 document.getElementById('today-schedule-games').textContent = `경기 : ${data.games[0].opponent}랑 경기`;
+            } else {
+                document.getElementById('today-schedule-games').innerHTML = `<span class="no-schedule">오늘 경기는 존재하지 않습니다.</span>`;
             }
             if (!data.trainings || data.trainings.length !== 0) {
                 console.log(`today's trainings : ${data.trainings}`);
                 //document.getElementById('today-schedule-trainings').textContent = ``;
+            } else {
+                document.getElementById('today-schedule-trainings').innerHTML = `<span class="no-schedule">오늘 훈련은 존재하지 않습니다.</span>`;
             }
 
 
