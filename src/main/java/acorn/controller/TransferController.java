@@ -61,6 +61,7 @@ public class TransferController {
         Person tempPerson = transfer.getPerson();
         tempPerson.setPersonName(transfer.getPlayerName());
         tempPerson.setTeamIdx(teamIdx);
+        tempPerson.setTypeCode("player");
 
         Person person = personService.addPerson(tempPerson);
 

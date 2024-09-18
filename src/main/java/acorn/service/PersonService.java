@@ -103,7 +103,7 @@ public class PersonService {
         if (person.getAbility() != null) {
             person.getAbility().setPerson(person);
         }
-        person.setTypeCode("player");
+
         Person savedPerson = personRepository.save(person);  // person 테이블 저장
         System.out.println("Person saved successfully: " + savedPerson.getPersonIdx());
         // 기본 비밀번호 "123"을 암호화
