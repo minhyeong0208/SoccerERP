@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import acorn.repository.LoginRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import acorn.entity.Login;
@@ -22,6 +25,12 @@ public class PersonService {
 
     @Autowired
     private LoginService loginService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder; // PasswordEncoder 주입
+
+    @Autowired
+    private LoginRepository loginRepository;
 
     // 포지션별 선수 수 반환
     public List<Map<String, Object>> getPlayersCountByPosition() {
@@ -80,17 +89,30 @@ public class PersonService {
     }
 
     // 새로운 사람 추가
+    /*public Person addPerson(Person person) {
+        // 양방향 관계 설정
+        if (person.getAbility() != null) {
+            person.getAbility().setPerson(person);
+        }
+        return personRepository.save(person);
+        
+    }*/
+
     public Person addPerson(Person person) {
+    	// 양방향 관계 설정
+        if (person.getAbility() != null) {
+            person.getAbility().setPerson(person);
+        }
         person.setTypeCode("player");
         Person savedPerson = personRepository.save(person);  // person 테이블 저장
-        
-        // Debugging log
-        System.out.println("Person saved: " + savedPerson.getId());
-        
+        System.out.println("Person saved successfully: " + savedPerson.getPersonIdx());
+        // 기본 비밀번호 "123"을 암호화
+        String defaultPassword = passwordEncoder.encode("123");
+
         try {
             Login login = Login.builder()
                 .loginId(savedPerson.getId())
-                .pw(null)
+                .pw(defaultPassword)
                 .role("USER")
                 .build();
             
@@ -180,8 +202,18 @@ public class PersonService {
         personRepository.deleteById(personIdx);
     }
     
-    // 다중 삭제 메서드
+    @Transactional
     public void deletePersons(List<Integer> personIds) {
+        for (Integer personIdx : personIds) {
+            // 각 personIdx로 Person 엔티티를 찾기
+            Person person = personRepository.findByPersonIdx(personIdx);
+            if (person != null) {
+                // login 테이블에서 해당 id로 레코드를 삭제
+                loginRepository.deleteByLoginId(person.getId());
+                //System.out.println("Deleting login record with loginId: " + person.getId());
+            }
+        }
+        // person 테이블의 레코드 삭제
         personRepository.deleteAllByIdInBatch(personIds);
     }
     
@@ -195,4 +227,30 @@ public class PersonService {
      * @return
      */
     public List<Person> findAllWithTeamIdx(String teamIdx) { return personRepository.findAllWithTeamIdx(teamIdx); }
+
+ // 비밀번호 변경 로직
+    public void changePassword(int personIdx, String newPassword) {
+        Person person = personRepository.findByPersonIdx(personIdx);
+
+        if (person == null) {
+            throw new RuntimeException("Person not found for personIdx: " + personIdx);
+        }
+
+        Login login = loginRepository.findByLoginId(person.getId());
+        if (login == null) {
+            throw new RuntimeException("Login not found for loginId: " + person.getId());
+        }
+
+        // 로그 출력: 비밀번호 변경 확인
+        System.out.println("Changing password for person with ID: " + personIdx);
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        login.setPw(encodedPassword);
+        loginRepository.save(login);
+
+        // 로그 출력: 비밀번호 변경 완료
+        System.out.println("Password successfully changed for person with ID: " + personIdx);
+    }
+
+
 }

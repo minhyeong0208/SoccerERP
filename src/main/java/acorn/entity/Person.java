@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
@@ -36,7 +37,7 @@ public class Person {
     private double weight;
     private Date birth;
     private String position;
-    private Integer backNumber;
+    private int backNumber;  // Integer -> int 로 변경
     private String nationality;
     private Date contractStart;
     private Date contractEnd;
@@ -49,6 +50,7 @@ public class Person {
 
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
+    @ToString.Exclude  // 순환 참조 방지를 위해 제외
     private Ability ability;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
