@@ -676,7 +676,6 @@ $(document).ready(function() {
         console.log('# transferData > ', transferData);
 
         transferData.person = personData;
-        const formData = transferData;
 
         fetch('/transfers/sell', {
             method: 'POST',
@@ -684,7 +683,7 @@ $(document).ready(function() {
                 'Content-Type': 'application/json',
                 [csrfHeader]: csrfToken
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(transferData)
         })
             .then(response => {
                 return response.statusText;
