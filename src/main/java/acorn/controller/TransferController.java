@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import acorn.service.AbilityService;
 import acorn.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import acorn.entity.Transfer;
+import acorn.entity.Ability;
 import acorn.entity.Person;
 import acorn.service.TransferService;
 
@@ -26,6 +28,9 @@ public class TransferController {
 
     @Autowired
     private PersonService personService;
+    
+    @Autowired
+    private AbilityService abilityService;
 
     private static final String teamIdx = "GFC";
 
@@ -65,6 +70,20 @@ public class TransferController {
 
         Person person = personService.addPerson(tempPerson);
 
+     // 능력치 초기화
+        Ability ability = Ability.builder()
+            .person(person)
+            .pass(0)
+            .physical(0)
+            .shoot(0)
+            .speed(0)
+            .dribble(0)
+            .defence(0)
+            .build();
+
+        // Ability 저장
+        abilityService.addAbility(ability);
+        
         transfer.setPerson(person);
 
         try {
@@ -84,6 +103,9 @@ public class TransferController {
         transfer.setPerson(person);
 
         try {
+        	// 선수의 능력치 삭제
+            abilityService.deleteAbility(person.getPersonIdx());
+        	
             transferService.addSaleTransfer(transfer);
             return ResponseEntity.ok("");
         } catch (Exception e) {
