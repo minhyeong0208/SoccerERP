@@ -5,7 +5,6 @@ $(document).ready(function() {
     let transferData = [];
     let currentPage = 0;
     let transferType = '전체'; // string | enum['구매', '판매']
-    let currentFilter = '전체';
     const pageSize = 10;
     let totalPages = 0;
 
@@ -35,9 +34,9 @@ $(document).ready(function() {
      */
     document.querySelectorAll('input[name="transferTypeFilter"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            currentFilter = this.value;
-            currentPage = 0;
-            console.log('Filter changed to:', currentFilter);  // 필터 변경 로깅 추가
+            transferType = this.value;
+            currentPage = 0; // 필터 변경 시 첫 페이지로 리셋
+            console.log('# transferTypeFilter > click')
             search();
         });
     });
@@ -143,10 +142,14 @@ $(document).ready(function() {
         let searchField = $('#searchField').val();
         let searchTerm = $('#searchInput').val().toLowerCase();
 
-        const url = `/transfers?${searchField}=${searchTerm}&page=${currentPage}&size=${pageSize}`
-            + (currentFilter !== '전체' ? `&transferType=${currentFilter}` : '');
+        let state = 0;
 
-        console.log('Search URL:', url);  // URL 로깅 추가
+        if (caller === '.page-link' || caller === '#prevGroup' || caller === '#nextGroup') {
+            state = currentPage;
+        }
+
+        const url = `/transfers?${searchField}=${searchTerm}&page=${state}&size=${pageSize}`
+            + (transferType !== '' ? `&transferType=${transferType}` : '');
 
         $.ajax({
             url: url,
@@ -155,8 +158,6 @@ $(document).ready(function() {
                 transferData = data.content;
                 totalPages = data.totalPages;
                 currentPage = data.number;
-                console.log('Search Response:', data);
-                console.log('Current Page after search:', currentPage);
                 renderTable(transferData);
                 renderPaginationButtons();
             },
@@ -170,13 +171,13 @@ $(document).ready(function() {
     /**
      * 페이지네이션 이벤트
      */
-    $(document).on('click', '.page-link', function(e) {
+    $(document).on('click', '.page-link', function() {
+        // prevGroup과 nextGroup 버튼에 대해서는 이벤트를 처리하지 않음
         const thisId = $(this).attr('id');
         if (thisId === 'prevGroup' || thisId === 'nextGroup') {
             return;
         }
-        currentPage = parseInt($(this).data('page'));
-        console.log('Page changed to:', currentPage);
+        currentPage = $(this).data('page');
         search('.page-link');
     });
 
@@ -186,7 +187,6 @@ $(document).ready(function() {
     $('#prevGroup').on('click', function() {
         if (currentPage > 0) {
             currentPage--;
-            console.log('Moved to previous page:', currentPage);  // 이전 페이지 이동 로깅
             search('#prevGroup');
         }
     });
@@ -197,7 +197,6 @@ $(document).ready(function() {
     $('#nextGroup').on('click', function() {
         if (currentPage < totalPages - 1) {
             currentPage++;
-            console.log('Moved to next page:', currentPage);  // 다음 페이지 이동 로깅
             search('#nextGroup');
         }
     });
@@ -212,12 +211,10 @@ $(document).ready(function() {
         console.log('# currentPage, totalPages >', currentPage, totalPages)
 
         // 이전 버튼 상태 설정
-        $('#prevGroupItem').toggleClass('disabled', currentPage === 0);
-        $('#prevGroup').prop('disabled', currentPage === 0);
+        $('#prevGroupItem').toggleClass('disabled', currentPage === 0).find('#prevGroup').prop('disabled', currentPage === 0);
 
         // 다음 버튼 상태 설정
-        $('#nextGroupItem').toggleClass('disabled', currentPage >= totalPages - 1);
-        $('#nextGroup').prop('disabled', currentPage >= totalPages - 1);
+        $('#nextGroupItem').toggleClass('disabled', currentPage >= totalPages - 1).find('#nextGroup').prop('disabled', currentPage >= totalPages - 1);
 
         let startPage = Math.max(0, currentPage - 2);
         let endPage = Math.min(totalPages - 1, startPage + 4);
@@ -250,19 +247,13 @@ $(document).ready(function() {
      */
     function loadTransfer(page = 0) {
         const url = `/transfers?page=${page}&size=${pageSize}`
-            + (currentFilter !== '전체' ? `&transferType=${currentFilter}` : '');
-
-        console.log('Load Transfer URL:', url);
-
+            + (transferType !== '전체' ? `&transferType=` + transferType : '');
         $.ajax({
             url: url,
             method: "GET",
             success: function(response) {
                 transferData = response.content;
                 totalPages = response.totalPages;
-                currentPage = response.number;
-                console.log('Load Transfer Response:', response);
-                console.log('Current Page after load:', currentPage);
                 renderTable(transferData);
                 renderPaginationButtons();
             },
@@ -281,16 +272,16 @@ $(document).ready(function() {
 
         $.each(data, function(index, transfer) {
             transferTableBody.append(`
-        <tr style="cursor: pointer;" data-id="${transfer.transferIdx}">
-            <td><input type="checkbox" name="rowCheckbox" value="${transfer.transferIdx}"></td>
-            <td>${transfer.transferType === 1 ? '구매' : '판매'}</td>
-            <td>${transfer.person ? transfer.person.personName : '--'}</td>
-            <td>${transfer.opponent || '--'}</td>
-            <td>${new Date(transfer.tradingDate).toLocaleDateString()}</td>
-            <td>${new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(transfer.price)}</td>
-            <td style="display: none;">${transfer.transferMemo || ''}</td>
-        </tr>
-    `);
+            <tr style="cursor: pointer;" data-id="${transfer.transferIdx}">
+                <td><input type="checkbox" name="rowCheckbox" value="${transfer.transferIdx}"></td>
+                <td>${transfer.transferType === 1 ? '구매' : '판매'}</td>
+                <td>${transfer.person ? transfer.person.personName : '--'}</td>
+                <td>${transfer.opponent || '--'}</td>
+                <td>${new Date(transfer.tradingDate).toLocaleDateString()}</td>
+                <td>${new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(transfer.price)}</td>
+                <td>${transfer.transferMemo || ''}</td>
+            </tr>
+        `);
         });
     }
 
@@ -299,6 +290,7 @@ $(document).ready(function() {
      */
     function loadPlayerImage(backNumber, personName) {
         const url = `/persons/image?backNumber=${backNumber}&personName=${personName}`;
+        let playerImage = document.getElementById('playerImage');
 
         fetch(url, {
             headers: {
@@ -310,12 +302,7 @@ $(document).ready(function() {
                 return response.text();
             })
             .then(imagePath => {
-                let playerImage = document.getElementById('playerImage');
-                if (imagePath) {
-                    playerImage.src = '/img/persons/' + imagePath;
-                } else {
-                    playerImage.src = '/img/persons/default.png';
-                }
+                playerImage.src = '/img/persons/' + imagePath;
                 playerImage.onerror = function() {
                     this.onerror = null;
                     this.src = '/img/persons/default.png';
@@ -323,8 +310,8 @@ $(document).ready(function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                let playerImage = document.getElementById('playerImage');
                 playerImage.src = '/img/persons/default.png';
+                alert('이미지 정보를 불러오는 중 오류가 발생했습니다.');
             });
     }
 
@@ -603,9 +590,9 @@ $(document).ready(function() {
     });
 
     /**
-     * 구매
+     * 구매 (비동기 처리)
      */
-    function buy() {
+    async function buy() {
         let price = $('#addPrice').val();
 
         var transferData = {
@@ -617,12 +604,18 @@ $(document).ready(function() {
         };
 
         console.log('# transferData > ', transferData);
-
         /**
          * 파일 업로드 후 URL 구성
          */
         const addPlayerImage = $('#addPlayerImage')[0].files[0];
-        const uploadedImageLocation = uploadImage(addPlayerImage);
+        let uploadedImageLocation = '';
+
+        try {
+            uploadedImageLocation = await uploadImage(addPlayerImage);
+        } catch (error) {
+            console.error('Error in handleAddPlayer:', error);
+            showModal('오류', '선수 정보 처리 중 오류가 발생했습니다 > 이미지 구성');
+        }
 
         let backNumber = $('#addPlayerBackNumber').val();
         let height = $('#addPlayerHeight').val();
@@ -688,8 +681,6 @@ $(document).ready(function() {
         };
 
         console.log('# transferData > ', transferData);
-
-        transferData.person = personData;
 
         fetch('/transfers/sell', {
             method: 'POST',
@@ -764,34 +755,24 @@ $(document).ready(function() {
     }
 
     /**
-     * 이미지 업로드
+     * 이미지 업로드 (비동기 처리)
      */
-    function uploadImage(file) {
-        var formData = new FormData();
+    async function uploadImage(file) {
+        const formData = new FormData();
         formData.append('file', file);
 
-        let uploadedImageLocation = '';
-
-        fetch('/persons/add-only-image', {
-            method: 'POST',
-            headers: {
-                [csrfHeader]: csrfToken
-            },
-            body: formData
-        })
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
-                uploadedImageLocation = data.imageLocation;
-                console.log('Image uploaded successfully. Location:', uploadedImageLocation);
-                return uploadedImageLocation;
-            })
-            .catch(error => {
-                console.error('Error uploading image:', error);
-                showModal('오류', '이미지 업로드 중 오류가 발생했습니다.');
+        try {
+            const response = await fetch('/persons/add-only-image', {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken },
+                body: formData
             });
-        return uploadedImageLocation;
+            const data = await response.json();
+            return data.imageLocation;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            throw error;
+        }
     }
 
     $('#addPlayerImage').on('change', function(event) {
