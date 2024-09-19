@@ -59,7 +59,7 @@ public class TransferController {
         transfer.setTransferType(TRANSFER_TYPE_BUY);
 
         Person tempPerson = transfer.getPerson();
-        tempPerson.setPersonName(transfer.getPlayerName());
+        tempPerson.setPersonName(transfer.getPersonName());
         tempPerson.setTeamIdx(teamIdx);
         tempPerson.setTypeCode("player");
 
@@ -80,7 +80,8 @@ public class TransferController {
     public ResponseEntity<?> sell(@RequestBody Transfer transfer) {
         transfer.setTransferType(TRANSFER_TYPE_SELL);
 
-        transfer.setPerson(personService.getPersonById(transfer.getPersonIdx()));
+        Person person = personService.getPersonById(transfer.getPersonIdx());
+        transfer.setPerson(person);
 
         try {
             transferService.addSaleTransfer(transfer);

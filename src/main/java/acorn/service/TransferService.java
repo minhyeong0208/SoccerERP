@@ -53,7 +53,10 @@ public class TransferService {
     // 판매 이적 처리
     @Transactional
     public void addSaleTransfer(Transfer transfer) {
+        Person tempPerson = transfer.getPerson();
+        transfer.setPersonName(tempPerson.getPersonName());
         Transfer savedTransfer = transferRepository.save(transfer);
+
         personRepository.deleteById(transfer.getPersonIdx());
 
         Finance income = Finance.builder()
@@ -77,21 +80,6 @@ public class TransferService {
     @Transactional
     public Transfer updateTransfer(Transfer transfer) {
         return transferRepository.save(transfer);
-    }
-
-    // 이적 정보 업데이트
-    @Transactional
-    public Transfer updateTransfer(int transferIdx, Transfer transferDetails) {
-        Transfer transfer = getTransferById(transferIdx);
-        if (transfer != null) {
-            transfer.setTransferType(transferDetails.getTransferType());
-            transfer.setTradingDate(transferDetails.getTradingDate());
-            transfer.setOpponent(transferDetails.getOpponent());
-            transfer.setTransferMemo(transferDetails.getTransferMemo());
-            transfer.setPrice(transferDetails.getPrice());
-            return transferRepository.save(transfer);
-        }
-        return null;
     }
 
     // 추가: 모든 이적 정보 조회 (리스트)

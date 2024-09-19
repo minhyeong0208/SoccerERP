@@ -276,7 +276,7 @@ $(document).ready(function() {
             <tr style="cursor: pointer;" data-id="${transfer.transferIdx}">
                 <td><input type="checkbox" name="rowCheckbox" value="${transfer.transferIdx}"></td>
                 <td>${transfer.transferType === 1 ? '구매' : '판매'}</td>
-                <td>${transfer.person ? transfer.person.personName : '--'}</td>
+                <td>${transfer.person ? transfer.person.personName : (transfer.personName || '--')}</td>
                 <td>${transfer.opponent || '--'}</td>
                 <td>${new Date(transfer.tradingDate).toLocaleDateString()}</td>
                 <td>${new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(transfer.price)}</td>
@@ -597,7 +597,7 @@ $(document).ready(function() {
         let price = $('#addPrice').val();
 
         var transferData = {
-            playerName: $('#addPlayerName').val(),
+            personName: $('#addPlayerName').val(),
             tradingDate: $('#addTradingDate').val(),
             price: removeCommas(price),
             opponent: $('#addOpponent').val(),
@@ -697,7 +697,7 @@ $(document).ready(function() {
             .then(data => {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addTransferModal'));
                 modal.hide();
-                showModal('성공', '정상적으로 방출을 완료하였습니다.', (event) => {
+                showModal('성공', '정상적으로 판매를 완료하였습니다.', (event) => {
                     location.reload();
                 });
             })
