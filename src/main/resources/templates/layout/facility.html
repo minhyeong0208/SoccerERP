@@ -80,6 +80,7 @@
 					</li>
 				</ul>
 			</nav>
+			<th:block th:replace="fragments/modal :: modalFragment"></th:block>
 		</div>
 
 		<!-- 시설 추가 모달 -->
@@ -130,25 +131,6 @@
 							data-bs-dismiss="modal">취소</button>
 						<button type="button" class="btn btn-primary"
 							id="addFacilityButton">추가</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- 시설 추가 성공 모달 -->
-		<div class="modal fade" id="successModal" tabindex="-1"
-			aria-labelledby="successModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="successModalLabel">시설 추가 성공</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"
-							aria-label="Close"></button>
-					</div>
-					<div class="modal-body">시설이 성공적으로 추가되었습니다.</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-primary"
-							data-bs-dismiss="modal">확인</button>
 					</div>
 				</div>
 			</div>
@@ -208,108 +190,11 @@
 				</div>
 			</div>
 		</div>
-
-		<!-- 삭제 확인 모달 -->
-		<div class="modal fade" id="deleteConfirmModal" tabindex="-1"
-			aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="deleteConfirmModalLabel">삭제 확인</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"
-							aria-label="Close"></button>
-					</div>
-					<div class="modal-body">정말 삭제하시겠습니까?</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							id="cancelDeleteButton" data-bs-dismiss="modal">취소</button>
-						<button type="button" class="btn btn-danger"
-							id="confirmDeleteButton">삭제</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- 오류 알림 모달 -->
-		<div class="modal fade" id="errorModal" tabindex="-1"
-			aria-labelledby="errorModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="errorModalLabel">오류 발생</h5>
-					</div>
-					<div class="modal-body">
-						<p id="errorMessage">시설 정보를 불러오는 중 오류가 발생했습니다.</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							data-bs-dismiss="modal">닫기</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- 위치 선택 필요 모달 -->
-		<div class="modal fade" id="locationRequiredModal" tabindex="-1"
-			aria-labelledby="locationRequiredModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="locationRequiredModalLabel">알림</h5>
-					</div>
-					<div class="modal-body">시설 위치를 검색하고 선택해야 합니다.</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-primary"
-							data-bs-dismiss="modal">확인</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- 성공 알림 모달 -->
-		<div class="modal fade" id="successModal" tabindex="-1"
-			aria-labelledby="successModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="successModalLabel">성공</h5>
-					</div>
-					<div class="modal-body">
-						<p id="successMessage">작업이 성공적으로 완료되었습니다.</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-primary"
-							data-bs-dismiss="modal">확인</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- 오류 알림 모달 -->
-		<div class="modal fade" id="errorModal" tabindex="-1"
-			aria-labelledby="errorModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="errorModalLabel">오류 발생</h5>
-					</div>
-					<div class="modal-body">
-						<p id="errorMessage">오류 메시지가 여기에 표시됩니다.</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							data-bs-dismiss="modal">닫기</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-
 	</th:block>
 
 	<!-- Kakao Maps API를 여기에 직접 추가 -->
 	<th:block layout:fragment="customContents2">
-		<div id="map" style="width: 100%; height: 900px;"></div>
+		<div id="map" style="width: 100%; height: 700px;"></div>
 	</th:block>
 
 	<th:block layout:fragment="customJs">
@@ -323,6 +208,7 @@
 		<!-- Kakao Maps API 스크립트 -->
 		<script
 			src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e2da4b13684924225b9fa377da6f4e94&libraries=services"></script>
+		<script src="/js/modal.js"></script>
 		<script src="/js/facility.js"></script>
 	</th:block>
 </body>
