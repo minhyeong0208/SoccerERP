@@ -104,8 +104,7 @@ document.getElementById("updateAllButton").onclick = function() {
 		};
 	});
 
-	// 수정 확인 메시지
-	showConfirmModal('확인', '수정하시겠습니까?', function() {
+
 		// 변경된 데이터를 서버로 전송
 		updatedFinances.forEach(financeData => {
 			fetch(`/finances/${financeData.financeIdx}`, {
@@ -120,7 +119,7 @@ document.getElementById("updateAllButton").onclick = function() {
 					if (!response.ok) {
 						throw new Error('Network response was not ok');
 					}
-					showAlertModal("알림", "수정이 완료되었습니다."); // 수정 완료 알림 추가
+					showAlertModal("수정 완료", "수정이 완료되었습니다."); // 수정 완료 알림 추가
 					// 수정 후 데이터 재로드 (날짜 필터 무시하고 전체 데이터를 불러옴)
 					document.querySelector('#startDate').value = '';
 					document.querySelector('#endDate').value = '';
@@ -131,8 +130,6 @@ document.getElementById("updateAllButton").onclick = function() {
 					console.error('Error updating data:', error);
 				});
 		});
-	});
-
 };
 
 // 삭제 기능 추가
@@ -145,7 +142,7 @@ function deleteSelectedFinances() {
 		return;
 	}
 
-	showConfirmModal('확인', '삭제하시겠습니까?', function() {
+	showConfirmModal('삭제 확인', '선택한 항목을 삭제하시겠습니까?', function() {
 		const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 		const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
@@ -161,7 +158,7 @@ function deleteSelectedFinances() {
 				if (!response.ok) {
 					throw new Error('삭제 오류');
 				}
-				showAlertModal("알림", "삭제가 완료되었습니다."); // 삭제 완료 알림 추가
+				showAlertModal("삭제 완료", "삭제가 완료되었습니다."); // 삭제 완료 알림 추가
 				// 삭제 후 테이블 갱신
 				loadFinanceData(currentPage);
 			})
@@ -211,52 +208,7 @@ window.onclick = function(event) {
 	}
 }
 
-// 추가 버튼 클릭 시 데이터 처리
-document.getElementById("financeForm").addEventListener("submit", function(event) {
-	event.preventDefault(); // 폼의 기본 제출 동작 막기
-	const financeType = document.getElementById("modalIncomeRadio").checked ? "수입" : "지출";
-	const financeDate = document.getElementById("financeDate").value;
-	const amount = document.getElementById("amount").value;
-	const trader = document.getElementById("trader").value;
-	const purpose = document.getElementById("purpose").value;
-	const financeMemo = document.getElementById("financeMemo").value;
 
-
-	const financeData = {
-		financeType: financeType,
-		financeDate: financeDate,
-		amount: parseInt(amount),
-		trader: trader,
-		purpose: purpose,
-		financeMemo: financeMemo
-	};
-
-	const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-	const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-	fetch(`/finances/${financeType === '수입' ? 'income' : 'expense'}`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			[csrfHeader]: csrfToken
-		},
-		body: JSON.stringify(financeData)
-	})
-		.then(response => {
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
-			}
-			return response.json();
-		})
-		.then(data => {
-			console.log('Success:', data);
-			modal.style.display = "none";
-			location.reload(); // 새로고침하여 변경 사항 반영
-		})
-		.catch(error => {
-			console.error('Error:', error);
-		});
-});
 
 // 라디오 버튼 변경 시 데이터를 로드
 document.querySelectorAll('input[name="financeType"]').forEach(radio => {
@@ -301,6 +253,58 @@ document.querySelector("#searchButton").onclick = () => {
 // 페이지 로드 시 데이터 로드
 document.addEventListener("DOMContentLoaded", function() {
 	loadFinanceData(currentPage);
+
+	// 추가 버튼 클릭 시 데이터 처리
+	document.getElementById("financeForm").addEventListener("submit", function(event) {
+		event.preventDefault(); // 폼의 기본 제출 동작 막기
+		const financeType = document.getElementById("modalIncomeRadio").checked ? "수입" : "지출";
+		const financeDate = document.getElementById("financeDate").value;
+		const amount = document.getElementById("amount").value;
+		const trader = document.getElementById("trader").value;
+		const purpose = document.getElementById("purpose").value;
+		const financeMemo = document.getElementById("financeMemo").value;
+
+
+		const financeData = {
+			financeType: financeType,
+			financeDate: financeDate,
+			amount: parseInt(amount),
+			trader: trader,
+			purpose: purpose,
+			financeMemo: financeMemo
+		};
+
+		const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+		const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+		fetch(`/finances/${financeType === '수입' ? 'income' : 'expense'}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				[csrfHeader]: csrfToken
+			},
+			body: JSON.stringify(financeData)
+		})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			})
+			.then(data => {
+				console.log('Success:', data);
+				showAlertModal('추가 성공', '데이터가 성공적으로 추가되었습니다.');
+				modal.style.display = "none";
+
+				// 알림 모달이 닫힌 후 새로고침
+				document.getElementById("alertModal").addEventListener('hidden.bs.modal', function() {
+					location.reload(); // 새로고침하여 변경 사항 반영
+				});
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+	});
 });
 
 // 삭제 버튼 클릭 시 삭제 실행
