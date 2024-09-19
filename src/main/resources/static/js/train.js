@@ -436,6 +436,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // 선택된 항목 삭제
+// 선택된 항목 삭제
 document.querySelector('button[type="deleteButton"]').addEventListener('click', function() {
 	const selectedCheckboxes = document.querySelectorAll('.delete-checkbox:checked');
 	const selectedTrainIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute('data-id'));
@@ -447,30 +448,38 @@ document.querySelector('button[type="deleteButton"]').addEventListener('click', 
 
 	// showConfirmModal 호출, 확인 후 삭제 진행
 	showConfirmModal('삭제 확인', `선택한 항목을 삭제하시겠습니까?`, function() {
-		selectedTrainIds.forEach(trainId => {
-			fetch(`/trains/${trainId}`, {
+		const deletePromises = selectedTrainIds.map(trainId => {
+			return fetch(`/trains/${trainId}`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
 					[csrfHeader]: csrfToken
 				}
-			})
-				.then(response => {
-					if (!response.ok) throw new Error(`훈련 ${trainId} 삭제 실패`);
-					return response.text();
-				})
-				.then(() => {
-					console.log(`훈련 ${trainId} 삭제 성공`);
-					document.getElementById('trainInfo').style.display = 'none';
-					document.getElementById('noSelectionMessage').style.display = 'block';
-					document.getElementById('playerSection').style.display = 'none';
-					loadTrainData(currentPage); // 삭제 후 데이터 다시 로드
-					selectedTrainIdx = null; // 선택된 훈련 인덱스 초기화
-				})
-				.catch(error => console.error('훈련 삭제 중 오류 발생:', error));
+			}).then(response => {
+				if (!response.ok) throw new Error(`훈련 ${trainId} 삭제 실패`);
+				return response.text();
+			});
 		});
+
+		// 모든 삭제 작업이 완료된 후에 실행
+		Promise.all(deletePromises)
+			.then(() => {
+				// 삭제가 완료된 후 화면을 업데이트하고 알림 모달을 띄움
+				document.getElementById('trainInfo').style.display = 'none';
+				document.getElementById('noSelectionMessage').style.display = 'block';
+				document.getElementById('playerSection').style.display = 'none';
+				loadTrainData(currentPage); // 삭제 후 데이터 다시 로드
+				selectedTrainIdx = null; // 선택된 훈련 인덱스 초기화
+				
+				// 삭제 완료 알림 모달 표시
+				showAlertModal('삭제 완료', '삭제가 완료되었습니다.');
+			})
+			.catch(error => {
+				console.error('훈련 삭제 중 오류 발생:', error);
+			});
 	});
 });
+
 
 function searchTrains(trainName, page) {
 	fetch(`/trains/search?trainName=${encodeURIComponent(trainName)}&page=${page}&size=${pageSize}`)
