@@ -168,7 +168,8 @@ function updateChart(data) {
         myChart = new Chart(ctx, {
             type: 'radar',
             data: {
-                labels: Object.keys(abilities),
+                //labels: Object.keys(abilities),
+                labels: ['패스', '피지컬', '슛', '스피드', '드리블', '수비'],
                 datasets: [{
                     data: Object.values(abilities),
                     backgroundColor: [
@@ -285,7 +286,7 @@ document.getElementById('update-player-ability').addEventListener('click', funct
         })
         .then(data => {
             if (data !== null) {
-                showAlertModal('알림', '수정되었습니다.');
+                showAlertModal('알림', '수정이 완료되었습니다.');
             }
         })
         .catch(error => {
@@ -375,11 +376,16 @@ function postPlayer(newPerson) {
         .then(response => response.json())
         .then(result => {
             if (result != null) {
-                showAlertModal("알림", "선수가 추가되었습니다!");
+                showAlertModal("알림", "데이터가 성공적으로 추가되었습니다.");
                 modal.style.display = "none";
-                location.reload(); // 페이지 갱신
+                //location.reload(); // 페이지 갱신
+
+                // hidden.bs.modal : 모달의 닫힘이 끝나고 실행되는 이벤트
+                document.getElementById("alertModal").addEventListener('hidden.bs.modal', function() {
+                    location.reload(); // 페이지 갱신
+                });
             } else {
-                showAlertModal("알림", "관리자에게 문의하세요");
+                showAlertModal("알림", "관리자에게 문의하세요.");
             }
         })
         .catch(error => {
@@ -400,7 +406,7 @@ if (document.getElementById('update-player')) {
         const fileInput = document.getElementById('update-personImage');
         formData.append('file', fileInput.files[0]);
 
-        showConfirmModal("확인", "정말 수정하시겠습니까?", function () {
+        showConfirmModal("확인", "수정하시겠습니까?", function () {
             putPlayer(playerInfo.personIdx, formData);
         })
 
@@ -419,12 +425,12 @@ function putPlayer(id, formData) {
         .then(response => response.json())
         .then(result => {
             if (result != null) {
-                showAlertModal("알림", "수정되었습니다!");
+                showAlertModal("알림", "수정이 완료되었습니다");
 
                 fetchPlayerData(currentPage, url); // 수정 후 데이터 갱신
                 modal.style.display = "none";
             } else {
-                showAlertModal("알림", "관리자에게 문의하세요");
+                showAlertModal("알림", "관리자에게 문의하세요.");
             }
         })
         .catch(error => {
@@ -446,11 +452,11 @@ function deletePerson() {
     const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute('data-id'));
 
     if (selectedIds.length === 0) {
-        showAlertModal("알림", "삭제할 항목을 선택하세요!");
+        showAlertModal("알림", "삭제할 항목을 선택하세요.");
         return;
     }
 
-    showConfirmModal("확인", "정말 삭제하시겠습니까?", function () {
+    showConfirmModal("확인", "선택한 항목을 삭제하시겠습니까?", function () {
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
@@ -465,10 +471,10 @@ function deletePerson() {
             .then(response => response.text())
             .then(result => {
                 if (result) {
-                    showAlertModal("알림", "삭제 되었습니다.");
+                    showAlertModal("알림", "삭제가 완료되었습니다.");
                     fetchPlayerData(currentPage, url);
                 } else {
-                    showAlertModal("알림", 'ㅠㅠ');
+                    showAlertModal("알림", '관리자에게 문의하세요.');
                 }
             })
             .catch(error => {
