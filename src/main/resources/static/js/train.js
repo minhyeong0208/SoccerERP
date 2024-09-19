@@ -303,7 +303,8 @@ document.getElementById("trainForm").addEventListener("submit", function(event) 
 			return response.json();
 		})
 		.then(data => {
-			console.log('훈련 추가 성공:', data);
+			//console.log('훈련 추가 성공:', data);
+			showAlertModal('추가 성공', "데이터가 성공적으로 추가되었습니다.")
 			loadTrainData(currentPage); // 훈련 목록 다시 로드
 			document.getElementById('trainForm').reset(); // 폼 초기화
 
@@ -372,6 +373,9 @@ document.getElementById('saveTrainChanges').addEventListener('click', function()
 			showTrainDetails(updatedTrain); // 수정된 훈련 상세 정보 업데이트
 			const editModal = bootstrap.Modal.getInstance(document.getElementById('editTrainModal'));
 			editModal.hide();
+
+			// 수정 완료 알림 모달 표시
+			showAlertModal('수정 완료', '수정이 완료되었습니다.');
 		})
 		.catch(error => console.error('훈련 수정 중 오류 발생:', error));
 });
@@ -379,12 +383,12 @@ document.getElementById('saveTrainChanges').addEventListener('click', function()
 // 훈련 삭제
 document.getElementById('deleteTrainButton').addEventListener('click', function() {
 	if (!selectedTrainIdx) {
-		showAlertModal('알림', '삭제할 훈련을 선택하세요.');
+		showAlertModal('알림', '삭제할 항목을 선택하세요.');
 		return;
 	}
 
 	// showConfirmModal 함수 호출
-	showConfirmModal('확인', '정말로 이 훈련을 삭제하시겠습니까?', function() {
+	showConfirmModal('삭제 확인', '정말로 이 훈련을 삭제하시겠습니까?', function() {
 		// 확인이 되었을 때 실행되는 콜백 함수
 		fetch(`/trains/${selectedTrainIdx}`, {
 			method: 'DELETE',
@@ -398,7 +402,9 @@ document.getElementById('deleteTrainButton').addEventListener('click', function(
 				return response.text();
 			})
 			.then(() => {
-				console.log(`훈련 ${selectedTrainIdx} 삭제 성공`);
+
+				// 삭제 완료 후 '삭제가 완료되었습니다.' 모달 표시
+				showAlertModal('삭제 완료', '삭제가 완료되었습니다.');
 				document.getElementById('trainInfo').style.display = 'none';
 				//document.getElementById('playerSection').style.display = 'none';
 				document.getElementById('noSelectionMessage').style.display = 'block';
@@ -440,7 +446,7 @@ document.querySelector('button[type="deleteButton"]').addEventListener('click', 
 	}
 
 	// showConfirmModal 호출, 확인 후 삭제 진행
-	showConfirmModal('확인', `선택한 ${selectedTrainIds.length}개의 항목을 삭제하시겠습니까?`, function() {
+	showConfirmModal('삭제 확인', `선택한 항목을 삭제하시겠습니까?`, function() {
 		selectedTrainIds.forEach(trainId => {
 			fetch(`/trains/${trainId}`, {
 				method: 'DELETE',

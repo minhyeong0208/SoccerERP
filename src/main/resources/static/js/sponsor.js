@@ -134,7 +134,7 @@ document.getElementById("deleteSponsorButton").onclick = function() {
 	const idsToDelete = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute("data-id"));
 
 	if (idsToDelete.length > 0) {
-		showConfirmModal('확인', `선택한 ${idsToDelete.length}개의 항목을 삭제하시겠습니까?`, function() {
+		showConfirmModal('삭제 확인', `선택한 항목을 삭제하시겠습니까?`, function() {
 			fetch(`/sponsors/delete-multiple`, {
 				method: 'DELETE',
 				headers: {
@@ -147,7 +147,7 @@ document.getElementById("deleteSponsorButton").onclick = function() {
 					if (!response.ok) {
 						throw new Error('Network response was not ok');
 					}
-					showAlertModal("알림", "삭제가 완료되었습니다."); // 삭제 완료 알림 추가
+					showAlertModal("삭제 완료", "삭제가 완료되었습니다."); // 삭제 완료 알림 추가
 					loadSponsorData(currentPage); // 삭제 후 데이터 재로드
 				})
 				.catch(error => {
@@ -210,6 +210,7 @@ document.getElementById("sponsorForm").addEventListener("submit", function(event
 			console.log('Success:', data);
 			const modal = bootstrap.Modal.getInstance(document.getElementById("sponsorModal"));
 			modal.hide(); // 모달 닫기
+			showAlertModal('추가 성공', '데이터가 성공적으로 추가되었습니다.'); // 추가 완료 알림 모달 표시
 			loadSponsorData(currentPage); // 데이터 재로드
 		})
 		.catch(error => {
@@ -234,33 +235,30 @@ document.getElementById("updateAllButton").onclick = function() {
 		};
 	});
 
-	// 수정 확인 메시지
-	showConfirmModal('확인', '수정하시겠습니까?', function() {
-		// 변경된 데이터를 서버로 전송
-		updatedSponsors.forEach(sponsorData => {
-			fetch(`/sponsors/${sponsorData.sponsorIdx}`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-					[csrfHeader]: csrfToken
-				},
-				body: JSON.stringify(sponsorData)
-			})
-				.then(response => {
-					if (!response.ok) {
-						throw new Error('Network response was not ok');
-					}
-					showAlertModal("알림", "수정이 완료되었습니다.");
+	// 변경된 데이터를 서버로 전송
+	updatedSponsors.forEach(sponsorData => {
+		fetch(`/sponsors/${sponsorData.sponsorIdx}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				[csrfHeader]: csrfToken
+			},
+			body: JSON.stringify(sponsorData)
+		})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				showAlertModal("수정 완료", "수정이 완료되었습니다.");
 
-					document.querySelector('#startDate').value = '';
-					document.querySelector('#endDate').value = '';
-					document.querySelector('#searchKeyword').value = '';
-					loadSponsorData(currentPage); // 수정 후 데이터 재로드
-				})
-				.catch(error => {
-					console.error('Error updating data:', error);
-				});
-		});
+				document.querySelector('#startDate').value = '';
+				document.querySelector('#endDate').value = '';
+				document.querySelector('#searchKeyword').value = '';
+				loadSponsorData(currentPage); // 수정 후 데이터 재로드
+			})
+			.catch(error => {
+				console.error('Error updating data:', error);
+			});
 	});
 };
 
