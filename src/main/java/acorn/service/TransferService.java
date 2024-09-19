@@ -59,6 +59,13 @@ public class TransferService {
     public void addSaleTransfer(Transfer transfer) {
         if (transfer.getTransferMemo() == null || "".equals(transfer.getTransferMemo())) { transfer.setTransferMemo(TRANSFER_MEMO_DEF_SELL); }
         Person tempPerson = transfer.getPerson();
+
+        // 기존 구매 건에 대해서도 이름 저장
+        Transfer purchaseTransfer = transferRepository.findWithPersonId(tempPerson.getPersonIdx());
+        purchaseTransfer.setPersonName(tempPerson.getPersonName());
+        this.updateTransfer(purchaseTransfer);
+
+        // 추가할 판매 건 이름 저장
         transfer.setPersonName(tempPerson.getPersonName());
         Transfer savedTransfer = transferRepository.save(transfer);
 

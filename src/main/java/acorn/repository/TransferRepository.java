@@ -37,6 +37,9 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE p.personName LIKE %:term% OR t.opponent LIKE %:term%")
     Page<Transfer> searchTransfers(@Param("term") String term, Pageable pageable);
 
+    @Query("SELECT t FROM Transfer  t LEFT JOIN FETCH t.person p WHERE p.personIdx = :personIdx")
+    Transfer findWithPersonId(@Param("personIdx") int personIdx);
+
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person WHERE t.transferIdx = :id")
     Transfer findByIdWithPerson(@Param("id") int id);
 }
