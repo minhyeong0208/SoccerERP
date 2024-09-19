@@ -33,9 +33,13 @@ public class TransferService {
     private static final String TRANSFER_FILTER_TEAM = "team";
     private static final String TRANSFER_FILTER_PERSON = "person";
 
+    private static final String TRANSFER_MEMO_DEF_BUY = "선수 구매 완료";
+    private static final String TRANSFER_MEMO_DEF_SELL = "선수 판매 완료";
+
     // 구매 이적 처리
     @Transactional
     public void addPurchaseTransfer(Transfer transfer) {
+        if (transfer.getTransferMemo() == null || "".equals(transfer.getTransferMemo())) { transfer.setTransferMemo(TRANSFER_MEMO_DEF_BUY); }
         Transfer savedTransfer = transferRepository.save(transfer);
 
         Finance expense = Finance.builder()
@@ -53,6 +57,7 @@ public class TransferService {
     // 판매 이적 처리
     @Transactional
     public void addSaleTransfer(Transfer transfer) {
+        if (transfer.getTransferMemo() == null || "".equals(transfer.getTransferMemo())) { transfer.setTransferMemo(TRANSFER_MEMO_DEF_SELL); }
         Person tempPerson = transfer.getPerson();
         transfer.setPersonName(tempPerson.getPersonName());
         Transfer savedTransfer = transferRepository.save(transfer);
