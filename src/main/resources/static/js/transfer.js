@@ -144,6 +144,7 @@ $(document).ready(function() {
 
         let state = 0;
 
+        console.log('# caller >', caller);
         if (caller === '.page-link' || caller === '#prevGroup' || caller === '#nextGroup') {
             state = currentPage;
         }
