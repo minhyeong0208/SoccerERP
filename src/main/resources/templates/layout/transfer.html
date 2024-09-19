@@ -60,6 +60,7 @@
                     <td th:text="${transfer.opponent}">상대팀</td>
                     <td th:text="${#temporals.format(transfer.tradingDate, 'yyyy-MM-dd')}">이적일자</td>
                     <td th:text="${#numbers.formatInteger(transfer.price, 3, 'COMMA')}">이적료</td>
+                    <td th:text="${transfer.transferMemo}">관련 메모</td>
                 </tr>
             </tbody>
         </table>
@@ -341,7 +342,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    정말 선택한 경기를 삭제하시겠습니까?
+                    선택한 이적 기록을 삭제하시겠습니까?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
