@@ -329,7 +329,7 @@ $(document).ready(function() {
         loadPlayerImage(transfer.person ? transfer.person.backNumber : -1,
             transfer.person ? transfer.person.personName : 'default');
 
-        $('#editTransferPlayer').val(transfer.person ? transfer.person.personName : '');
+        $('#editTransferPlayer').val(transfer.person ? transfer.person.personName : (transfer.personName || '--'));
 
         // 날짜 처리 수정
         let date = new Date(transfer.tradingDate);
