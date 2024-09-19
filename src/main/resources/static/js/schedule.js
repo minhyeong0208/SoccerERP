@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', function () {
     let trainings = [];
     let matches = [];
 
+    function convertDate(date) {
+        date = new Date(date);
+        let offset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - offset);
+    }
+
     function showModal(modal) {
         modal.style.display = 'flex';
     }
@@ -24,8 +30,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 //console.group(data);
-
-                // 날짜 하루씩 밀리는데..?
 
                 data.trainings.map((train) => {
                     let training = new Object();
@@ -80,7 +84,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function handleEventClick(info) {
         modalTitle.textContent = info.event.title;
-        modalStart.textContent = info.event.start.toISOString().split('T', 1);
+        //modalStart.textContent = info.event.start.toISOString().split('T', 1);
+        modalStart.textContent = convertDate(info.event.start).toISOString().split('T', 1);
         if (info.event.classNames.includes('match')) {
             modalDescription.textContent = `${info.event.extendedProps.isHome}, ${info.event.extendedProps.stadium}`;
             modalClass.textContent = '경기';
