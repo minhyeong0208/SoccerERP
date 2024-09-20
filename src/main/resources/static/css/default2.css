@@ -299,3 +299,7 @@ button:hover {
 ::-webkit-scrollbar-thumb:hover {
     background: #909090; /* 호버 상태 색상 */
 }
+
+.bold {
+	font-weight: 900;
+}
