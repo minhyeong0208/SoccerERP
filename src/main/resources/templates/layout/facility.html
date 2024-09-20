@@ -21,19 +21,22 @@
 			</div>
 
 			<!-- 추가/삭제 버튼을 오른쪽에 배치 -->
-			<div class="d-flex justify-content-end mb-3">
-				<button id="openAddFacilityModalButton" class="btn btn-primary me-2"
-					data-bs-toggle="modal" data-bs-target="#addFacilityModal">
-					<i class="fas fa-plus"></i> 시설 추가
-				</button>
-				<!-- 수정 버튼에서 data-bs-toggle과 data-bs-target 제거 -->
-				<button id="openUpdateFacilityModalButton"
-					class="btn btn-warning me-2">
-					<i class="fas fa-edit"></i> 시설 수정
-				</button>
-				<button id="openDeleteButton" class="btn btn-danger">
-					<i class="fas fa-trash"></i> 선택 삭제
-				</button>
+			<div sec:authorize="hasRole('ADMIN')">
+				<div class="d-flex justify-content-end mb-3">
+					<button id="openAddFacilityModalButton"
+						class="btn btn-primary me-2" data-bs-toggle="modal"
+						data-bs-target="#addFacilityModal">
+						<i class="fas fa-plus"></i> 시설 추가
+					</button>
+					<!-- 수정 버튼에서 data-bs-toggle과 data-bs-target 제거 -->
+					<button id="openUpdateFacilityModalButton"
+						class="btn btn-warning me-2">
+						<i class="fas fa-edit"></i> 시설 수정
+					</button>
+					<button id="openDeleteButton" class="btn btn-danger">
+						<i class="fas fa-trash"></i> 선택 삭제
+					</button>
+				</div>
 			</div>
 
 			<!-- 시설 리스트 테이블 -->
