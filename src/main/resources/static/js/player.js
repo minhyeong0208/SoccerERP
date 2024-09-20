@@ -142,6 +142,7 @@ function showPlayerDetail(player) {
     document.getElementById('detail-nationality').value = player.nationality;
     document.getElementById('detail-personIdx').value = player.personIdx;
 
+    document.getElementById('player-name-backnumber').textContent = player.personIdx + ' ' + player.personName;
     document.getElementById('player-detail-image').setAttribute('src', `/img/persons/${player.personImage}`);
     document.getElementById('player-detail-image').setAttribute('onerror', `this.onerror = null; this.src = '/img/persons/default.png';`);
 
