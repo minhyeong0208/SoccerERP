@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	let deleteId;
 
 	// 페이징 관련 변수
-	let currentPage = 0;
-	let totalPages = 0;
+	let currentPage = 0;	// 현재 페이지 번호 
+	let totalPages = 0;		// 총 페이지 수 
 	let isSearching = false;
 	let searchCurrentPage = 0;
 	let searchTotalPages = 0;
@@ -145,48 +145,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// 시설 추가 기능
 	document.getElementById('addFacilityButton').addEventListener('click', function() {
+	    const form = document.getElementById('facilityAddForm');
+	    
+	    if (!locationSelected) {
+	        const addFacilityModal = bootstrap.Modal.getInstance(document.getElementById('addFacilityModal'));
+	        if (addFacilityModal) {
+	            addFacilityModal.hide();
+	        }
+	        showAlertModal('알림', '시설 위치를 검색하고 선택해야 합니다.');
+	        return;
+	    }
 
-		if (!locationSelected) {
-		    // 먼저 시설 추가 모달을 닫고
-		    const addFacilityModal = bootstrap.Modal.getInstance(document.getElementById('addFacilityModal'));
-		    if (addFacilityModal) {
-		        addFacilityModal.hide();
-		    }
+	    // 폼이 유효한지 검사
+	    if (form.checkValidity()) {
+	        const facilityData = {
+	            facilityName: document.getElementById('facilityName').value,
+	            facilityLocation: document.getElementById('facilityLocation').value,
+	            latitude: selectedLatitude,
+	            longitude: selectedLongitude,
+	            capacity: document.getElementById('facilityCapacity').value,
+	            facilityFound: document.getElementById('facilityFoundDate').value
+	        };
 
-		    // 알림 모달을 화면에 표시
-		    showAlertModal('알림', '시설 위치를 검색하고 선택해야 합니다.');
-		    return;
-		}
+	        fetch('/facilities', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	                [csrfHeader]: csrfToken
+	            },
+	            body: JSON.stringify(facilityData)
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	            showAlertModal('추가 성공', '데이터가 성공적으로 추가되었습니다.');
+	            loadFacilityData(currentPage);
 
-		const facilityData = {
-			facilityName: document.getElementById('facilityName').value,
-			facilityLocation: document.getElementById('facilityLocation').value,
-			latitude: selectedLatitude,
-			longitude: selectedLongitude,
-			capacity: document.getElementById('facilityCapacity').value,
-			facilityFound: document.getElementById('facilityFoundDate').value
-		};
-
-		fetch('/facilities', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				[csrfHeader]: csrfToken
-			},
-			body: JSON.stringify(facilityData)
-		})
-			.then(response => response.json())
-			.then(data => {
-			    showAlertModal('추가 성공', '데이터가 성공적으로 추가되었습니다.');
-			    loadFacilityData(currentPage);
-
-			    const modal = bootstrap.Modal.getInstance(document.getElementById('addFacilityModal'));
-			    modal.hide();
-			})
-			.catch(error => {
-				console.error('시설 추가 중 오류:', error);
-			});
+	            const modal = bootstrap.Modal.getInstance(document.getElementById('addFacilityModal'));
+	            modal.hide();
+	        })
+	        .catch(error => {
+	            console.error('시설 추가 중 오류:', error);
+	        });
+	    } else {
+	        // 폼의 유효성 검사를 트리거
+	        form.reportValidity();
+	    }
 	});
+
 
 	// 수정 기능
 	document.getElementById('editFacilityButton').addEventListener('click', function() {
@@ -368,10 +373,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 	}
 
-	// 페이징 버튼 렌더링 함수
+	// 페이지 버튼 렌더링 함수
 	function renderPaginationButtons(totalPages, currentPage, isSearch) {
 		const pageButtons = $('#pageButtons');
-		pageButtons.empty();
+		pageButtons.empty(); // 기존 버튼 초기화
 
 		for (let i = 0; i < totalPages; i++) {
 			const pageButton = `<li class="page-item ${i === currentPage ? 'active' : ''}">
@@ -380,36 +385,44 @@ document.addEventListener('DOMContentLoaded', function() {
 			pageButtons.append(pageButton);
 		}
 	}
-
-	// 페이지 버튼 클릭 시 처리
+	
 	$(document).on('click', '.page-link', function() {
 		const page = $(this).data('page');
 		const isSearch = $(this).data('search');
+		
 		if (isSearch) {
-			searchCurrentPage = page;
 			const searchTerm = document.getElementById('searchInput').value.trim();
-			loadFacilityData('facilityName', searchTerm, searchCurrentPage);
+			loadFacilityData('facilityName', searchTerm, page); // 검색 처리
 		} else {
-			currentPage = page;
-			loadFacilityData(null, '', currentPage);
+			loadFacilityData(null, '', page); // 일반 페이지 처리
 		}
 	});
 
+	// 초기 데이터 로드 시 1페이지부터 로드
+	$(document).ready(function() {
+		loadFacilityData(null, '', 0);  // 기본 데이터 0페이지 로드
+	});
+	
 	// 이전 페이지로 이동
 	$('#prevGroup').on('click', function() {
-		if (currentPage > 0) {
-			currentPage--;
-			loadFacilityData(currentPage);
-		}
+	    if (currentPage > 0) {
+	        currentPage--;
+	        loadFacilityData(null, '', currentPage);  // searchField와 searchTerm을 올바르게 전달
+	    } else {
+	        console.log('이전 페이지가 없습니다.');
+	    }
 	});
 
 	// 다음 페이지로 이동
 	$('#nextGroup').on('click', function() {
-		if (currentPage < totalPages - 1) {
-			currentPage++;
-			loadFacilityData(currentPage);
-		}
+	    if (currentPage < totalPages - 1) {
+	        currentPage++;
+	        loadFacilityData(null, '', currentPage);  // searchField와 searchTerm을 올바르게 전달
+	    } else {
+	        console.log('다음 페이지가 없습니다.');
+	    }
 	});
+
 
 	// 검색 기능
 	document.getElementById('searchButton').addEventListener('click', function() {

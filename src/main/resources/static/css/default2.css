@@ -217,10 +217,6 @@ button:hover {
 }
 
 /* 모달 */ 
-.modal-backdrop:not(:first-of-type) {
-    display: none; /* 중복된 모달 배경을 제거 */
-}
-
 /* 공통 모달 스타일 */
 .modal-content {
     background-color: #fff; /* 메인 배경색 */
@@ -251,6 +247,18 @@ button:hover {
     border-bottom-left-radius: 8px; /* 둥근 모서리 */
     border-bottom-right-radius: 8px;
 }
+
+/* 모달 뒤에 배경 어둡게 설정 -> z-index */
+.modal-content {
+    position: relative; 
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    position: fixed; 
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 1050; /* 모달 컨텐츠보다 낮은 값이어야 함 */
+} 
 
 .btn-primary {
     background-color: #001c48; /* 포인트 컬러 버튼 */
