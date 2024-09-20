@@ -216,16 +216,13 @@
              style="height: 100%;">
             <!-- Center the image -->
             <div class="d-flex justify-content-center flex-grow-1 align-items-center ">
-                <div class="image-container text-center me-4" style="width: 300px; height: 300px; overflow: hidden; display: inline-block; vertical-align: top;">
+                <div class="image-container text-center me-4"
+                     style="width: 300px; height: 300px; overflow: hidden; display: inline-block; vertical-align: top;">
                     <img id="player-detail-image" style="width: 100%; height: 100%; object-fit: contain;"/>
                 </div>
 
             </div>
 
-            <!-- Position file input at the bottom -->
-            <div class="mb-3 w-100">
-                <input type="file" class="form-control" id="update-personImage">
-            </div>
         </div>
         <div class="grid-item-2-top-right p-4 border rounded shadow-sm bg-light">
             <canvas id="player-ability-chart" style="align-self: center"></canvas>
@@ -321,6 +318,12 @@
                                     <label for="detail-position-df" class="form-check-label">DF</label>
                                 </div>
                             </div>
+                            <div class="row mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <label for="update-personImage" class="form-label me-2 custom-label">사진</label>
+                                    <input type="file" class="form-control custom-input" id="update-personImage">
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -355,32 +358,37 @@
                             </div>
                             <div class="mb-3">
                                 <label for="physical" class="form-label">피지컬</label>
-                                <input type="range" class="form-control" name="physical" id="update-physical" min="1" max="100"
+                                <input type="range" class="form-control" name="physical" id="update-physical" min="1"
+                                       max="100"
                                        value="50" oninput="updateAbilityValue(this.id, this.value)">
                                 <span id="show-update-physical">50</span>
                             </div>
                             <div class="mb-3">
                                 <label for="speed" class="form-label">스피드</label>
-                                <input type="range" class="form-control" name="speed" id="update-speed" min="1" max="100"
+                                <input type="range" class="form-control" name="speed" id="update-speed" min="1"
+                                       max="100"
                                        value="50" oninput="updateAbilityValue(this.id, this.value)">
                                 <span id="show-update-speed">50</span>
                             </div>
 
                             <div class="mb-3">
                                 <label for="dribble" class="form-label">드리블</label>
-                                <input type="range" class="form-control" name="dribble" id="update-dribble" min="1" max="100"
+                                <input type="range" class="form-control" name="dribble" id="update-dribble" min="1"
+                                       max="100"
                                        value="50" oninput="updateAbilityValue(this.id, this.value)">
                                 <span id="show-update-dribble">50</span>
                             </div>
                             <div class="mb-3">
                                 <label for="shoot" class="form-label">슛</label>
-                                <input type="range" class="form-control" name="shoot" id="update-shoot" min="1" max="100"
+                                <input type="range" class="form-control" name="shoot" id="update-shoot" min="1"
+                                       max="100"
                                        value="50" oninput="updateAbilityValue(this.id, this.value)">
                                 <span id="show-update-shoot">50</span>
                             </div>
                             <div class="mb-3">
                                 <label for="defence" class="form-label">수비</label>
-                                <input type="range" class="form-control" name="defence" id="update-defence" min="1" max="100"
+                                <input type="range" class="form-control" name="defence" id="update-defence" min="1"
+                                       max="100"
                                        value="50" oninput="updateAbilityValue(this.id, this.value)">
                                 <span id="show-update-defence">50</span>
                             </div>
