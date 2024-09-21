@@ -47,7 +47,8 @@ function fetchPlayerData(page, url) {
                 //.filter(person => person.typeCode === 'player')
                 .map(
                     (person) => {
-                        return `<tr class="player-row" data-id="${person.personIdx}">
+                        if(document.getElementById('selectAllCheckbox')){
+                            return `<tr class="player-row" data-id="${person.personIdx}">
                                         <td>
                                             <input type="checkbox" class="delete-checkbox" data-id="${person.personIdx}">
                                         </td>
@@ -63,6 +64,21 @@ function fetchPlayerData(page, url) {
                                             ${person.backNumber}
                                         </td>
                                     </tr>`;
+                        } else {
+                            return `<tr class="player-row" data-id="${person.personIdx}">
+                                        <td>
+                                            ${person.personName}
+                                        </td>
+                                        <td>
+                                            <span class="position position--${person.position}">
+                                                ${person.position}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            ${person.backNumber}
+                                        </td>
+                                    </tr>`;
+                        }
                     }
                 );
 
@@ -486,14 +502,16 @@ function deletePerson() {
 }
 
 // 체크박스 전체 클릭
-document.querySelector("#selectAllCheckbox").addEventListener("change", function () {
-    const isChecked = this.checked;
-    const checkboxes = document.querySelectorAll(".delete-checkbox");
+if(document.getElementById('selectAllCheckbox')){
+    document.querySelector("#selectAllCheckbox").addEventListener("change", function () {
+        const isChecked = this.checked;
+        const checkboxes = document.querySelectorAll(".delete-checkbox");
 
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = isChecked;
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
     });
-});
+}
 
 // 페이징 - 이전 페이지
 document.querySelector("#prevGroup").onclick = () => {

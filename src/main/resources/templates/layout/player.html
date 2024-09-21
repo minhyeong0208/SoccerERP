@@ -30,7 +30,9 @@
         <table class="table table-bordered table-hover" id="playerTable">
             <thead class="table table-bordered">
             <tr>
-                <th><input type="checkbox" id="selectAllCheckbox"></th>
+                <div sec:authorize="hasRole('ADMIN')">
+                    <th><input type="checkbox" id="selectAllCheckbox"></th>
+                </div>
                 <th>선수명</th>
                 <th>포지션</th>
                 <th>등번호</th>

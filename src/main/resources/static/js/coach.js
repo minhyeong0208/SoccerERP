@@ -44,7 +44,8 @@ function fetchCoachData(page, url) {
             mappedPeople = totalPeople
                 .map(
                     (person) => {
-                        return `<tr class="person-rows" data-id="${person.personIdx}">
+                        if(document.getElementById('selectAllCheckbox')){
+                            return `<tr class="person-rows" data-id="${person.personIdx}">
                                         <td>
                                             <input type="checkbox" class="delete-checkbox" data-id="${person.personIdx}">
                                         </td>
@@ -57,6 +58,19 @@ function fetchCoachData(page, url) {
                                             </span>
                                         </td>
                                     </tr>`;
+                        } else {
+                            return `<tr class="person-rows" data-id="${person.personIdx}">                                      
+                                        <td>
+                                            ${person.personName}
+                                        </td>
+                                        <td>
+                                            <span class="position position--${person.position}">
+                                                ${person.position}
+                                            </span>
+                                        </td>
+                                    </tr>`;
+                        }
+
                     }
                 );
             tableBody.innerHTML = mappedPeople.join('');
@@ -341,14 +355,16 @@ function deletePerson() {
 }
 
 // 체크박스 전체 클릭
-document.querySelector("#selectAllCheckbox").addEventListener("change", function () {
-    const isChecked = this.checked;
-    const checkboxes = document.querySelectorAll(".delete-checkbox");
+if(document.getElementById('selectAllCheckbox')){
+    document.querySelector("#selectAllCheckbox").addEventListener("change", function () {
+        const isChecked = this.checked;
+        const checkboxes = document.querySelectorAll(".delete-checkbox");
 
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = isChecked;
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
     });
-});
+}
 
 // 페이지 로드
 document.addEventListener('DOMContentLoaded', function () {
