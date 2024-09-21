@@ -137,34 +137,6 @@ $(document).ready(function() {
         });
     }
 
-    // 페이지 버튼을 렌더링하는 함수
-    function renderPaginationButtons() {
-        let pageButtons = $('#pageButtons');
-        pageButtons.empty();  // 기존 페이지 버튼 초기화
-
-        // 이전 버튼 활성화/비활성화
-        if (currentPage > 0) {
-            $('#prevGroup').prop('disabled', false);
-        } else {
-            $('#prevGroup').prop('disabled', true);
-        }
-
-        // 다음 버튼 활성화/비활성화
-        if (currentPage < totalPages - 1) {
-            $('#nextGroup').prop('disabled', false);
-        } else {
-            $('#nextGroup').prop('disabled', true);
-        }
-
-        // 페이지 번호 버튼 렌더링
-        for (let i = 0; i < totalPages; i++) {
-            const pageButton = `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                                    <button class="page-link" data-page="${i}">${i + 1}</button>
-                                </li>`;
-            pageButtons.append(pageButton);
-        }
-    }
-
     // 부상 정보 수정
     $('#updateInjuryButton').on('click', function() {
         let injuryIdx = $('#injuryId').val();
@@ -272,10 +244,67 @@ $(document).ready(function() {
     });
 
     // 페이지 이동 버튼 클릭 시 이벤트 처리
-    $(document).on('click', '.page-link', function() {
-        currentPage = $(this).data('page');
-        loadInjuryData(currentPage);
-    });
+	$(document).on('click', '.page-link', function() {
+	    const thisId = $(this).attr('id');
+	    if (thisId === 'prevGroup') {
+	        if (currentPage > 0) {
+	            currentPage--;
+	        }
+	    } else if (thisId === 'nextGroup') {
+	        if (currentPage < totalPages - 1) {
+	            currentPage++;
+	        }
+	    } else {
+	        currentPage = $(this).data('page');
+	    }
+	    loadInjuryData(currentPage);
+	});
+
+	function renderPaginationButtons() {
+	    let pageButtons = $('#pageButtons');
+	    pageButtons.empty();
+
+	    // 이전 버튼 생성
+	    pageButtons.append(`
+	        <li class="page-item ${currentPage === 0 ? 'disabled' : ''}" id="prevGroupItem">
+	            <button class="page-link" id="prevGroup" ${currentPage === 0 ? 'disabled' : ''}>이전</button>
+	        </li>
+	    `);
+
+	    let startPage = Math.max(0, currentPage - 2);
+	    let endPage = Math.min(totalPages - 1, startPage + 4);
+
+	    if (startPage > 0) {
+	        pageButtons.append(`<li class="page-item"><button class="page-link" data-page="0">1</button></li>`);
+	        if (startPage > 1) {
+	            pageButtons.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
+	        }
+	    }
+
+	    for (let i = startPage; i <= endPage; i++) {
+	        pageButtons.append(`
+	            <li class="page-item ${i === currentPage ? 'active' : ''}">
+	                <button class="page-link" data-page="${i}">${i + 1}</button>
+	            </li>
+	        `);
+	    }
+
+	    if (endPage < totalPages - 1) {
+	        if (endPage < totalPages - 2) {
+	            pageButtons.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
+	        }
+	        pageButtons.append(`<li class="page-item"><button class="page-link" data-page="${totalPages - 1}">${totalPages}</button></li>`);
+	    }
+
+	    // 다음 버튼 생성
+	    pageButtons.append(`
+	        <li class="page-item ${currentPage >= totalPages - 1 ? 'disabled' : ''}" id="nextGroupItem">
+	            <button class="page-link" id="nextGroup" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>다음</button>
+	        </li>
+	    `);
+	}
+
+
 
     // 테이블 행 클릭 시, 해당 선수 정보와 부상 정보를 표시 및 이미지 로드
     $('#injuryTableBody').on('click', 'tr', function() {

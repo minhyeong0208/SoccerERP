@@ -375,54 +375,69 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// 페이지 버튼 렌더링 함수
 	function renderPaginationButtons(totalPages, currentPage, isSearch) {
-		const pageButtons = $('#pageButtons');
-		pageButtons.empty(); // 기존 버튼 초기화
+	    const pageButtons = $('#pageButtons');
+	    pageButtons.empty(); // 기존 버튼 초기화
 
-		for (let i = 0; i < totalPages; i++) {
-			const pageButton = `<li class="page-item ${i === currentPage ? 'active' : ''}">
-								   <button class="page-link" data-page="${i}" data-search="${isSearch}">${i + 1}</button>
-							   </li>`;
-			pageButtons.append(pageButton);
-		}
+	    // 이전 버튼 생성
+	    pageButtons.append(`
+	        <li class="page-item ${currentPage === 0 ? 'disabled' : ''}">
+	            <button class="page-link" id="prevGroup" data-search="${isSearch}">이전</button>
+	        </li>
+	    `);
+
+	    // 페이지 번호 버튼 생성
+	    for (let i = 0; i < totalPages; i++) {
+	        const pageButton = `
+	            <li class="page-item ${i === currentPage ? 'active' : ''}">
+	                <button class="page-link" data-page="${i}" data-search="${isSearch}">${i + 1}</button>
+	            </li>`;
+	        pageButtons.append(pageButton);
+	    }
+
+	    // 다음 버튼 생성
+	    pageButtons.append(`
+	        <li class="page-item ${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+	            <button class="page-link" id="nextGroup" data-search="${isSearch}">다음</button>
+	        </li>
+	    `);
 	}
-	
+
 	$(document).on('click', '.page-link', function() {
-		const page = $(this).data('page');
-		const isSearch = $(this).data('search');
-		
-		if (isSearch) {
-			const searchTerm = document.getElementById('searchInput').value.trim();
-			loadFacilityData('facilityName', searchTerm, page); // 검색 처리
-		} else {
-			loadFacilityData(null, '', page); // 일반 페이지 처리
-		}
+	    const page = $(this).data('page');
+	    const isSearch = $(this).data('search');
+	    const buttonId = $(this).attr('id');
+
+	    if (buttonId === 'prevGroup') {
+	        // 이전 버튼 클릭 처리
+	        if (currentPage > 0) {
+	            currentPage--;
+	        } else {
+	            return; // 더 이상 이전 페이지가 없으므로 함수 종료
+	        }
+	    } else if (buttonId === 'nextGroup') {
+	        // 다음 버튼 클릭 처리
+	        if (currentPage < totalPages - 1) {
+	            currentPage++;
+	        } else {
+	            return; // 더 이상 다음 페이지가 없으므로 함수 종료
+	        }
+	    } else if (page !== undefined) {
+	        // 페이지 번호 버튼 클릭 처리
+	        currentPage = page;
+	    }
+
+	    if (isSearch) {
+	        const searchTerm = $('#searchInput').val().trim();
+	        loadFacilityData('facilityName', searchTerm, currentPage); // 검색 처리
+	    } else {
+	        loadFacilityData(null, '', currentPage); // 일반 페이지 처리
+	    }
 	});
 
 	// 초기 데이터 로드 시 1페이지부터 로드
 	$(document).ready(function() {
 		loadFacilityData(null, '', 0);  // 기본 데이터 0페이지 로드
 	});
-	
-	// 이전 페이지로 이동
-	$('#prevGroup').on('click', function() {
-	    if (currentPage > 0) {
-	        currentPage--;
-	        loadFacilityData(null, '', currentPage);  // searchField와 searchTerm을 올바르게 전달
-	    } else {
-	        console.log('이전 페이지가 없습니다.');
-	    }
-	});
-
-	// 다음 페이지로 이동
-	$('#nextGroup').on('click', function() {
-	    if (currentPage < totalPages - 1) {
-	        currentPage++;
-	        loadFacilityData(null, '', currentPage);  // searchField와 searchTerm을 올바르게 전달
-	    } else {
-	        console.log('다음 페이지가 없습니다.');
-	    }
-	});
-
 
 	// 검색 기능
 	document.getElementById('searchButton').addEventListener('click', function() {
