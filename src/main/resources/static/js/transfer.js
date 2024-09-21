@@ -2,11 +2,41 @@ $(document).ready(function() {
     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
+    /**
+     * user 권한일 때 read만 가능하도록
+     */
+    const isUserPath = window.location.pathname.includes('/user/');
+    if (isUserPath) {
+        // 추가 버튼 숨기기
+        $('#openAddTransferModalButton').hide();
+        // 삭제 버튼 숨기기
+        $('#deleteSelectedBtn').hide();
+        // 수정 버튼 숨기기
+        $('#updateTransferButton').hide();
+
+        // 체크박스 비활성화
+        $('input[name="rowCheckbox"]').prop('disabled', true);
+        $('#selectAllCheckbox').prop('disabled', true);
+
+        // 테이블의 모든 입력 필드를 읽기 전용으로 설정
+        $('.transfer-form-container input, .transfer-form-container select, .transfer-form-container textarea').prop('readonly', true);
+        $('.transfer-form-container select').prop('disabled', true);
+
+        // AJAX 요청 인터셉터 추가
+        $(document).ajaxSend(function(e, xhr, options) {
+            if (options.type !== "GET") {
+                xhr.abort();  // GET 요청이 아닌 경우 요청 중단
+            }
+        });
+    }
+
     let transferData = [];
     let currentPage = 0;
     let transferType = '전체'; // string | enum['구매', '판매']
     const pageSize = 10;
     let totalPages = 0;
+
+
 
     // 숫자에 콤마 추가하는 함수
     function addCommas(num) {
