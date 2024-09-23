@@ -9,7 +9,7 @@ $(document).ready(function() {
     function fetchTeamInfo() {
         // 서버에서 강원FC의 정보를 가져옵니다.
         $.ajax({
-            url: '/teams/GAW',  // 실제 API 엔드포인트로 변경해야 합니다.
+            url: '/teams/GFC',  // 실제 API 엔드포인트로 변경해야 합니다.
             method: 'GET',
             headers: {
                 [csrfHeader]: csrfToken  // CSRF 토큰을 헤더에 추가

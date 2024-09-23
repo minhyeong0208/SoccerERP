@@ -40,6 +40,10 @@ public class TransferService {
     @Transactional
     public void addPurchaseTransfer(Transfer transfer) {
         if (transfer.getTransferMemo() == null || "".equals(transfer.getTransferMemo())) { transfer.setTransferMemo(TRANSFER_MEMO_DEF_BUY); }
+        // 선수 이름 저장
+        if (transfer.getPerson() != null) {
+            transfer.setPlayerName(transfer.getPerson().getPersonName()); // 구매 시 playerName 설정
+        }
         Transfer savedTransfer = transferRepository.save(transfer);
 
         Finance expense = Finance.builder()
@@ -60,13 +64,21 @@ public class TransferService {
         if (transfer.getTransferMemo() == null || "".equals(transfer.getTransferMemo())) { transfer.setTransferMemo(TRANSFER_MEMO_DEF_SELL); }
         Person tempPerson = transfer.getPerson();
 
+     	// 판매할 선수의 이름을 따로 저장
+        String personName = tempPerson.getPersonName();
+        
         // 기존 구매 건에 대해서도 이름 저장
         Transfer purchaseTransfer = transferRepository.findWithPersonId(tempPerson.getPersonIdx());
-        purchaseTransfer.setPersonName(tempPerson.getPersonName());
-        this.updateTransfer(purchaseTransfer);
 
-        // 추가할 판매 건 이름 저장
-        transfer.setPersonName(tempPerson.getPersonName());
+        if (purchaseTransfer != null) {
+            purchaseTransfer.getPerson().setPersonName(tempPerson.getPersonName());  // Person의 이름 설정
+            this.updateTransfer(purchaseTransfer);  // 기존 Transfer 업데이트
+        }
+        
+        // 추가할 판매 건의 Person 정보 설정
+        transfer.setPerson(tempPerson);  // Person을 Transfer에 설정
+        transfer.setPlayerName(personName);  // 삭제 전 선수 이름 저장
+        
         Transfer savedTransfer = transferRepository.save(transfer);
 
         personRepository.deleteById(transfer.getPersonIdx());

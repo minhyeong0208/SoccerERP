@@ -48,10 +48,11 @@ public class Person {
     private String typeCode;
     private String personImage;
 
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    // 능력치 관계 수정: OneToMany로 변경 (하나의 Person이 여러 개의 Ability를 가질 수 있음)
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
-    @ToString.Exclude  // 순환 참조 방지를 위해 제외
-    private Ability ability;
+    @ToString.Exclude
+    private List<Ability> abilities;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference

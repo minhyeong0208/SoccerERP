@@ -1,6 +1,7 @@
 package acorn.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,22 +41,19 @@ public class AbilityController {
         return ResponseEntity.ok().body(ability);
     }
 
-    // 새로운 능력치 추가
-    @PostMapping
-    public Ability createAbility(@RequestBody Ability ability) {
-        return abilityService.addAbility(ability);
+    // 특정 선수의 예측 및 실제 능력치 조회
+    @GetMapping("/person/{personIdx}/abilities")
+    public ResponseEntity<Map<String, Ability>> getAbilities(@PathVariable int personIdx) {
+        Map<String, Ability> abilities = abilityService.getActualAndPrediction(personIdx);
+        return ResponseEntity.ok().body(abilities);
     }
 
-    // 능력치 업데이트
-    @PutMapping("/{id}")
-    public ResponseEntity<Ability> updateAbility(@PathVariable(value = "id") int abilityIdx,
-                                                 @RequestBody Ability abilityDetails) {
-        Ability updatedAbility = abilityService.updateAbility(abilityIdx, abilityDetails);
-        if (updatedAbility == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(updatedAbility);
+    // 새로운 실제 능력치 추가 (기존 데이터 업데이트가 아니라 새로운 데이터로 추가)
+    @PostMapping("/actual/{personIdx}") 
+    public Ability createActualAbility(@RequestBody Ability ability, @PathVariable("personIdx") int personIdx) { 
+        return abilityService.addAbility(ability, personIdx); 
     }
+
 
     // 능력치 삭제
     @DeleteMapping("/{id}")

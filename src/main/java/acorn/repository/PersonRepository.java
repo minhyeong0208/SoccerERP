@@ -16,12 +16,12 @@ import acorn.entity.Person;
 public interface PersonRepository extends JpaRepository<Person, Integer> {
 
     // 페이징 처리를 위한 메서드, ability와 함께 가져오기
-    @Query(value = "SELECT p FROM Person p LEFT JOIN FETCH p.ability",
+    @Query(value = "SELECT p FROM Person p LEFT JOIN FETCH p.abilities",
            countQuery = "SELECT count(p) FROM Person p")
     Page<Person> findAllWithAbility(Pageable pageable);
 
     // 모든 사람 조회 (능력치 포함, 페이징 없이)
-    @Query("SELECT p FROM Person p LEFT JOIN FETCH p.ability")
+    @Query("SELECT p FROM Person p LEFT JOIN FETCH p.abilities")
     List<Person> findAllWithAbility();
 
     // 역할 구분에 따른 조회 (선수/코치) - 페이징 처리
@@ -57,4 +57,6 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
 
     @Query("SELECT p FROM Person p WHERE p.teamIdx = :teamIdx")
     List<Person> findAllWithTeamIdx(@Param("teamIdx") String teamIdx);
+    
+
 }

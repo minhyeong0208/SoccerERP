@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import acorn.entity.Transfer;
+import acorn.dto.TransferDto;
 import acorn.entity.Ability;
 import acorn.entity.Person;
 import acorn.service.TransferService;
@@ -60,29 +61,49 @@ public class TransferController {
 
     // 선수 구매
     @PostMapping("/buy")
-    public ResponseEntity<?> buy(@RequestBody Transfer transfer) {
-        transfer.setTransferType(TRANSFER_TYPE_BUY);
+    public ResponseEntity<?> buy(@RequestBody TransferDto  transferDTO) {
+    	transferDTO.setTransferType(TRANSFER_TYPE_BUY);
 
-        Person tempPerson = transfer.getPerson();
-        tempPerson.setPersonName(transfer.getPersonName());
+    	// DTO에서 personName 가져옴
+        Person tempPerson = new Person();
+        tempPerson.setPersonName(transferDTO.getPersonName());
         tempPerson.setTeamIdx(teamIdx);
         tempPerson.setTypeCode("player");
+        tempPerson.setBirth(transferDTO.getPerson().getBirth());
+        tempPerson.setNationality(transferDTO.getPerson().getNationality());
+        tempPerson.setBackNumber(transferDTO.getPerson().getBackNumber());
+        tempPerson.setPosition(transferDTO.getPerson().getPosition());
+        tempPerson.setContractStart(transferDTO.getPerson().getContractStart());
+        tempPerson.setContractEnd(transferDTO.getPerson().getContractEnd());
+        tempPerson.setPersonImage(transferDTO.getPerson().getPersonImage());
+        tempPerson.setWeight(transferDTO.getPerson().getWeight());
+        tempPerson.setHeight(transferDTO.getPerson().getHeight());
 
         Person person = personService.addPerson(tempPerson);
+        
+     // Transfer 객체 생성
+        Transfer transfer = new Transfer();
+        transfer.setPerson(person);  // 저장된 Person 객체를 설정
+        transfer.setTradingDate(transferDTO.getTradingDate());
+        transfer.setPrice(transferDTO.getPrice());
+        transfer.setOpponent(transferDTO.getOpponent());
+        transfer.setTransferMemo(transferDTO.getTransferMemo());
+        transfer.setTransferType(TRANSFER_TYPE_BUY);
+        
 
      // 능력치 초기화
         Ability ability = Ability.builder()
             .person(person)
-            .pass(0)
-            .physical(0)
-            .shoot(0)
-            .speed(0)
-            .dribble(0)
-            .defence(0)
+            .pass(50)
+            .physical(50)
+            .shoot(50)
+            .speed(50)
+            .dribble(50)
+            .defence(50)
             .build();
 
         // Ability 저장
-        abilityService.addAbility(ability);
+        abilityService.addAbility(ability, person.getPersonIdx());
         
         transfer.setPerson(person);
 

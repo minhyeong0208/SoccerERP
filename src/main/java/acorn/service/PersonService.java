@@ -88,20 +88,10 @@ public class PersonService {
                 .orElse("/img/default-person.png");
     }
 
-    // 새로운 사람 추가
-    /*public Person addPerson(Person person) {
-        // 양방향 관계 설정
-        if (person.getAbility() != null) {
-            person.getAbility().setPerson(person);
-        }
-        return personRepository.save(person);
-        
-    }*/
-
     public Person addPerson(Person person) {
     	// 양방향 관계 설정
-        if (person.getAbility() != null) {
-            person.getAbility().setPerson(person);
+        if (person.getAbilities() != null) {
+        	person.getAbilities().forEach(ability -> ability.setPerson(person));
         }
 
         Person savedPerson = personRepository.save(person);  // person 테이블 저장
@@ -184,8 +174,9 @@ public class PersonService {
                 person.setPersonImage(personDetails.getPersonImage());
             }
             // 능력치 업데이트 (null 체크)
-            if (personDetails.getAbility() != null) {
-                person.setAbility(personDetails.getAbility());
+            if (personDetails.getAbilities() != null) {
+            	person.setAbilities(personDetails.getAbilities());
+                person.getAbilities().forEach(ability -> ability.setPerson(person));
             }
 
             return personRepository.save(person);

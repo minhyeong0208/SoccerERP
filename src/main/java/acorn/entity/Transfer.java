@@ -28,9 +28,15 @@ public class Transfer {
     private String opponent;
     private String transferMemo;
     private int price;
-    private String personName;
 
     @Transient
     private int personIdx;
+    
+    // 새로 추가된 필드: 선수 이름 저장
+    private String playerName;
 
+    // person의 personName을 가져오는 메소드 추가
+    public String getPersonName() {
+        return this.person != null ? this.person.getPersonName() : null;
+    }
 }
