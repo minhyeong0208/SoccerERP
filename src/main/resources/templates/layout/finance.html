@@ -68,9 +68,9 @@
 </div>
 
 	<!-- 테이블 헤더는 HTML에서만 정의 -->
-	<table class="table table-bordered table-hover" id="financeTable">
-		<thead class="table table-bordered">
-			<tr>
+	<table class="table table-hover" id="financeTable">
+		<thead class="table">
+			<tr style="background-color: #f0f0f0">
 				<th><input type="checkbox" id="selectAllCheckbox"></th>
 				<th>수입/지출</th>
 				<th>거래 날짜</th>
@@ -97,7 +97,7 @@
 	
 	<!-- 모달 구조 -->
 	<div id="financeModal" class="modal fade" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog  modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 id="modalTitle" class="modal-title">수입 항목 추가</h5>

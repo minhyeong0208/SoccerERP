@@ -22,14 +22,16 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.transferType = :transferType ORDER BY t.tradingDate DESC")
     Page<Transfer> findAllWithPersonFilterTransferType(@Param("transferType") int transferType, Pageable pageable);
 
-    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE p.personName LIKE %:name% order by t.tradingDate desc")
-    Page<Transfer> findByPersonNameContaining(@Param("name") String name, Pageable pageable);
+    // 선수명 검색을 playerName으로 변경
+    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.playerName LIKE %:name% ORDER BY t.tradingDate DESC")
+    Page<Transfer> findByPlayerNameContaining(@Param("name") String name, Pageable pageable);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.opponent LIKE %:name% order by t.tradingDate desc")
     Page<Transfer> findByTeamNameContaining(@Param("name") String name, Pageable pageable);
 
-    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.transferType = :transferType AND p.personName LIKE %:name% order by t.tradingDate desc")
-    Page<Transfer> findByPersonNameContainingFilterTransferType(@Param("name") String name, @Param("transferType") int transferType, Pageable pageable);
+    // 선수명 검색을 playerName으로 변경 + 이적 타입 필터 적용
+    @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.transferType = :transferType AND t.playerName LIKE %:name% ORDER BY t.tradingDate DESC")
+    Page<Transfer> findByPlayerNameContainingFilterTransferType(@Param("name") String name, @Param("transferType") int transferType, Pageable pageable);
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person p WHERE t.transferType = :transferType AND t.opponent LIKE %:name% order by t.tradingDate desc")
     Page<Transfer> findByTeamNameContainingFilterTransferType(@Param("name") String name, @Param("transferType") int transferType, Pageable pageable);
@@ -42,4 +44,5 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
     @Query("SELECT t FROM Transfer t LEFT JOIN FETCH t.person WHERE t.transferIdx = :id")
     Transfer findByIdWithPerson(@Param("id") int id);
+    
 }

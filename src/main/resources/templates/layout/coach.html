@@ -43,9 +43,9 @@
 
     </div>
     <div id="person-table-widget">
-        <table class="table table-bordered table-hover" id="playerTable">
-            <thead class="table table-bordered">
-            <tr>
+        <table class="table table-hover" id="playerTable">
+            <thead class="table">
+            <tr style="background-color: #f0f0f0">
                 <div sec:authorize="hasRole('ADMIN')">
                     <th><input type="checkbox" id="selectAllCheckbox"></th>
                 </div>
@@ -86,7 +86,7 @@
 
     <!-- 모달 구조 -->
     <div id="coach-modal" class="modal fade" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog  modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 id="modalTitle" class="modal-title">코치 추가</h5>

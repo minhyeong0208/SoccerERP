@@ -66,25 +66,35 @@
                 <!-- 수정 버튼은 button 타입으로 설정 -->
                 <button id="edit-button" class="btn btn-secondary" type="button">수정</button>
             </div>
-
+            
+			<th:block th:replace="fragments/modal :: modalFragment"></th:block>
+			
             <!-- 비밀번호 확인 모달 -->
-            <div id="passwordModal" class="modal fade" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="passwordModalLabel">비밀번호 확인</h5>
-                            <button type="button" class="btn-close" id="modal-close" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>비밀번호를 입력하세요:</p>
-                            <input type="password" id="confirmPassword" class="form-control">
-                        </div>
-                        <div class="modal-footer">
-                            <button id="confirmPasswordButton" class="btn btn-primary" type="button">확인</button>
-                        </div>
-                    </div>
-                </div>
+<div id="passwordModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="padding: 0;">
+        <div class="modal-content" style="border-radius: 0; padding: 0;">
+            <div class="modal-header" style="padding: 10px 15px;">
+                <h5 id="passwordModalLabel" class="modal-title">비밀번호 확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body" style="padding: 10px 15px;">
+                <form id="confirm-password-form">
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">비밀번호를 입력하세요:</label>
+                        <input type="password" id="confirmPassword" class="form-control" required>
+                    </div>
+                    <!-- 비밀번호 틀림 오류 메시지 표시 -->
+                    <div id="error-message" style="color: red; display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer" style="padding: 10px 15px;">
+                <button id="confirmPasswordButton" class="btn btn-primary">확인</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
         </div>
     </th:block>
 
@@ -96,6 +106,7 @@
         <script th:inline="javascript">
             var loggedInCoachId = /*[[${session.loggedInId}]]*/ 'default_id';
         </script>
+        <script src="/js/modal.js"></script>
         <script src="/js/personal.js"></script>
     </th:block>
 </body>

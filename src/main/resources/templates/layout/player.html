@@ -27,9 +27,9 @@
 
     </div>
     <div id="person-table-widget">
-        <table class="table table-bordered table-hover" id="playerTable">
-            <thead class="table table-bordered">
-            <tr>
+        <table class="table table-hover" id="playerTable">
+            <thead class="table">
+            <tr style="background-color: #f0f0f0">
                 <div sec:authorize="hasRole('ADMIN')">
                     <th><input type="checkbox" id="selectAllCheckbox"></th>
                 </div>
@@ -74,7 +74,7 @@
 
     <!-- 모달 구조 -->
     <div id="player-modal" class="modal fade" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog  modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 id="modalTitle" class="modal-title">선수 추가</h5>
@@ -256,7 +256,7 @@
                                     <div class="d-flex align-items-center mb-2">
                                         <label for="detail-teamIdx" class="form-label me-2 custom-label">팀명</label>
                                         <input type="text" class="form-control custom-input" name="teamIdx"
-                                               id="detail-teamIdx" value="GWO" required>
+                                               id="detail-teamIdx" value="GFC" required>
                                     </div>
                                 </div>
                                 <div class="col">

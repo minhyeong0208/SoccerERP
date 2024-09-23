@@ -145,7 +145,7 @@ public class TransferService {
             else return transferRepository.findByTeamNameContainingFilterTransferType(name, transferType, pageable); // 조건, 팀 검색
         }
 
-        if ( -1 == transferType ) return transferRepository.findByPersonNameContaining(name, pageable); // 전체, 선수 검색
-        return transferRepository.findByPersonNameContainingFilterTransferType(name, transferType, pageable); // 조건, 선수 검색
+        if ( -1 == transferType ) return transferRepository.findByPlayerNameContaining(name, pageable); // 전체, 선수 검색
+        return transferRepository.findByPlayerNameContainingFilterTransferType(name, transferType, pageable); // 조건, 선수 검색
     }
 }

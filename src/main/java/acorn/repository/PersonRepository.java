@@ -30,10 +30,11 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
 
     // 이름 또는 포지션으로 검색
     @Query("SELECT p FROM Person p WHERE (:personName IS NULL OR p.personName LIKE %:personName%) "
-    	     + "AND (:position IS NULL OR p.position = :position)")
-    	Page<Person> searchByPersonNameOrPosition(@Param("personName") String personName, 
-    	                                          @Param("position") String position, 
-    	                                          Pageable pageable);  // 페이징 지원
+    	     + "AND (:position IS NULL OR p.position LIKE %:position%)")
+    Page<Person> searchByPersonNameOrPosition(@Param("personName") String personName, 
+                                              @Param("position") String position, 
+                                              Pageable pageable);
+
 
     // personIdx로 personImage를 직접 조회하는 메서드
     @Query("SELECT p.personImage FROM Person p WHERE p.backNumber = :backNumber AND p.personName = :personName")

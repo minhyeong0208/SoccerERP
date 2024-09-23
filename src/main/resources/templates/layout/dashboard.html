@@ -91,7 +91,8 @@
 
         .rank-table-widget table {
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: auto; /* 여기서 fixed를 auto로 변경 */
+        	width: 100%; /* 테이블이 부모 요소에 맞게 */
             height: 99vh;
         }
 
@@ -106,6 +107,7 @@
             width: fit-content;
             white-space: nowrap;
             background-color: #F4F5FC;
+            text-align: center; /* 내용이 중앙에 오도록 */
         }
 
         .rank-table-widget td {
@@ -113,6 +115,7 @@
             vertical-align: middle;
             white-space: nowrap;
             border-bottom: 2px solid #EDEEF1;
+            text-align: center; /* 내용이 중앙에 오도록 */
         }
 
         .font-bold {

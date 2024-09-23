@@ -8,7 +8,7 @@
     <div th:fragment="header" class="header">
         <div class="menu__wrapper">
             <!-- Flexbox를 사용해 한 줄로 정렬 -->
-            <a href="#" title="Logo" class="logo"> SOCCER ERP </a>
+            <a href="#" title="Logo" class="logo"> FootMAN </a>
             <ul class="navigation">
                 <li th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}">
                     <a th:href="@{/user/personal}" title="마이페이지"> 마이페이지 </a>
