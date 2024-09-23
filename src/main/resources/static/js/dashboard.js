@@ -23,7 +23,7 @@ function getPlayerCount() {
         .then(data => {
             playerCount = data.totalElements;
             //console.log(playerCount);
-            document.getElementById('player-count').textContent = `${playerCount}명~`;
+            document.getElementById('player-count').textContent = `${playerCount}명`;
         })
 }
 
@@ -33,7 +33,7 @@ function getInjured() {
         .then(response => response.json())
         .then(data => {
             //console.log(`getInjured : ${data.totalElements}`);
-            document.getElementById('injury-count').textContent = `${data.totalElements}명~`;
+            document.getElementById('injury-count').textContent = `${data.totalElements}명`;
         })
 }
 
@@ -283,28 +283,35 @@ function getTodaySchedule() {
 
             //document.getElementById('today-schedule-overview').textContent = `경기 : ${data.games.length}, 훈련 : ${data.trainings.length}, 부상 : ${data.injuries.length}`;
 
+            // 부상
             if (!data.injuries || data.injuries.length !== 0) {
                 //console.log(`today's injuries : ${data.injuries.length}`);
-                let injuriesText = '부상자 : ';
+                let todayInjuries = '';
                 data.injuries.map((injury) => {
-                    injuriesText += `${injury.injuryIdx}  `;
+                    todayInjuries += `<div class="ec-schedule">번호 : ${injury.injuryIdx},&nbsp;&nbsp;&nbsp;부위 : ${injury.injuryPart}</div>`;
                 })
-                document.getElementById('today-schedule-injuries').textContent = injuriesText;
+                document.getElementById('today-schedule-injuries').innerHTML = todayInjuries;
             } else {
                 document.getElementById('today-schedule-injuries').innerHTML = `<span class="no-schedule">오늘 부상자는 존재하지 않습니다.</span>`;
             }
+
+            // 경기
             if (!data.games || data.games.length !== 0) {
                 //console.log(`today's games : ${data.games.length}`);
-                document.getElementById('today-schedule-games').textContent = `경기 : ${data.games[0].opponent}랑 경기`;
+                const isHome = data.games[0].isHome === 1 ? '홈' : '원정';
+                //document.getElementById('today-schedule-games').textContent = `경기 : ${data.games[0].opponent}랑 경기`;
+                document.getElementById('today-schedule-games').innerHTML = `${isHome},&nbsp;&nbsp; 상대 : ${data.games[0].opponent}`;
             } else {
                 document.getElementById('today-schedule-games').innerHTML = `<span class="no-schedule">오늘 경기는 존재하지 않습니다.</span>`;
             }
+
+            // 훈련
             if (!data.trainings || data.trainings.length !== 0) {
                 //console.log(`today's trainings : ${data.trainings}`);
                 let trainingsText = '';
                 data.trainings.map((training) => {
                     const trainDate = new Date(training.startTime);
-                    trainingsText += `<div class="ec-schedule">${trainDate.getHours()} - ${training.trainName}</div>`;
+                    trainingsText += `<div class="ec-schedule">${trainDate.getHours()}시&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;${training.trainName}</div>`;
                 })
                 document.getElementById('today-schedule-trainings').innerHTML = trainingsText;
             } else {
