@@ -46,7 +46,7 @@
 
 .fc-event {
     cursor: pointer;
-    padding: 5px 8px;
+    padding: 0.25rem;
     margin-bottom: 5px;
     border-radius: 4px;
     font-weight: 500;
@@ -98,3 +98,22 @@
     outline: none !important; /* 포커스 및 호버 시에도 외곽선 제거 유지 */
 }
 
+.fc-event-title {
+    color: black;
+}
+
+.fc-daygrid-event-dot {
+    display: none;
+}
+
+.fc-toolbar-title {
+    font-weight: bold;
+}
+
+a {
+    text-decoration: none;
+}
+
+#modal-title {
+    font-weight: bold;
+}

@@ -68,11 +68,14 @@ document.addEventListener('DOMContentLoaded', function () {
             eventClick: function (info) {
                 handleEventClick(info);
             },
-            customButtons: {
-                today: {
-                  text: '오늘',
-                },
+            buttonText: {
+                today: '오늘',
             },
+            // customButtons: {
+            //     today: {
+            //       text: '오늘',
+            //     },
+            // },
             headerToolbar: {
                 right: 'prev,next today',
                 center: 'title',
